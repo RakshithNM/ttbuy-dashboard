@@ -111,6 +111,10 @@ const lastUpdated = computed(() => {
 
   <p v-else-if="loadError" class="error">Couldn't load rate data: {{ loadError }}</p>
   <p v-else class="loading">Loading rates…</p>
+
+  <footer class="site-footer">
+    Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a>
+  </footer>
 </template>
 
 <style scoped lang="scss">
@@ -198,5 +202,24 @@ const lastUpdated = computed(() => {
 
 .error {
   color: var(--status-critical);
+}
+
+.site-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+
+  a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
 }
 </style>
