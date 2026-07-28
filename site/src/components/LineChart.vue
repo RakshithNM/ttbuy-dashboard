@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { BankSeries } from "../types";
+import { shortName } from "../bankPalette";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -9,7 +10,7 @@ const props = defineProps<{
 const emit = defineEmits<{ (e: "toggle", bank: string): void }>();
 
 const svgRef = ref<SVGSVGElement | null>(null);
-const showTable = ref(false);
+const showTable = ref(true);
 
 const W = 960;
 const H = 380;
@@ -309,7 +310,15 @@ const tableRows = computed(() =>
         <thead>
           <tr>
             <th scope="col">Date</th>
-            <th v-for="s in visibleSeries" :key="s.name" scope="col" class="num">{{ s.name }}</th>
+            <th v-for="s in visibleSeries" :key="s.name" scope="col" class="num">
+              <span
+                class="key"
+                :class="{ wrapped: s.wrapped }"
+                :style="{ background: s.wrapped ? undefined : `var(${s.color})`, borderColor: `var(${s.color})` }"
+                aria-hidden="true"
+              ></span>
+              {{ shortName(s.name) }}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -506,6 +515,21 @@ const tableRows = computed(() =>
   .num {
     text-align: right;
     font-variant-numeric: tabular-nums;
+  }
+
+  thead .key {
+    display: inline-block;
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+
+    &.wrapped {
+      height: 0;
+      border-top: 3px dashed;
+      border-radius: 0;
+    }
   }
 }
 </style>

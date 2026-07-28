@@ -49,6 +49,29 @@ export function slotForBank(bank: string): string {
   return CATEGORICAL_SLOTS[index % CATEGORICAL_SLOTS.length];
 }
 
+// Short display names for banks whose full name is unwieldy in tight spaces
+// (table headers, dense legends). Falls back to the full name otherwise.
+const SHORT_NAMES: Record<string, string> = {
+  "Axis Bank": "Axis",
+  "IOB": "IOB",
+  "State Bank of India": "SBI",
+  "Punjab National Bank": "Punjab National",
+  "Bank of Baroda": "Bank of Baroda",
+  "Canara Bank": "Canara",
+  "HDFC Bank": "HDFC",
+  "ICICI Bank": "ICICI",
+  "Kotak Mahindra Bank": "Kotak Mahindra",
+  "Yes Bank": "Yes",
+  "IDBI Bank": "IDBI",
+  "Karnataka Bank": "Karnataka",
+  "Central Bank of India": "Central Bank of India",
+  "Bank of Maharashtra": "Bank of Maharastra"
+};
+
+export function shortName(bank: string): string {
+  return SHORT_NAMES[bank] ?? bank;
+}
+
 export function sortByBankOrder(banks: string[]): string[] {
   return [...banks].sort((a, b) => {
     const ai = BANK_ORDER.indexOf(a);
