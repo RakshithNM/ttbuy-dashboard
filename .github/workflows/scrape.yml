@@ -1,0 +1,45 @@
+name: Scrape TT Buy rates
+
+on:
+  schedule:
+    - cron: "30 5 * * *" # 11:00 IST daily
+  workflow_dispatch: {}
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install scraper dependencies
+        run: pip install -r scraper/requirements.txt
+
+      - name: Install Playwright browser (Kotak needs a headless render)
+        run: playwright install --with-deps chromium
+
+      - name: Scrape live rates
+        env:
+          BANKS: axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi
+          MAX_SNAPSHOTS: "0"
+          INCLUDE_LIVE: "1"
+        run: python3 -m scraper.main
+
+      - name: Export rates.json
+        run: python3 -m scraper.export_json
+
+      - name: Sync rates.json into site
+        run: cp data/rates.json site/public/data/rates.json
+
+      - name: Commit updated data
+        run: |
+          git config user.name "ttbuy-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data site/public/data/rates.json
+          git diff --cached --quiet || git commit -m "Update TT Buy rates $(date -u +%F)"
+          git push

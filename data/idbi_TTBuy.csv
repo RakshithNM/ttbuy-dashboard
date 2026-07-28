@@ -1,0 +1,2 @@
+Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+IDBI Bank,live-20260729000903,2026-07-29,2026-07-28,2026-07-28,,94.17,https://idbi.bank.in/merchantrates.aspx,"['यूएसए\r\n  डॉलर / United States Dollar', 'USD', '97.24', '94.17', '97.43', '93.98', '97.65', '93.75']"

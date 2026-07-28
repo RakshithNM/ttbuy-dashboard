@@ -1,0 +1,2 @@
+Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+Kotak Mahindra Bank,live-20260729000527,2026-07-29,2026-07-29,,,94.05,https://www.kotak.bank.in/en/rates/forex-rates.html,"['USD', '92.96', '93.60', '92.78', '94.05']"

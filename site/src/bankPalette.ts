@@ -1,0 +1,58 @@
+// Fixed categorical hue order (dataviz skill palette, validated for CVD-safe
+// adjacent pairs). Slot assignment follows a fixed bank order, not alphabetical
+// or data-driven sort, so a bank's color never shifts as other banks are
+// filtered in/out or as new banks are added at the end of the list.
+export const CATEGORICAL_SLOTS = [
+  "--series-1", // blue
+  "--series-2", // orange
+  "--series-3", // aqua
+  "--series-4", // yellow
+  "--series-5", // magenta
+  "--series-6", // green
+  "--series-7", // violet
+  "--series-8", // red
+] as const;
+
+// Known banks in a stable order. New banks get appended here (never inserted)
+// so existing colors never repaint. Includes a few not-yet-scraped banks
+// (Punjab National Bank, Yes Bank, ...) so their slot is already reserved
+// once they do get implemented, rather than shifting banks after them.
+export const BANK_ORDER = [
+  "Axis Bank",
+  "IOB",
+  "State Bank of India",
+  "Punjab National Bank",
+  "Bank of Baroda",
+  "Canara Bank",
+  "HDFC Bank",
+  "ICICI Bank",
+  "Kotak Mahindra Bank",
+  "Yes Bank",
+  "IDBI Bank",
+  "Karnataka Bank",
+  "Central Bank of India",
+  "Bank of Maharashtra",
+];
+
+// The categorical palette only validates CVD-safe adjacent pairs up to 8
+// slots (see dataviz skill palette.md) — past that, hue alone can't carry
+// identity. A 9th+ bank reuses a hue but is drawn dashed (see LineChart.vue)
+// so it's never visually confused with the hue's first owner.
+export function isWrappedSlot(bank: string): boolean {
+  const index = BANK_ORDER.indexOf(bank);
+  return index === -1 || index >= CATEGORICAL_SLOTS.length;
+}
+
+export function slotForBank(bank: string): string {
+  let index = BANK_ORDER.indexOf(bank);
+  if (index === -1) index = BANK_ORDER.length; // unknown bank -> append after known ones
+  return CATEGORICAL_SLOTS[index % CATEGORICAL_SLOTS.length];
+}
+
+export function sortByBankOrder(banks: string[]): string[] {
+  return [...banks].sort((a, b) => {
+    const ai = BANK_ORDER.indexOf(a);
+    const bi = BANK_ORDER.indexOf(b);
+    return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+  });
+}
