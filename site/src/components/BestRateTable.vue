@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { BankSeries } from "../types";
+import { shortName } from "../bankPalette";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -48,12 +49,12 @@ const bestBank = computed(() => rows.value[0]?.bank ?? null);
             :style="{ background: `var(${row.color})` }"
             aria-hidden="true"
           ></span>
-          {{ row.bank }}
+          <span class="bank-name">{{ shortName(row.bank) }}</span>
           <span v-if="row.bank === bestBank" class="badge">
             <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
               <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            Best rate
+            <span class="badge-text">Best rate</span>
           </span>
         </th>
         <td class="num">{{ row.ttbuy.toFixed(2) }}</td>
@@ -81,6 +82,7 @@ const bestBank = computed(() => rows.value[0]?.bank ?? null);
     padding: 10px 12px;
     text-align: left;
     border-bottom: 1px solid var(--gridline);
+    white-space: nowrap;
   }
 
   thead th {
@@ -98,6 +100,13 @@ const bestBank = computed(() => rows.value[0]?.bank ?? null);
     gap: 8px;
   }
 
+  .bank-name {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .num {
     font-variant-numeric: tabular-nums;
     text-align: right;
@@ -105,6 +114,19 @@ const bestBank = computed(() => rows.value[0]?.bank ?? null);
 
   .muted {
     color: var(--text-muted);
+  }
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+
+    th,
+    td {
+      padding: 8px 6px;
+    }
+
+    .badge-text {
+      display: none;
+    }
   }
 
   .key {
@@ -123,6 +145,7 @@ const bestBank = computed(() => rows.value[0]?.bank ?? null);
   .badge {
     display: inline-flex;
     align-items: center;
+    flex: none;
     gap: 4px;
     color: var(--success-text);
     font-size: 12px;

@@ -12,6 +12,9 @@ const emit = defineEmits<{ (e: "toggle", bank: string): void }>();
 const svgRef = ref<SVGSVGElement | null>(null);
 const showTable = ref(true);
 
+// Fixed pixel size, not scaled down to fit a narrow viewport — on small
+// screens the chart stays at its intended size (readable axis text, normal
+// stroke widths) and the frame around it scrolls horizontally instead.
 const W = 960;
 const H = 380;
 const MARGIN = { top: 16, right: 16, bottom: 30, left: 46 };
@@ -210,8 +213,8 @@ const tableRows = computed(() =>
       </button>
     </div>
 
+    <div v-if="!showTable" class="chart-frame">
     <svg
-      v-if="!showTable"
       ref="svgRef"
       :viewBox="`0 0 ${W} ${H}`"
       class="chart-svg"
@@ -279,7 +282,7 @@ const tableRows = computed(() =>
             :text-anchor="endLabelProps(xScale(lastPoint(s)!.date)).anchor"
             class="end-label"
           >
-            {{ s.name }} {{ lastPoint(s)!.ttbuy.toFixed(2) }}
+            {{ shortName(s.name) }} {{ lastPoint(s)!.ttbuy.toFixed(2) }}
           </text>
         </template>
       </g>
@@ -292,10 +295,10 @@ const tableRows = computed(() =>
 
     <!-- tooltip -->
     <div
-      v-if="!showTable && hoverDate && tooltipRows.length"
+      v-if="hoverDate && tooltipRows.length"
       class="tooltip"
       :class="tooltipSide"
-      :style="{ left: `${(tooltipX / W) * 100}%` }"
+      :style="{ left: `${tooltipX}px` }"
     >
       <div class="tooltip-date">{{ formatShortDate(hoverDate) }}</div>
       <div v-for="row in tooltipRows" :key="row.name" class="tooltip-row">
@@ -303,6 +306,7 @@ const tableRows = computed(() =>
         <span class="tooltip-name">{{ row.name }}</span>
         <span class="tooltip-value">{{ row.value.toFixed(2) }}</span>
       </div>
+    </div>
     </div>
 
     <div v-if="showTable" class="table-wrap">
@@ -391,11 +395,24 @@ const tableRows = computed(() =>
   }
 }
 
+.chart-frame {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  // A visible scrollbar (rather than only a swipe gesture) hints that there's
+  // more chart off to the side on a narrow screen.
+  scrollbar-width: thin;
+}
+
 .chart-svg {
-  width: 100%;
+  // Fixed to its native pixel size (matches the viewBox 1:1) rather than
+  // scaled to the container — on a narrow screen the frame scrolls
+  // horizontally instead of shrinking the chart's text/strokes.
+  width: 960px;
+  max-width: none;
   height: auto;
   display: block;
-  touch-action: none;
+  touch-action: pan-x;
 }
 
 .gridline {

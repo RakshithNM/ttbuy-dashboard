@@ -159,6 +159,10 @@ const lastUpdated = computed(() => {
     font-size: 16px;
     margin: 0 0 16px;
   }
+
+  @media (max-width: 480px) {
+    padding: 14px;
+  }
 }
 
 .panel-header {
@@ -175,6 +179,7 @@ const lastUpdated = computed(() => {
 
 .range-filter {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   margin-bottom: 16px;
 }
@@ -186,6 +191,7 @@ const lastUpdated = computed(() => {
   padding: 5px 10px;
   font-size: 12px;
   color: var(--text-secondary);
+  white-space: nowrap;
   cursor: pointer;
 
   &.active {
