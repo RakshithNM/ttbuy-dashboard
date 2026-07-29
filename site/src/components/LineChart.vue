@@ -10,7 +10,7 @@ const props = defineProps<{
 const emit = defineEmits<{ (e: "toggle", bank: string): void }>();
 
 const svgRef = ref<SVGSVGElement | null>(null);
-const showTable = ref(true);
+const showTable = defineModel<boolean>("showTable", { default: true });
 
 // Fixed pixel size, not scaled down to fit a narrow viewport — on small
 // screens the chart stays at its intended size (readable axis text, normal
@@ -190,7 +190,7 @@ const tableRows = computed(() =>
 
 <template>
   <div class="line-chart">
-    <div class="legend" role="group" aria-label="Toggle banks">
+    <div v-if="!showTable" class="legend" role="group" aria-label="Toggle banks">
       <button
         v-for="s in series"
         :key="s.name"
@@ -207,9 +207,6 @@ const tableRows = computed(() =>
           aria-hidden="true"
         ></span>
         {{ s.name }}
-      </button>
-      <button type="button" class="table-toggle" @click="showTable = !showTable">
-        {{ showTable ? "Show chart" : "View as table" }}
       </button>
     </div>
 
@@ -377,21 +374,6 @@ const tableRows = computed(() =>
       border-top: 3px dashed;
       border-radius: 0;
     }
-  }
-}
-
-.table-toggle {
-  margin-left: auto;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  cursor: pointer;
-
-  &:hover {
-    color: var(--text-primary);
   }
 }
 

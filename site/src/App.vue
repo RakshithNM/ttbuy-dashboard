@@ -9,10 +9,12 @@ const rawRates = ref<RatesByBank>({});
 const loading = ref(true);
 const loadError = ref<string | null>(null);
 const hidden = ref<Set<string>>(new Set());
+const showTable = ref(true);
 
-type RangeKey = "30d" | "90d" | "1y" | "all";
-const range = ref<RangeKey>("90d");
+type RangeKey = "7d" | "30d" | "90d" | "1y" | "all";
+const range = ref<RangeKey>("7d");
 const RANGE_OPTIONS: { key: RangeKey; label: string; days: number | null }[] = [
+  { key: "7d", label: "Last 7 days", days: 7 },
   { key: "30d", label: "Last 30 days", days: 30 },
   { key: "90d", label: "Last 90 days", days: 90 },
   { key: "1y", label: "Last 1 year", days: 365 },
@@ -93,21 +95,26 @@ const lastUpdated = computed(() => {
     <section class="panel">
       <div class="panel-header">
         <h2>Historical TT Buy rate</h2>
-        <div class="range-filter" role="group" aria-label="Date range">
-          <button
-            v-for="opt in RANGE_OPTIONS"
-            :key="opt.key"
-            type="button"
-            class="range-btn"
-            :class="{ active: range === opt.key }"
-            :aria-pressed="range === opt.key"
-            @click="range = opt.key"
-          >
-            {{ opt.label }}
+        <div class="header-controls">
+          <button type="button" class="table-toggle" @click="showTable = !showTable">
+            {{ showTable ? "Show chart" : "View as table" }}
           </button>
+          <div class="range-filter" role="group" aria-label="Date range">
+            <button
+              v-for="opt in RANGE_OPTIONS"
+              :key="opt.key"
+              type="button"
+              class="range-btn"
+              :class="{ active: range === opt.key }"
+              :aria-pressed="range === opt.key"
+              @click="range = opt.key"
+            >
+              {{ opt.label }}
+            </button>
+          </div>
         </div>
       </div>
-      <LineChart :series="filteredSeries" :hidden="hidden" @toggle="toggleBank" />
+      <LineChart v-model:show-table="showTable" :series="filteredSeries" :hidden="hidden" @toggle="toggleBank" />
     </section>
   </main>
 
@@ -179,11 +186,33 @@ const lastUpdated = computed(() => {
   }
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.table-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
 .range-filter {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-bottom: 16px;
 }
 
 .range-btn {
