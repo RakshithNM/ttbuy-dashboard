@@ -141,10 +141,12 @@ Axis Bank | 2026-04-15 | 91.53
 Axis Bank | 2026-04-16 | 91.60
 Axis Bank | 2026-04-17 | 91.24
 Axis Bank | 2026-07-28 | 94.04
+Axis Bank | 2026-07-29 | 94.08
 Bank of Baroda | 2025-10-10 | 88.27
 Bank of Baroda | 2025-10-17 | 87.26
 Bank of Baroda | 2025-12-10 | 89.49
 Bank of Baroda | 2026-07-28 | 95.21
+Bank of Baroda | 2026-07-29 | 95.24
 Canara Bank | 2025-10-10 | 88.3775
 Canara Bank | 2026-01-21 | 91.8000
 Canara Bank | 2026-01-25 | 92.0300
@@ -152,11 +154,13 @@ Canara Bank | 2026-02-13 | 91.2525
 Canara Bank | 2026-04-06 | 93.4550
 Canara Bank | 2026-05-18 | 96.7725
 Canara Bank | 2026-07-28 | 95.3325
+Canara Bank | 2026-07-29 | 95.3950
 HDFC Bank | 2026-02-09 | 89.01
 HDFC Bank | 2026-02-13 | 89.03
 HDFC Bank | 2026-06-03 | 94.04
 HDFC Bank | 2026-07-02 | 93.63
 HDFC Bank | 2026-07-28 | 93.99
+HDFC Bank | 2026-07-29 | 94.01
 ICICI Bank | 2025-11-14 | 87.01
 ICICI Bank | 2025-11-18 | 86.98
 ICICI Bank | 2025-11-24 | 87.41
@@ -219,7 +223,9 @@ ICICI Bank | 2026-06-05 | 93.35
 ICICI Bank | 2026-06-05 | 93.35
 ICICI Bank | 2026-07-14 | 94.29
 ICICI Bank | 2026-07-28 | 94.01
+ICICI Bank | 2026-07-29 | 94.01
 IDBI Bank | 2026-07-28 | 94.17
+IDBI Bank | 2026-07-29 | 94.20
 IOB | 2024-04-12 | 83.15
 IOB | 2024-04-17 | 83.39
 IOB | 2024-06-12 | 83.32
@@ -239,6 +245,7 @@ IOB | 2026-03-13 | 92.05
 IOB | 2026-03-16 | 92.19
 IOB | 2026-05-29 | 95.11
 IOB | 2026-07-28 | 95.42
+IOB | 2026-07-29 | 95.46
 Kotak Mahindra Bank | 2026-07-29 | 94.05
 State Bank of India | 2025-09-08 | 87.6
 State Bank of India | 2025-09-12 | 87.95
@@ -251,3 +258,4 @@ State Bank of India | 2026-05-22 | 95.45
 State Bank of India | 2026-05-27 | 95.35
 State Bank of India | 2026-07-14 | 95.7
 State Bank of India | 2026-07-28 | 95.34
+State Bank of India | 2026-07-29 | 95.3
