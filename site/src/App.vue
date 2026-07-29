@@ -79,7 +79,9 @@ const lastUpdated = computed(() => {
       same dollar amount. Rates below are scraped directly from each bank's public
       forex rate page.
     </p>
-    <p v-if="lastUpdated" class="updated">Data last updated {{ lastUpdated }}.</p>
+    <p v-if="lastUpdated" class="updated">
+      Data last updated {{ lastUpdated }}. Collected daily once at 11 AM IST, starting 28 July 2026.
+    </p>
   </header>
 
   <main v-if="!loading && !loadError">
@@ -211,12 +213,25 @@ const lastUpdated = computed(() => {
 }
 
 .site-footer {
+  position: relative;
   margin-top: 40px;
   padding-top: 20px;
-  border-top: 1px solid var(--border);
   color: var(--text-muted);
   font-size: 13px;
   text-align: center;
+
+  // Full-bleed border: the footer itself is constrained to #app's max-width,
+  // but this line should span the whole viewport regardless.
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    height: 1px;
+    background: var(--border);
+    transform: translateX(-50%);
+  }
 
   a {
     color: var(--text-secondary);
