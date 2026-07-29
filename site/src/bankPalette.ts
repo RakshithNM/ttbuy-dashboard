@@ -32,6 +32,16 @@ export const BANK_ORDER = [
   "Karnataka Bank",
   "Central Bank of India",
   "Bank of Maharashtra",
+  "Bandhan Bank",
+  "City Union Bank",
+  "HSBC",
+  "Jammu & Kashmir Bank",
+  "Karur Vysya Bank",
+  "Citibank",
+  "Ujjivan Small Finance Bank",
+  "DCB Bank",
+  "IDFC FIRST Bank",
+  "DBS Bank India",
 ];
 
 // The categorical palette only validates CVD-safe adjacent pairs up to 8
@@ -65,7 +75,17 @@ const SHORT_NAMES: Record<string, string> = {
   "IDBI Bank": "IDBI",
   "Karnataka Bank": "Karnataka",
   "Central Bank of India": "Central Bank of India",
-  "Bank of Maharashtra": "Bank of Maharastra"
+  "Bank of Maharashtra": "Bank of Maharastra",
+  "Bandhan Bank": "Bandhan",
+  "City Union Bank": "City Union",
+  "HSBC": "HSBC",
+  "Jammu & Kashmir Bank": "J&K Bank",
+  "Karur Vysya Bank": "KVB",
+  "Citibank": "Citibank",
+  "Ujjivan Small Finance Bank": "Ujjivan",
+  "DCB Bank": "DCB",
+  "IDFC FIRST Bank": "IDFC FIRST",
+  "DBS Bank India": "DBS",
 };
 
 export function shortName(bank: string): string {

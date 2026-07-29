@@ -25,6 +25,7 @@ def normalize_date(value):
     value = re.sub(r",\s*", ",", str(value).strip())
     for date_format in (
         "%Y-%m-%d", "%d.%m.%Y", "%d/%m/%Y", "%d-%m-%Y", "%b %d,%Y", "%B %d,%Y", "%d/%b/%y", "%d-%b-%y",
+        "%d %B %Y", "%d %b %Y", "%d-%m-%y", "%d-%B-%Y",
     ):
         try:
             return datetime.strptime(value, date_format).strftime("%Y-%m-%d")

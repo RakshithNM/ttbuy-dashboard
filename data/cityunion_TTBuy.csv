@@ -1,0 +1,2 @@
+Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+City Union Bank,live-20260729232246,2026-07-29,2026-07-29,2026-07-29,10:00 AM,94.75,https://cityunionbank.bank.in/foreign-exchange-rates,"['USD', '94.75', '96.70', '94.75', '96.70', '94.30', '97.15', '93.80', '97.65']"

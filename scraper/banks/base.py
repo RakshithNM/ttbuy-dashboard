@@ -13,4 +13,8 @@ class BankPlugin:
     live_url: str
     wayback_urls: List[str]
     parse: ParseFn
-    kind: str = "html"  # "html" or "pdf" — selects how content is fetched
+    kind: str = "html"  # "html", "pdf", "browser", or "pdf_discover"
+    # For kind="pdf_discover": live_url is an HTML landing page whose PDF link
+    # rotates (dated filename or opaque hash); resolve_url(html) extracts the
+    # current PDF URL from that page so it can be fetched in a second step.
+    resolve_url: Optional[Callable[[str], Optional[str]]] = None

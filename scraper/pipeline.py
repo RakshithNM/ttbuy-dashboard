@@ -13,6 +13,12 @@ def fetch_content(plugin, url, is_wayback=False):
         return fetch_bytes(url, is_wayback=is_wayback)
     if plugin.kind == "browser":
         return fetch_rendered_html(url)
+    if plugin.kind == "pdf_discover":
+        landing_html = fetch_html(url, is_wayback=is_wayback)
+        pdf_url = plugin.resolve_url(landing_html) if plugin.resolve_url else None
+        if not pdf_url:
+            return None
+        return fetch_bytes(pdf_url, is_wayback=False)
     return fetch_html(url, is_wayback=is_wayback)
 
 OUTPUT_COLUMNS = [

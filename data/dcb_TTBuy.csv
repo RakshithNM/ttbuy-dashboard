@@ -1,0 +1,2 @@
+Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+DCB Bank,live-20260729232636,2026-07-29,2026-07-29,2026-07-29,15:55:55,93.85,https://www.dcb.bank.in/rates/forex-rates,"['1', 'USD', '97.45', '93.85', '97.65', '93.65', '97.85', '93.45', '98.35', '92.95']"

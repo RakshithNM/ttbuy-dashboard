@@ -10,7 +10,13 @@ const props = defineProps<{
 const emit = defineEmits<{ (e: "toggle", bank: string): void }>();
 
 const svgRef = ref<SVGSVGElement | null>(null);
+const chartFrame = ref<HTMLDivElement | null>(null);
+const scrollLeft = ref(0);
 const showTable = defineModel<boolean>("showTable", { default: true });
+
+function onFrameScroll() {
+  scrollLeft.value = chartFrame.value?.scrollLeft ?? 0;
+}
 
 // Fixed pixel size, not scaled down to fit a narrow viewport — on small
 // screens the chart stays at its intended size (readable axis text, normal
@@ -174,6 +180,10 @@ const tooltipRows = computed(() => {
 
 const tooltipX = computed(() => (hoverDate.value ? xScale(hoverDate.value) : 0));
 const tooltipSide = computed(() => (tooltipX.value > MARGIN.left + plotW * 0.6 ? "left" : "right"));
+// Positioned relative to .line-chart (outside the scrolling frame, so a tall
+// tooltip — e.g. one row per bank with many banks — is never clipped
+// vertically) — so its offset has to subtract the frame's own scroll.
+const tooltipLeft = computed(() => tooltipX.value - scrollLeft.value);
 
 const tableRows = computed(() =>
   allDates.value
@@ -210,7 +220,7 @@ const tableRows = computed(() =>
       </button>
     </div>
 
-    <div v-if="!showTable" class="chart-frame">
+    <div v-if="!showTable" ref="chartFrame" class="chart-frame" @scroll="onFrameScroll">
     <svg
       ref="svgRef"
       :viewBox="`0 0 ${W} ${H}`"
@@ -289,13 +299,16 @@ const tableRows = computed(() =>
         <line :x1="tooltipX" :x2="tooltipX" :y1="MARGIN.top" :y2="H - MARGIN.bottom" class="crosshair" />
       </g>
     </svg>
+    </div>
 
-    <!-- tooltip -->
+    <!-- tooltip: deliberately outside .chart-frame (which scrolls horizontally
+         and must clip vertically for that to look right) so a tall tooltip —
+         one row per bank, and there can be many — is never cut off -->
     <div
-      v-if="hoverDate && tooltipRows.length"
+      v-if="!showTable && hoverDate && tooltipRows.length"
       class="tooltip"
       :class="tooltipSide"
-      :style="{ left: `${tooltipX}px` }"
+      :style="{ left: `${tooltipLeft}px` }"
     >
       <div class="tooltip-date">{{ formatShortDate(hoverDate) }}</div>
       <div v-for="row in tooltipRows" :key="row.name" class="tooltip-row">
@@ -303,7 +316,6 @@ const tableRows = computed(() =>
         <span class="tooltip-name">{{ row.name }}</span>
         <span class="tooltip-value">{{ row.value.toFixed(2) }}</span>
       </div>
-    </div>
     </div>
 
     <div v-if="showTable" class="table-wrap">
@@ -445,6 +457,10 @@ const tableRows = computed(() =>
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   pointer-events: none;
   min-width: 140px;
+  // Defensive cap for a very long bank list — the normal case (up to ~20
+  // rows) fits well within this on any reasonable screen.
+  max-height: 70vh;
+  overflow-y: auto;
 
   &.left {
     transform: translateX(calc(-100% - 12px));

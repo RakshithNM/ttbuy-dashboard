@@ -1,4 +1,24 @@
-from . import axis, bob, canara, hdfc, icici, idbi, iob, kotak, sbi
+from . import (
+    axis,
+    bandhan,
+    bob,
+    canara,
+    citibank,
+    cityunion,
+    dbs,
+    dcb,
+    hdfc,
+    hsbc,
+    icici,
+    idbi,
+    idfcfirst,
+    iob,
+    jkbank,
+    kotak,
+    kvb,
+    sbi,
+    ujjivan,
+)
 
 REGISTRY = {
     axis.PLUGIN.slug: axis.PLUGIN,
@@ -10,4 +30,14 @@ REGISTRY = {
     hdfc.PLUGIN.slug: hdfc.PLUGIN,
     kotak.PLUGIN.slug: kotak.PLUGIN,
     idbi.PLUGIN.slug: idbi.PLUGIN,
+    bandhan.PLUGIN.slug: bandhan.PLUGIN,
+    cityunion.PLUGIN.slug: cityunion.PLUGIN,
+    hsbc.PLUGIN.slug: hsbc.PLUGIN,
+    jkbank.PLUGIN.slug: jkbank.PLUGIN,
+    kvb.PLUGIN.slug: kvb.PLUGIN,
+    citibank.PLUGIN.slug: citibank.PLUGIN,
+    ujjivan.PLUGIN.slug: ujjivan.PLUGIN,
+    dcb.PLUGIN.slug: dcb.PLUGIN,
+    idfcfirst.PLUGIN.slug: idfcfirst.PLUGIN,
+    dbs.PLUGIN.slug: dbs.PLUGIN,
 }

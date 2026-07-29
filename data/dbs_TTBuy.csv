@@ -1,0 +1,2 @@
+Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+DBS Bank India,live-20260729232630,2026-07-29,2026-07-29,2026-07-29,11:45AM,93.8352,https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page,"['US Dollar', '97.6651', '97.6651', '93.8352', '93.8352']"

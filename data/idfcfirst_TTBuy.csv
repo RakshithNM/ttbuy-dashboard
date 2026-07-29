@@ -1,0 +1,2 @@
+Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+IDFC FIRST Bank,live-20260729232642,2026-07-29,2026-07-29,2026-07-29,17:38:14,93.93,https://www.idfcfirst.bank.in/forex-rates.html,"['USDINR', '93.04', '98.27', '93.93', '97.38', '92.54', '98.77']"
