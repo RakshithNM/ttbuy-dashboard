@@ -1,2 +1,3 @@
 Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
 Karur Vysya Bank,live-20260729232248,2026-07-29,2026-07-29,2026-07-29,09:00:00,95.00,https://kvb.bank.in/manager/fx-card-rate/pdf/fx_card_rates.pdf,"['( USD ) US DOLLAR', '96.48', '96.72', '97.20', None, '95.00', '94.76', '94.52', '94.28']"
+Karur Vysya Bank,live-20260730061247,2026-07-30,2026-07-30,2026-07-30,09:00:00,94.85,https://kvb.bank.in/manager/fx-card-rate/pdf/fx_card_rates.pdf,"['( USD ) US DOLLAR', '96.35', '96.59', '97.07', None, '94.85', '94.61', '94.37', '94.13']"

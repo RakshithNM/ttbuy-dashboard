@@ -2,3 +2,4 @@ Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_
 Citibank,20250617203641,2025-06-17,2025-06-17,2025-06-17,09:07 AM IST,84.22,https://www.citigroup.com/rcs/citigpa/storage/public/India/forex-rates.pdf,"['USD/INR', '84.22', '87.66']"
 Citibank,20251029135255,2025-10-29,2025-10-29,2025-10-29,9:05 AM IST,86.4802,https://www.citigroup.com/rcs/citigpa/storage/public/India/forex-rates.pdf,"['USD/INR', '86.4802', '90.0253']"
 Citibank,live-20260729232246,2026-07-29,2026-07-29,2026-07-29,9:08 AM IST,93.7870,https://www.citigroup.com/rcs/citigpa/storage/public/India/forex-rates.pdf,"['USD/INR', '93.7870', '97.6415']"
+Citibank,live-20260730061359,2026-07-30,2026-07-30,2026-07-30,9:05 AM IST,93.6519,https://www.citigroup.com/rcs/citigpa/storage/public/India/forex-rates.pdf,"['USD/INR', '93.6519', '97.5010']"
