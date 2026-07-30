@@ -15,10 +15,11 @@ const safeAmount = computed(() => {
   return Number.isFinite(n) && n > 0 ? n : 0;
 });
 
-interface Row {
+interface DataRow {
   bank: string;
   color: string;
   wrapped: boolean;
+  hasData: true;
   ttbuy: number;
   date: string;
   youReceive: number;
@@ -32,6 +33,15 @@ interface Row {
   gapToBest: number;
 }
 
+interface EmptyRow {
+  bank: string;
+  color: string;
+  wrapped: boolean;
+  hasData: false;
+}
+
+type Row = DataRow | EmptyRow;
+
 function isPreviousCalendarDay(earlierDate: string, laterDate: string): boolean {
   const earlier = new Date(`${earlierDate}T00:00:00Z`);
   const later = new Date(`${laterDate}T00:00:00Z`);
@@ -40,32 +50,40 @@ function isPreviousCalendarDay(earlierDate: string, laterDate: string): boolean 
 }
 
 const rows = computed<Row[]>(() => {
-  const withoutGap = props.series
-    .map((s) => {
-      const last = s.points[s.points.length - 1];
-      if (!last) return null;
-      const prev = s.points.length >= 2 ? s.points[s.points.length - 2] : null;
-      const showDelta = prev !== null && isPreviousCalendarDay(prev.date, last.date);
-      return {
-        bank: s.name,
-        color: s.color,
-        wrapped: s.wrapped,
-        ttbuy: last.ttbuy,
-        date: last.date,
-        youReceive: last.ttbuy * safeAmount.value,
-        delta: showDelta ? last.ttbuy - prev!.ttbuy : null,
-      };
-    })
-    .filter((r): r is Omit<Row, "gapToBest"> => r !== null)
-    // Sorting by TT Buy is equivalent to sorting by amount received (a
-    // positive linear scale of it), so one sort serves both columns.
-    .sort((a, b) => b.ttbuy - a.ttbuy);
+  const dataRows: Omit<DataRow, "gapToBest">[] = [];
+  const emptyRows: EmptyRow[] = [];
 
-  const bestTtbuy = withoutGap[0]?.ttbuy ?? 0;
-  return withoutGap.map((r) => ({ ...r, gapToBest: (bestTtbuy - r.ttbuy) * safeAmount.value }));
+  for (const s of props.series) {
+    const last = s.points[s.points.length - 1];
+    if (!last) {
+      emptyRows.push({ bank: s.name, color: s.color, wrapped: s.wrapped, hasData: false });
+      continue;
+    }
+    const prev = s.points.length >= 2 ? s.points[s.points.length - 2] : null;
+    const showDelta = prev !== null && isPreviousCalendarDay(prev.date, last.date);
+    dataRows.push({
+      bank: s.name,
+      color: s.color,
+      wrapped: s.wrapped,
+      hasData: true,
+      ttbuy: last.ttbuy,
+      date: last.date,
+      youReceive: last.ttbuy * safeAmount.value,
+      delta: showDelta ? last.ttbuy - prev!.ttbuy : null,
+    });
+  }
+
+  // Sorting by TT Buy is equivalent to sorting by amount received (a
+  // positive linear scale of it), so one sort serves both columns. Banks
+  // with no data sort after every bank that has a rate to show.
+  dataRows.sort((a, b) => b.ttbuy - a.ttbuy);
+  const bestTtbuy = dataRows[0]?.ttbuy ?? 0;
+  const withGap = dataRows.map((r) => ({ ...r, gapToBest: (bestTtbuy - r.ttbuy) * safeAmount.value }));
+
+  return [...withGap, ...emptyRows];
 });
 
-const bestBank = computed(() => rows.value[0]?.bank ?? null);
+const bestBank = computed(() => rows.value.find((r) => r.hasData)?.bank ?? null);
 
 function formatInr(value: number): string {
   return value.toLocaleString("en-IN", { maximumFractionDigits: 0 });
@@ -118,26 +136,29 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
                 <span class="badge-text">Best rate</span>
               </span>
             </th>
-            <td class="num">
-              {{ row.ttbuy.toFixed(2) }}
-              <span
-                v-if="row.delta !== null"
-                class="delta"
-                :class="deltaDirection(row.delta)"
-                :title="`${deltaDirection(row.delta) === 'flat' ? 'Unchanged' : deltaDirection(row.delta) === 'up' ? 'Up' : 'Down'} ${Math.abs(row.delta).toFixed(2)} vs previous rate`"
-              >
-                <template v-if="deltaDirection(row.delta) === 'up'">▲</template>
-                <template v-else-if="deltaDirection(row.delta) === 'down'">▼</template>
-                <template v-else>–</template>
-                {{ Math.abs(row.delta).toFixed(2) }}
-              </span>
-            </td>
-            <td class="num receive">₹{{ formatInr(row.youReceive) }}</td>
-            <td class="num gap" :class="{ muted: row.bank === bestBank }">
-              <template v-if="row.bank === bestBank">—</template>
-              <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
-            </td>
-            <td class="muted">{{ row.date }}</td>
+            <template v-if="row.hasData">
+              <td class="num">
+                {{ row.ttbuy.toFixed(2) }}
+                <span
+                  v-if="row.delta !== null"
+                  class="delta"
+                  :class="deltaDirection(row.delta)"
+                  :title="`${deltaDirection(row.delta) === 'flat' ? 'Unchanged' : deltaDirection(row.delta) === 'up' ? 'Up' : 'Down'} ${Math.abs(row.delta).toFixed(2)} vs previous rate`"
+                >
+                  <template v-if="deltaDirection(row.delta) === 'up'">▲</template>
+                  <template v-else-if="deltaDirection(row.delta) === 'down'">▼</template>
+                  <template v-else>–</template>
+                  {{ Math.abs(row.delta).toFixed(2) }}
+                </span>
+              </td>
+              <td class="num receive">₹{{ formatInr(row.youReceive) }}</td>
+              <td class="num gap" :class="{ muted: row.bank === bestBank }">
+                <template v-if="row.bank === bestBank">—</template>
+                <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
+              </td>
+              <td class="muted">{{ row.date }}</td>
+            </template>
+            <td v-else colspan="4" class="no-data">No data for this bank</td>
           </tr>
         </tbody>
       </table>
@@ -285,6 +306,12 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
 
   .muted {
     color: var(--text-muted);
+  }
+
+  .no-data {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
   }
 
   @media (max-width: 480px) {

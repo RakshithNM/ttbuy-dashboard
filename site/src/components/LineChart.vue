@@ -32,6 +32,13 @@ const visibleSeries = computed(() =>
   props.series.filter((s) => !props.hidden.has(s.name) && s.points.length > 0)
 );
 
+// Shown (not hidden) but with no points in the current filtered range —
+// excluded from the chart/table grid itself, but called out below the table
+// so it's clear they're missing data rather than silently absent.
+const noDataSeries = computed(() =>
+  props.series.filter((s) => !props.hidden.has(s.name) && s.points.length === 0)
+);
+
 const allDates = computed(() => {
   const set = new Set<string>();
   for (const s of visibleSeries.value) for (const p of s.points) set.add(p.date);
@@ -378,6 +385,11 @@ const tableRows = computed(() =>
               {{ cell.value !== null ? cell.value.toFixed(2) : "—" }}
             </td>
           </tr>
+          <tr v-if="noDataSeries.length">
+            <td :colspan="1 + tableSeries.length" class="no-data">
+              No data for {{ noDataSeries.map((s) => shortName(s.name)).join(", ") }} in this range.
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -570,6 +582,13 @@ const tableRows = computed(() =>
   .num {
     text-align: right;
     font-variant-numeric: tabular-nums;
+  }
+
+  .no-data {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    white-space: normal;
   }
 
   thead .key {
