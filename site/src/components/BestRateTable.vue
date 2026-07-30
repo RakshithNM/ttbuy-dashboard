@@ -22,13 +22,21 @@ interface Row {
   ttbuy: number;
   date: string;
   youReceive: number;
-  // Change vs this bank's previous scraped rate — not strictly "yesterday",
-  // since a bank can miss a day; null when there's no earlier point to
-  // compare against yet.
+  // Change vs the previous calendar day's rate; null when the previous
+  // scraped point isn't from the day right before (a bank missed a day, or
+  // this is the first point on record) — showing a delta across a gap would
+  // misrepresent it as a single day's move.
   delta: number | null;
   // Rupees you'd receive less than the best bank, at the chosen amount —
   // 0 for the best bank itself.
   gapToBest: number;
+}
+
+function isPreviousCalendarDay(earlierDate: string, laterDate: string): boolean {
+  const earlier = new Date(`${earlierDate}T00:00:00Z`);
+  const later = new Date(`${laterDate}T00:00:00Z`);
+  const diffDays = (later.getTime() - earlier.getTime()) / 86_400_000;
+  return diffDays === 1;
 }
 
 const rows = computed<Row[]>(() => {
@@ -37,6 +45,7 @@ const rows = computed<Row[]>(() => {
       const last = s.points[s.points.length - 1];
       if (!last) return null;
       const prev = s.points.length >= 2 ? s.points[s.points.length - 2] : null;
+      const showDelta = prev !== null && isPreviousCalendarDay(prev.date, last.date);
       return {
         bank: s.name,
         color: s.color,
@@ -44,7 +53,7 @@ const rows = computed<Row[]>(() => {
         ttbuy: last.ttbuy,
         date: last.date,
         youReceive: last.ttbuy * safeAmount.value,
-        delta: prev ? last.ttbuy - prev.ttbuy : null,
+        delta: showDelta ? last.ttbuy - prev!.ttbuy : null,
       };
     })
     .filter((r): r is Omit<Row, "gapToBest"> => r !== null)

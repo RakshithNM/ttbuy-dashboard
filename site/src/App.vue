@@ -127,7 +127,7 @@ const lastUpdated = computed(() => {
 <template>
   <header class="page-header">
     <p class="eyebrow">Inward remittance rates</p>
-    <h1>{{ currency }} TT Buy rate by Indian bank</h1>
+    <h1>{{ currency }} TT Buy rate by Indian banks</h1>
     <p class="lede">
       TT Buy is the rate a bank credits you at when you receive a foreign inward
       (telegraphic transfer) remittance — a higher TT Buy means more rupees for the
