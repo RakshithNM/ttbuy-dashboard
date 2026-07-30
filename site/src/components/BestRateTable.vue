@@ -31,40 +31,48 @@ const bestBank = computed(() => rows.value[0]?.bank ?? null);
 </script>
 
 <template>
-  <table class="best-rate-table">
-    <caption>USD TT Buy rate by bank — most recent published rate per bank</caption>
-    <thead>
-      <tr>
-        <th scope="col">Bank</th>
-        <th scope="col" class="num">TT Buy (₹ / USD)</th>
-        <th scope="col">As of</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="row in rows" :key="row.bank" :class="{ best: row.bank === bestBank }">
-        <th scope="row">
-          <span
-            class="key"
-            :class="{ wrapped: row.wrapped }"
-            :style="{ background: `var(${row.color})` }"
-            aria-hidden="true"
-          ></span>
-          <span class="bank-name">{{ shortName(row.bank) }}</span>
-          <span v-if="row.bank === bestBank" class="badge">
-            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-              <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <span class="badge-text">Best rate</span>
-          </span>
-        </th>
-        <td class="num">{{ row.ttbuy.toFixed(2) }}</td>
-        <td class="muted">{{ row.date }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-wrap">
+    <table class="best-rate-table">
+      <caption>USD TT Buy rate by bank — most recent published rate per bank</caption>
+      <thead>
+        <tr>
+          <th scope="col">Bank</th>
+          <th scope="col" class="num">TT Buy (₹ / USD)</th>
+          <th scope="col">As of</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in rows" :key="row.bank" :class="{ best: row.bank === bestBank }">
+          <th scope="row">
+            <span
+              class="key"
+              :class="{ wrapped: row.wrapped }"
+              :style="{ background: `var(${row.color})` }"
+              aria-hidden="true"
+            ></span>
+            <span class="bank-name">{{ shortName(row.bank) }}</span>
+            <span v-if="row.bank === bestBank" class="badge">
+              <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <span class="badge-text">Best rate</span>
+            </span>
+          </th>
+          <td class="num">{{ row.ttbuy.toFixed(2) }}</td>
+          <td class="muted">{{ row.date }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <style scoped lang="scss">
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
 .best-rate-table {
   width: 100%;
   border-collapse: collapse;
@@ -74,7 +82,8 @@ const bestBank = computed(() => rows.value[0]?.bank ?? null);
     text-align: left;
     color: var(--text-secondary);
     font-size: 13px;
-    margin-bottom: 8px;
+    padding: 10px 12px 0;
+    margin-bottom: 4px;
   }
 
   th,

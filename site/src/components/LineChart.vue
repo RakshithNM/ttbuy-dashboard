@@ -212,11 +212,18 @@ const tooltipSide = computed(() => (tooltipX.value > MARGIN.left + plotW * 0.6 ?
 // vertically) — so its offset has to subtract the frame's own scroll.
 const tooltipLeft = computed(() => tooltipX.value - scrollLeft.value);
 
+// Table columns sort by each bank's most recent TT Buy rate, best (highest)
+// first — different from the chart, whose colors/legend order stay fixed
+// per bank identity regardless of who's currently ahead.
+const tableSeries = computed(() =>
+  [...visibleSeries.value].sort((a, b) => (lastPoint(b)?.ttbuy ?? -Infinity) - (lastPoint(a)?.ttbuy ?? -Infinity))
+);
+
 const tableRows = computed(() =>
   allDates.value
     .map((date) => ({
       date,
-      values: visibleSeries.value.map((s) => ({
+      values: tableSeries.value.map((s) => ({
         name: s.name,
         value: s.points.find((p) => p.date === date)?.ttbuy ?? null,
       })),
@@ -352,7 +359,7 @@ const tableRows = computed(() =>
         <thead>
           <tr>
             <th scope="col">Date</th>
-            <th v-for="s in visibleSeries" :key="s.name" scope="col" class="num">
+            <th v-for="s in tableSeries" :key="s.name" scope="col" class="num">
               <span
                 class="key"
                 :class="{ wrapped: s.wrapped }"
