@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import LineChart from "./components/LineChart.vue";
 import BestRateTable from "./components/BestRateTable.vue";
 import { isWrappedSlot, shortName, slotForBank, sortByBankOrder } from "./bankPalette";
@@ -9,11 +9,9 @@ const rawRates = ref<RatesByBank>({});
 const loading = ref(true);
 const loadError = ref<string | null>(null);
 const hidden = ref<Set<string>>(new Set());
-const showTable = ref(true);
 const bankQuery = ref("");
 
 type RangeKey = "7d" | "30d" | "90d" | "1y" | "all";
-const range = ref<RangeKey>("7d");
 const RANGE_OPTIONS: { key: RangeKey; label: string; days: number | null }[] = [
   { key: "7d", label: "Last 7 days", days: 7 },
   { key: "30d", label: "Last 30 days", days: 30 },
@@ -21,6 +19,40 @@ const RANGE_OPTIONS: { key: RangeKey; label: string; days: number | null }[] = [
   { key: "1y", label: "Last 1 year", days: 365 },
   { key: "all", label: "All time", days: null },
 ];
+
+// Remember the date range and table/chart toggle across visits. localStorage
+// can throw (private browsing, disabled storage) — this is a nice-to-have,
+// never worth breaking the page over, so every access is best-effort.
+const VIEW_STORAGE_KEY = "ttbuy-dashboard:view";
+
+interface StoredView {
+  range?: RangeKey;
+  showTable?: boolean;
+}
+
+function loadStoredView(): StoredView {
+  try {
+    const raw = localStorage.getItem(VIEW_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as StoredView) : {};
+  } catch {
+    return {};
+  }
+}
+
+const storedView = loadStoredView();
+
+const range = ref<RangeKey>(
+  storedView.range && RANGE_OPTIONS.some((o) => o.key === storedView.range) ? storedView.range : "7d"
+);
+const showTable = ref(typeof storedView.showTable === "boolean" ? storedView.showTable : true);
+
+watch([range, showTable], ([r, t]) => {
+  try {
+    localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ range: r, showTable: t }));
+  } catch {
+    // Persistence is best-effort; nothing to do if storage is unavailable.
+  }
+});
 
 onMounted(async () => {
   try {
