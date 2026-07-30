@@ -19,7 +19,7 @@ export const CATEGORICAL_SLOTS = [
 // once they do get implemented, rather than shifting banks after them.
 export const BANK_ORDER = [
   "Axis Bank",
-  "IOB",
+  "Indian Overseas Bank",
   "State Bank of India",
   "Punjab National Bank",
   "Bank of Baroda",
@@ -63,7 +63,7 @@ export function slotForBank(bank: string): string {
 // (table headers, dense legends). Falls back to the full name otherwise.
 const SHORT_NAMES: Record<string, string> = {
   "Axis Bank": "Axis",
-  "IOB": "IOB",
+  "Indian Overseas Bank": "IOB",
   "State Bank of India": "SBI",
   "Punjab National Bank": "Punjab National",
   "Bank of Baroda": "Bank of Baroda",

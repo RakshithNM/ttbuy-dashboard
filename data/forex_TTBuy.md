@@ -956,30 +956,30 @@ IDFC FIRST Bank | EUR | 2026-07-30 | 106.6
 IDFC FIRST Bank | GBP | 2026-07-30 | 124.51
 IDFC FIRST Bank | USD | 2026-07-29 | 93.93
 IDFC FIRST Bank | USD | 2026-07-30 | 93.85
-IOB | AED | 2026-07-30 | 25.81
-IOB | EUR | 2026-07-30 | 108.94
-IOB | GBP | 2026-07-30 | 126.92
-IOB | USD | 2024-04-12 | 83.15
-IOB | USD | 2024-04-17 | 83.39
-IOB | USD | 2024-06-12 | 83.32
-IOB | USD | 2024-07-24 | 83.48
-IOB | USD | 2024-11-06 | 84.05
-IOB | USD | 2024-11-08 | 84.11
-IOB | USD | 2024-11-20 | 84.12
-IOB | USD | 2024-12-13 | 84.53
-IOB | USD | 2025-02-10 | 87.66
-IOB | USD | 2025-03-07 | 86.91
-IOB | USD | 2025-03-19 | 86.33
-IOB | USD | 2025-05-30 | 85.17
-IOB | USD | 2025-08-06 | 87.45
-IOB | USD | 2025-08-13 | 87.38
-IOB | USD | 2026-02-12 | 90.91
-IOB | USD | 2026-03-13 | 92.05
-IOB | USD | 2026-03-16 | 92.19
-IOB | USD | 2026-05-29 | 95.11
-IOB | USD | 2026-07-28 | 95.42
-IOB | USD | 2026-07-29 | 95.46
-IOB | USD | 2026-07-30 | 95.30
+Indian Overseas Bank | AED | 2026-07-30 | 25.81
+Indian Overseas Bank | EUR | 2026-07-30 | 108.94
+Indian Overseas Bank | GBP | 2026-07-30 | 126.92
+Indian Overseas Bank | USD | 2024-04-12 | 83.15
+Indian Overseas Bank | USD | 2024-04-17 | 83.39
+Indian Overseas Bank | USD | 2024-06-12 | 83.32
+Indian Overseas Bank | USD | 2024-07-24 | 83.48
+Indian Overseas Bank | USD | 2024-11-06 | 84.05
+Indian Overseas Bank | USD | 2024-11-08 | 84.11
+Indian Overseas Bank | USD | 2024-11-20 | 84.12
+Indian Overseas Bank | USD | 2024-12-13 | 84.53
+Indian Overseas Bank | USD | 2025-02-10 | 87.66
+Indian Overseas Bank | USD | 2025-03-07 | 86.91
+Indian Overseas Bank | USD | 2025-03-19 | 86.33
+Indian Overseas Bank | USD | 2025-05-30 | 85.17
+Indian Overseas Bank | USD | 2025-08-06 | 87.45
+Indian Overseas Bank | USD | 2025-08-13 | 87.38
+Indian Overseas Bank | USD | 2026-02-12 | 90.91
+Indian Overseas Bank | USD | 2026-03-13 | 92.05
+Indian Overseas Bank | USD | 2026-03-16 | 92.19
+Indian Overseas Bank | USD | 2026-05-29 | 95.11
+Indian Overseas Bank | USD | 2026-07-28 | 95.42
+Indian Overseas Bank | USD | 2026-07-29 | 95.46
+Indian Overseas Bank | USD | 2026-07-30 | 95.30
 Jammu & Kashmir Bank | AED | 2026-07-30 | 24.21
 Jammu & Kashmir Bank | EUR | 2026-07-30 | 108.750000
 Jammu & Kashmir Bank | GBP | 2026-07-30 | 126.800000

@@ -52,7 +52,7 @@ def parse(html, source_url):
 
 
 PLUGIN = BankPlugin(
-    name="IOB",
+    name="Indian Overseas Bank",
     slug="iob",
     live_url=IOB_LIVE_URL,
     wayback_urls=IOB_WAYBACK_URLS,
