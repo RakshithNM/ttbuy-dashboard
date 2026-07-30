@@ -141,6 +141,26 @@ function endLabelProps(x: number): { x: number; anchor: "start" | "end" } {
 
 const hoverDate = ref<string | null>(null);
 
+// The tooltip can be taller than the chart (many banks on one date) and
+// needs to be mouse-wheel scrollable, which means it must accept pointer
+// events — but it sits outside the SVG, so leaving the SVG towards the
+// tooltip would otherwise fire onPointerLeave and hide it before the
+// pointer arrives. Track both regions and only clear after a short delay
+// that a same-tick pointerenter on the tooltip can cancel.
+let clearHoverTimer: ReturnType<typeof setTimeout> | null = null;
+function cancelHoverClear() {
+  if (clearHoverTimer !== null) {
+    clearTimeout(clearHoverTimer);
+    clearHoverTimer = null;
+  }
+}
+function scheduleHoverClear() {
+  cancelHoverClear();
+  clearHoverTimer = setTimeout(() => {
+    hoverDate.value = null;
+  }, 60);
+}
+
 function onPointerMove(evt: PointerEvent) {
   const svg = svgRef.value;
   if (!svg || allDates.value.length === 0) return;
@@ -160,10 +180,17 @@ function onPointerMove(evt: PointerEvent) {
       nearest = d;
     }
   }
+  cancelHoverClear();
   hoverDate.value = nearest;
 }
 function onPointerLeave() {
-  hoverDate.value = null;
+  scheduleHoverClear();
+}
+function onTooltipPointerEnter() {
+  cancelHoverClear();
+}
+function onTooltipPointerLeave() {
+  scheduleHoverClear();
 }
 
 const tooltipRows = computed(() => {
@@ -309,6 +336,8 @@ const tableRows = computed(() =>
       class="tooltip"
       :class="tooltipSide"
       :style="{ left: `${tooltipLeft}px` }"
+      @pointerenter="onTooltipPointerEnter"
+      @pointerleave="onTooltipPointerLeave"
     >
       <div class="tooltip-date">{{ formatShortDate(hoverDate) }}</div>
       <div v-for="row in tooltipRows" :key="row.name" class="tooltip-row">
@@ -447,23 +476,26 @@ const tableRows = computed(() =>
 
 .tooltip {
   position: absolute;
-  top: 8px;
-  transform: translateX(12px);
+  top: 60%;
+  transform: translate(12px, -50%);
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  pointer-events: none;
-  min-width: 140px;
-  // Defensive cap for a very long bank list — the normal case (up to ~20
-  // rows) fits well within this on any reasonable screen.
+  // Accepts pointer events (unlike most tooltips) so it can be scrolled —
+  // with many banks on one date it can be taller than the chart itself.
+  // onTooltipPointerEnter/Leave in the script keep it from vanishing the
+  // moment the pointer crosses from the SVG onto the tooltip.
+  pointer-events: auto;
+  min-width: 250px;
   max-height: 70vh;
-  overflow-y: auto;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
 
   &.left {
-    transform: translateX(calc(-100% - 12px));
+    transform: translate(calc(-100% - 12px), -50%);
   }
 }
 
