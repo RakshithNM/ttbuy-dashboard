@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { BankSeries } from "../types";
 import { shortName } from "../bankPalette";
 
@@ -7,12 +7,19 @@ const props = defineProps<{
   series: BankSeries[];
 }>();
 
+const amount = ref(1000);
+const safeAmount = computed(() => {
+  const n = Number(amount.value);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+});
+
 interface Row {
   bank: string;
   color: string;
   wrapped: boolean;
   ttbuy: number;
   date: string;
+  youReceive: number;
 }
 
 const rows = computed<Row[]>(() => {
@@ -20,53 +27,133 @@ const rows = computed<Row[]>(() => {
     .map((s) => {
       const last = s.points[s.points.length - 1];
       if (!last) return null;
-      return { bank: s.name, color: s.color, wrapped: s.wrapped, ttbuy: last.ttbuy, date: last.date };
+      return {
+        bank: s.name,
+        color: s.color,
+        wrapped: s.wrapped,
+        ttbuy: last.ttbuy,
+        date: last.date,
+        youReceive: last.ttbuy * safeAmount.value,
+      };
     })
     .filter((r): r is Row => r !== null);
 
+  // Sorting by TT Buy is equivalent to sorting by amount received (a
+  // positive linear scale of it), so one sort serves both columns.
   return latest.sort((a, b) => b.ttbuy - a.ttbuy);
 });
 
 const bestBank = computed(() => rows.value[0]?.bank ?? null);
+
+function formatInr(value: number): string {
+  return value.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+}
 </script>
 
 <template>
-  <div class="table-wrap">
-    <table class="best-rate-table">
-      <caption>USD TT Buy rate by bank — most recent published rate per bank</caption>
-      <thead>
-        <tr>
-          <th scope="col">Bank</th>
-          <th scope="col" class="num">TT Buy (₹ / USD)</th>
-          <th scope="col">As of</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="row in rows" :key="row.bank" :class="{ best: row.bank === bestBank }">
-          <th scope="row">
-            <span
-              class="key"
-              :class="{ wrapped: row.wrapped }"
-              :style="{ background: `var(${row.color})` }"
-              aria-hidden="true"
-            ></span>
-            <span class="bank-name">{{ shortName(row.bank) }}</span>
-            <span v-if="row.bank === bestBank" class="badge">
-              <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-                <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-              <span class="badge-text">Best rate</span>
-            </span>
-          </th>
-          <td class="num">{{ row.ttbuy.toFixed(2) }}</td>
-          <td class="muted">{{ row.date }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="best-rate">
+    <div class="amount-control">
+      <label for="remit-amount">If you receive</label>
+      <div class="amount-field">
+        <span class="prefix">$</span>
+        <input id="remit-amount" v-model.number="amount" type="number" min="0" step="1" inputmode="decimal" class="amount-input" />
+      </div>
+      <span class="suffix">USD, here's what each bank credits you</span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="best-rate-table">
+        <caption>USD TT Buy rate by bank — most recent published rate per bank</caption>
+        <thead>
+          <tr>
+            <th scope="col">Bank</th>
+            <th scope="col" class="num">TT Buy (₹ / USD)</th>
+            <th scope="col" class="num">You receive (₹)</th>
+            <th scope="col">As of</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in rows" :key="row.bank" :class="{ best: row.bank === bestBank }">
+            <th scope="row">
+              <span
+                class="key"
+                :class="{ wrapped: row.wrapped }"
+                :style="{ background: `var(${row.color})` }"
+                aria-hidden="true"
+              ></span>
+              <span class="bank-name">{{ shortName(row.bank) }}</span>
+              <span v-if="row.bank === bestBank" class="badge">
+                <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                  <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="badge-text">Best rate</span>
+              </span>
+            </th>
+            <td class="num">{{ row.ttbuy.toFixed(2) }}</td>
+            <td class="num receive">₹{{ formatInr(row.youReceive) }}</td>
+            <td class="muted">{{ row.date }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+.amount-control {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+
+  label {
+    white-space: nowrap;
+  }
+
+  .suffix {
+    color: var(--text-muted);
+  }
+}
+
+.amount-field {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 8px;
+  background: var(--surface-1);
+
+  .prefix {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+}
+
+.amount-input {
+  width: 100px;
+  border: none;
+  background: none;
+  padding: 6px 4px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+
+  &:focus {
+    outline: none;
+  }
+
+  // Hide the spinner so it doesn't fight with the $ prefix for space.
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
 .table-wrap {
   overflow: auto;
   border: 1px solid var(--border);
@@ -119,6 +206,11 @@ const bestBank = computed(() => rows.value[0]?.bank ?? null);
   .num {
     font-variant-numeric: tabular-nums;
     text-align: right;
+  }
+
+  .receive {
+    color: var(--text-primary);
+    font-weight: 600;
   }
 
   .muted {
