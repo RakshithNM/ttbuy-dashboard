@@ -2,7 +2,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from ..core import normalize_date
+from ..core import TARGET_CURRENCIES, normalize_date
 from .base import BankPlugin
 
 IOB_LIVE_URL = "https://www.iob.bank.in/en/forex-rates"
@@ -30,23 +30,25 @@ def parse(html, source_url):
     published_at_match = re.search(r"updated at\s+([0-9.:]+\s*[AP]M)", text, re.I)
     published_at = published_at_match.group(1).strip() if published_at_match else None
 
+    is_old_site = "iob.in" in source_url and "iob.bank.in" not in source_url
+
+    results = {}
     for row in soup.find_all("tr"):
         cells = [cell.get_text(" ", strip=True) for cell in row.find_all(["td", "th"])]
-        if len(cells) < 5 or not any(cell.upper() == "USD" for cell in cells):
+        if len(cells) < 5:
+            continue
+        code = next((c for c in TARGET_CURRENCIES if any(cell.upper() == c for cell in cells)), None)
+        if code is None or code in results:
             continue
 
-        if "iob.in" in source_url and "iob.bank.in" not in source_url:
-            tt_buy = cells[4]
-        else:
-            tt_buy = cells[2]
-
-        return {
+        tt_buy = cells[4] if is_old_site else cells[2]
+        results[code] = {
             "Rate_Date": rate_date,
             "Published_At": published_at,
             "TT_Buy": tt_buy,
             "Raw_Data_Row": cells,
         }
-    return None
+    return results or None
 
 
 PLUGIN = BankPlugin(

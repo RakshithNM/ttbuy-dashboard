@@ -1,3 +1,6 @@
-Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
-Ujjivan Small Finance Bank,live-20260729232249,2026-07-29,2026-07-29,2026-07-29,9.45 am,94.30,https://www.ujjivansfb.bank.in/forex-rates,"['United States Dollar', 'USD', '94.30', '97.21']"
-Ujjivan Small Finance Bank,live-20260730061253,2026-07-30,2026-07-30,2026-07-30,9.45 am,94.18,https://www.ujjivansfb.bank.in/forex-rates,"['United States Dollar', 'USD', '94.18', '97.07']"
+Bank,Currency,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+Ujjivan Small Finance Bank,USD,live-20260729232249,2026-07-29,2026-07-29,2026-07-29,9.45 am,94.30,https://www.ujjivansfb.bank.in/forex-rates,"['United States Dollar', 'USD', '94.30', '97.21']"
+Ujjivan Small Finance Bank,USD,live-20260730061253,2026-07-30,2026-07-30,2026-07-30,9.45 am,94.18,https://www.ujjivansfb.bank.in/forex-rates,"['United States Dollar', 'USD', '94.18', '97.07']"
+Ujjivan Small Finance Bank,AED,live-20260730184135,2026-07-30,2026-07-30,2026-07-30,9.45 am,25.21,https://www.ujjivansfb.bank.in/forex-rates,"['U.A.E. Dirham', 'AED', '25.21', '26.83']"
+Ujjivan Small Finance Bank,EUR,live-20260730184135,2026-07-30,2026-07-30,2026-07-30,9.45 am,107.83,https://www.ujjivansfb.bank.in/forex-rates,"['Euro', 'EUR', '107.83', '111.15']"
+Ujjivan Small Finance Bank,GBP,live-20260730184135,2026-07-30,2026-07-30,2026-07-30,9.45 am,125.69,https://www.ujjivansfb.bank.in/forex-rates,"['Great Britain Pound', 'GBP', '125.69', '129.56']"

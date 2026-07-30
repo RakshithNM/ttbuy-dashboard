@@ -7,6 +7,14 @@ from .base import BankPlugin
 
 DBS_URL = "https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page"
 
+# DBS's combined table keys rows by full currency name, not ISO code.
+CURRENCY_NAMES = {
+    "US Dollar": "USD",
+    "British Pound": "GBP",
+    "Euro": "EUR",
+    "United Arab Emirates Dirham": "AED",
+}
+
 
 def parse(html, source_url):
     """DBS's rates load client-side. The page repeats each currency as its
@@ -20,6 +28,7 @@ def parse(html, source_url):
     rate_date = normalize_date(match.group(1)) if match else None
     published_at = match.group(2) if match else None
 
+    results = {}
     for table in soup.find_all("table"):
         header_text = table.get_text(" ", strip=True)
         if "Selling TT" not in header_text or "Buying TT" not in header_text:
@@ -27,16 +36,19 @@ def parse(html, source_url):
 
         for row in table.find_all("tr"):
             cells = [cell.get_text(" ", strip=True) for cell in row.find_all(["td", "th"])]
-            if len(cells) <= 3 or cells[0] != "US Dollar":
+            if len(cells) <= 3:
+                continue
+            code = CURRENCY_NAMES.get(cells[0])
+            if code is None or code in results:
                 continue
 
-            return {
+            results[code] = {
                 "Rate_Date": rate_date,
                 "Published_At": published_at,
                 "TT_Buy": cells[3],
                 "Raw_Data_Row": cells,
             }
-    return None
+    return results or None
 
 
 PLUGIN = BankPlugin(

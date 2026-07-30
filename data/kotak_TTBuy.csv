@@ -1,3 +1,6 @@
-Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
-Kotak Mahindra Bank,live-20260729000527,2026-07-29,2026-07-29,,,94.05,https://www.kotak.bank.in/en/rates/forex-rates.html,"['USD', '92.96', '93.60', '92.78', '94.05']"
-Kotak Mahindra Bank,live-20260730061301,2026-07-30,2026-07-30,,,93.95,https://www.kotak.bank.in/en/rates/forex-rates.html,"['USD', '92.86', '93.50', '92.68', '93.95']"
+Bank,Currency,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+Kotak Mahindra Bank,USD,live-20260729000527,2026-07-29,2026-07-29,,,94.05,https://www.kotak.bank.in/en/rates/forex-rates.html,"['USD', '92.96', '93.60', '92.78', '94.05']"
+Kotak Mahindra Bank,USD,live-20260730061301,2026-07-30,2026-07-30,,,93.95,https://www.kotak.bank.in/en/rates/forex-rates.html,"['USD', '92.86', '93.50', '92.68', '93.95']"
+Kotak Mahindra Bank,GBP,live-20260730184127,2026-07-30,2026-07-30,,,124.83,https://www.kotak.bank.in/en/rates/forex-rates.html,"['GBP', '124.09', '124.09', '122.76', '124.83']"
+Kotak Mahindra Bank,AED,live-20260730184127,2026-07-30,2026-07-30,,,25.03,https://www.kotak.bank.in/en/rates/forex-rates.html,"['AED', '25.23', '25.37', '24.05', '25.03']"
+Kotak Mahindra Bank,EUR,live-20260730184127,2026-07-30,2026-07-30,,,107.03,https://www.kotak.bank.in/en/rates/forex-rates.html,"['EUR', '105.79', '106.35', '105.12', '107.03']"

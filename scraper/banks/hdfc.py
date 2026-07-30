@@ -3,7 +3,7 @@ import re
 
 import pdfplumber
 
-from ..core import normalize_date
+from ..core import TARGET_CURRENCIES, normalize_date
 from .base import BankPlugin
 
 HDFC_URL = (
@@ -26,16 +26,21 @@ def parse(pdf_bytes, source_url):
     rate_date = normalize_date(match.group(1)) if match else None
     published_at = match.group(2).strip() if match else None
 
+    results = {}
     for row in table:
-        if not row or len(row) <= 6 or row[1] != "USD":
+        if not row or len(row) <= 6:
             continue
-        return {
+        code = row[1]
+        if code not in TARGET_CURRENCIES or code in results:
+            continue
+
+        results[code] = {
             "Rate_Date": rate_date,
             "Published_At": published_at,
             "TT_Buy": row[6],
             "Raw_Data_Row": row[:11],
         }
-    return None
+    return results or None
 
 
 PLUGIN = BankPlugin(

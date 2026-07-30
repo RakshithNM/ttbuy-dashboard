@@ -1,3 +1,6 @@
-Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
-DBS Bank India,live-20260729232630,2026-07-29,2026-07-29,2026-07-29,11:45AM,93.8352,https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page,"['US Dollar', '97.6651', '97.6651', '93.8352', '93.8352']"
-DBS Bank India,live-20260730061323,2026-07-30,2026-07-30,2026-07-30,11:45AM,93.6968,https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page,"['US Dollar', '97.5211', '97.5211', '93.6968', '93.6968']"
+Bank,Currency,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+DBS Bank India,USD,live-20260729232630,2026-07-29,2026-07-29,2026-07-29,11:45AM,93.8352,https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page,"['US Dollar', '97.6651', '97.6651', '93.8352', '93.8352']"
+DBS Bank India,USD,live-20260730061323,2026-07-30,2026-07-30,2026-07-30,11:45AM,93.6968,https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page,"['US Dollar', '97.5211', '97.5211', '93.6968', '93.6968']"
+DBS Bank India,EUR,live-20260730184157,2026-07-30,2026-07-30,2026-07-30,11:45AM,107.0242,https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page,"['Euro', '111.9509', '111.9509', '107.0242', '107.0242']"
+DBS Bank India,GBP,live-20260730184157,2026-07-30,2026-07-30,2026-07-30,11:45AM,124.7378,https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page,"['British Pound', '130.4799', '130.4799', '124.7378', '124.7378']"
+DBS Bank India,AED,live-20260730184157,2026-07-30,2026-07-30,2026-07-30,11:45AM,25.4472,https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page,"['United Arab Emirates Dirham', '26.6186', '26.6186', '25.4472', '25.4472']"

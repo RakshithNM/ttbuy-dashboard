@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from typing import Any, Callable, List, Optional
 
-# parse(content, source_url) -> {Rate_Date, Published_At, TT_Buy, Raw_Data_Row} | None
-# content is decoded HTML text for kind="html", raw bytes for kind="pdf".
+# parse(content, source_url) -> {currency_code: {Rate_Date, Published_At, TT_Buy,
+# Raw_Data_Row}, ...} | None — one entry per currency actually found on the
+# page (see core.TARGET_CURRENCIES). content is decoded HTML text for
+# kind="html", raw bytes for kind="pdf".
 ParseFn = Callable[[Any, str], Optional[dict]]
 
 

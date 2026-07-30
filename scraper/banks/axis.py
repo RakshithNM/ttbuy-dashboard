@@ -2,7 +2,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from ..core import normalize_date
+from ..core import TARGET_CURRENCIES, normalize_date
 from .base import BankPlugin
 
 AXIS_URL = "https://application.axis.bank.in/webforms/corporatecardrate/index.aspx"
@@ -10,7 +10,8 @@ AXIS_URL = "https://application.axis.bank.in/webforms/corporatecardrate/index.as
 
 def parse(html, source_url):
     """Axis table columns: Currency, Code, TT Buy, TT Sell, Bill Buy, Bill Sell,
-    TC Buy, TC Sell, CCY Buy, CCY Sell."""
+    TC Buy, TC Sell, CCY Buy, CCY Sell. The code (USD/GBP/EUR/AED) is its own
+    cell; TT Buy is the next cell."""
     soup = BeautifulSoup(html, "html.parser")
     text = soup.get_text(" ", strip=True)
 
@@ -25,26 +26,26 @@ def parse(html, source_url):
         published_date = normalize_date(match.group(1))
         published_at = match.group(2).strip()
 
+    results = {}
     for row in soup.find_all("tr"):
         cells = [
             cell.get_text(" ", strip=True)
             for cell in row.find_all(["td", "th"])
             if cell.get_text(" ", strip=True)
         ]
-        if "USD" not in cells:
-            continue
-
-        usd_index = cells.index("USD")
-        if len(cells) <= usd_index + 1:
-            continue
-
-        return {
-            "Rate_Date": published_date,
-            "Published_At": published_at,
-            "TT_Buy": cells[usd_index + 1],
-            "Raw_Data_Row": cells,
-        }
-    return None
+        for code in TARGET_CURRENCIES:
+            if code in results or code not in cells:
+                continue
+            idx = cells.index(code)
+            if len(cells) <= idx + 1:
+                continue
+            results[code] = {
+                "Rate_Date": published_date,
+                "Published_At": published_at,
+                "TT_Buy": cells[idx + 1],
+                "Raw_Data_Row": cells,
+            }
+    return results or None
 
 
 PLUGIN = BankPlugin(

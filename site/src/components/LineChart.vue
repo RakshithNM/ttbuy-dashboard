@@ -6,6 +6,7 @@ import { shortName } from "../bankPalette";
 const props = defineProps<{
   series: BankSeries[];
   hidden: Set<string>;
+  currency: string;
 }>();
 const emit = defineEmits<{ (e: "toggle", bank: string): void }>();
 
@@ -260,7 +261,7 @@ const tableRows = computed(() =>
       :viewBox="`0 0 ${W} ${H}`"
       class="chart-svg"
       role="img"
-      aria-label="USD TT Buy rate over time by bank"
+      :aria-label="`${currency} TT Buy rate over time by bank`"
       @pointermove="onPointerMove"
       @pointerleave="onPointerLeave"
     >

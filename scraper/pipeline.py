@@ -5,7 +5,14 @@ from datetime import datetime
 import pandas as pd
 
 from .banks import REGISTRY
-from .core import REQUEST_DELAY_SECONDS, fetch_bytes, fetch_html, fetch_rendered_html, get_wayback_snapshots
+from .core import (
+    REQUEST_DELAY_SECONDS,
+    TARGET_CURRENCIES,
+    fetch_bytes,
+    fetch_html,
+    fetch_rendered_html,
+    get_wayback_snapshots,
+)
 
 
 def fetch_content(plugin, url, is_wayback=False):
@@ -23,6 +30,7 @@ def fetch_content(plugin, url, is_wayback=False):
 
 OUTPUT_COLUMNS = [
     "Bank",
+    "Currency",
     "Snapshot_Timestamp",
     "Snapshot_Date",
     "Date",
@@ -56,6 +64,10 @@ def prepare_output_df(df, bank_name=None):
         if column not in df.columns:
             df[column] = None
 
+    # CSVs written before multi-currency support has no Currency column;
+    # every row scraped back then was USD.
+    df["Currency"] = df["Currency"].fillna("USD").replace("", "USD")
+
     if "Snapshot_Timestamp" in df.columns:
         df = df.sort_values("Snapshot_Timestamp")
 
@@ -80,10 +92,10 @@ def write_bank_outputs(slug, bank_name, df):
     df.to_csv(_csv_path(slug), index=False)
 
     with open(_md_path(slug), "w", encoding="utf-8") as output:
-        output.write("Date       | TT Buy\n")
-        output.write("---------------------\n")
+        output.write("Date       | Currency | TT Buy\n")
+        output.write("--------------------------------\n")
         for _, row in df.iterrows():
-            output.write(f"{row['Date']} | {row['TT_Buy']}\n")
+            output.write(f"{row['Date']} | {row['Currency']} | {row['TT_Buy']}\n")
 
 
 def write_combined_outputs():
@@ -93,15 +105,15 @@ def write_combined_outputs():
         return
 
     combined = pd.concat(valid_dfs, ignore_index=True)
-    combined = combined.sort_values(["Bank", "Snapshot_Timestamp"])
+    combined = combined.sort_values(["Bank", "Currency", "Snapshot_Timestamp"])
     os.makedirs(DATA_DIR, exist_ok=True)
     combined.to_csv(os.path.join(DATA_DIR, "forex_TTBuy.csv"), index=False)
 
     with open(os.path.join(DATA_DIR, "forex_TTBuy.md"), "w", encoding="utf-8") as output:
-        output.write("Bank | Date | TT Buy\n")
-        output.write("--------------------\n")
+        output.write("Bank | Currency | Date | TT Buy\n")
+        output.write("-------------------------------\n")
         for _, row in combined.iterrows():
-            output.write(f"{row['Bank']} | {row['Date']} | {row['TT_Buy']}\n")
+            output.write(f"{row['Bank']} | {row['Currency']} | {row['Date']} | {row['TT_Buy']}\n")
 
 
 def print_snapshot_coverage(bank_name, snapshots):
@@ -133,14 +145,22 @@ def scrape_bank_history(plugin, snapshots):
 
     existing_df = load_existing_output(plugin.slug, plugin.name)
     historical_data = existing_df.to_dict("records")
-    completed_snapshots = set(existing_df["Snapshot_Timestamp"].dropna()) if not existing_df.empty else set()
+    # A snapshot only counts as "done" once every target currency has a row
+    # for it — otherwise a snapshot scraped back when only USD was extracted
+    # would be skipped forever and never picked up for the new currencies.
+    currencies_by_snapshot = (
+        existing_df.groupby("Snapshot_Timestamp")["Currency"].apply(set).to_dict()
+        if not existing_df.empty
+        else {}
+    )
     skipped = []
 
-    if completed_snapshots:
-        print(f"Resuming from {plugin.slug}_TTBuy.csv with {len(completed_snapshots)} completed snapshots")
+    if currencies_by_snapshot:
+        print(f"Resuming from {plugin.slug}_TTBuy.csv with {len(currencies_by_snapshot)} snapshots on file")
 
     for timestamp, orig_url in snapshots:
-        if timestamp in completed_snapshots:
+        have_currencies = currencies_by_snapshot.get(timestamp, set())
+        if set(TARGET_CURRENCIES) <= have_currencies:
             continue
 
         archive_link = f"https://web.archive.org/web/{timestamp}/{orig_url}"
@@ -149,24 +169,31 @@ def scrape_bank_history(plugin, snapshots):
         print(f"Scraping {plugin.name} data for {snapshot_date}...")
         try:
             content = fetch_content(plugin, archive_link, is_wayback=True)
-            parsed_row = plugin.parse(content, orig_url)
+            parsed = plugin.parse(content, orig_url)
         except Exception as e:
             print(f"Failed to fetch/parse {archive_link}: {e}")
-            parsed_row = None
+            parsed = None
 
-        if parsed_row:
-            historical_data.append({
-                "Bank": plugin.name,
-                "Snapshot_Timestamp": timestamp,
-                "Snapshot_Date": snapshot_date,
-                "Date": parsed_row["Rate_Date"] or snapshot_date,
-                "Rate_Date": parsed_row["Rate_Date"],
-                "Published_At": parsed_row.get("Published_At"),
-                "TT_Buy": parsed_row["TT_Buy"],
-                "Source_URL": orig_url,
-                "Raw_Data_Row": parsed_row["Raw_Data_Row"],
-            })
-            write_bank_outputs(plugin.slug, plugin.name, pd.DataFrame(historical_data))
+        if parsed:
+            added_any = False
+            for currency, parsed_row in parsed.items():
+                if currency in have_currencies:
+                    continue
+                historical_data.append({
+                    "Bank": plugin.name,
+                    "Currency": currency,
+                    "Snapshot_Timestamp": timestamp,
+                    "Snapshot_Date": snapshot_date,
+                    "Date": parsed_row["Rate_Date"] or snapshot_date,
+                    "Rate_Date": parsed_row["Rate_Date"],
+                    "Published_At": parsed_row.get("Published_At"),
+                    "TT_Buy": parsed_row["TT_Buy"],
+                    "Source_URL": orig_url,
+                    "Raw_Data_Row": parsed_row["Raw_Data_Row"],
+                })
+                added_any = True
+            if added_any:
+                write_bank_outputs(plugin.slug, plugin.name, pd.DataFrame(historical_data))
         else:
             skipped.append({"Snapshot_Date": snapshot_date, "Source_URL": orig_url})
         time.sleep(REQUEST_DELAY_SECONDS)
@@ -191,37 +218,47 @@ def add_live_row(plugin):
 
     try:
         content = fetch_content(plugin, plugin.live_url)
-        parsed_row = plugin.parse(content, plugin.live_url)
+        parsed = plugin.parse(content, plugin.live_url)
     except Exception as e:
         print(f"Failed to fetch/parse live {plugin.name} rate: {e}")
-        parsed_row = None
+        parsed = None
 
-    if not parsed_row:
+    if not parsed:
         print(f"No live {plugin.name} TT Buy row parsed.")
         return existing_df
 
-    rate_date = parsed_row["Rate_Date"] or datetime.now().strftime("%Y-%m-%d")
-    existing_live = existing_df[
-        (existing_df["Source_URL"] == plugin.live_url) & (existing_df["Date"] == rate_date)
-    ] if not existing_df.empty else pd.DataFrame()
-    if not existing_live.empty:
-        print(f"Live {plugin.name} row for {rate_date} already exists.")
-        return existing_df
+    now = datetime.now()
+    live_timestamp = f"live-{now.strftime('%Y%m%d%H%M%S')}"
+    added = 0
+    for currency, parsed_row in parsed.items():
+        rate_date = parsed_row["Rate_Date"] or now.strftime("%Y-%m-%d")
+        existing_live = existing_df[
+            (existing_df["Source_URL"] == plugin.live_url)
+            & (existing_df["Date"] == rate_date)
+            & (existing_df["Currency"] == currency)
+        ] if not existing_df.empty else pd.DataFrame()
+        if not existing_live.empty:
+            print(f"Live {plugin.name} {currency} row for {rate_date} already exists.")
+            continue
 
-    live_timestamp = f"live-{datetime.now().strftime('%Y%m%d%H%M%S')}"
-    historical_data.append({
-        "Bank": plugin.name,
-        "Snapshot_Timestamp": live_timestamp,
-        "Snapshot_Date": datetime.now().strftime("%Y-%m-%d"),
-        "Date": rate_date,
-        "Rate_Date": parsed_row["Rate_Date"],
-        "Published_At": parsed_row.get("Published_At"),
-        "TT_Buy": parsed_row["TT_Buy"],
-        "Source_URL": plugin.live_url,
-        "Raw_Data_Row": parsed_row["Raw_Data_Row"],
-    })
+        historical_data.append({
+            "Bank": plugin.name,
+            "Currency": currency,
+            "Snapshot_Timestamp": live_timestamp,
+            "Snapshot_Date": now.strftime("%Y-%m-%d"),
+            "Date": rate_date,
+            "Rate_Date": parsed_row["Rate_Date"],
+            "Published_At": parsed_row.get("Published_At"),
+            "TT_Buy": parsed_row["TT_Buy"],
+            "Source_URL": plugin.live_url,
+            "Raw_Data_Row": parsed_row["Raw_Data_Row"],
+        })
+        print(f"Added live {plugin.name} {currency} row: {rate_date} TT Buy {parsed_row['TT_Buy']}")
+        added += 1
+
+    if added == 0:
+        return existing_df
 
     df = prepare_output_df(pd.DataFrame(historical_data), plugin.name)
     write_bank_outputs(plugin.slug, plugin.name, df)
-    print(f"Added live {plugin.name} row: {rate_date} TT Buy {parsed_row['TT_Buy']}")
     return df

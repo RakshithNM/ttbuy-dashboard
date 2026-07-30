@@ -1,7 +1,7 @@
 # TTBuy Dashboard
 
-Tracks the USD TT Buy (inward remittance) rate across Indian banks and shows the
-history on a small Vite + Vue + TypeScript site.
+Tracks the TT Buy (inward remittance) rate across Indian banks — USD, GBP, EUR,
+and AED — and shows the history on a small Vite + Vue + TypeScript site.
 
 ## Layout
 

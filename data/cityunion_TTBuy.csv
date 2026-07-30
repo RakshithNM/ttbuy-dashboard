@@ -1,3 +1,6 @@
-Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
-City Union Bank,live-20260729232246,2026-07-29,2026-07-29,2026-07-29,10:00 AM,94.75,https://cityunionbank.bank.in/foreign-exchange-rates,"['USD', '94.75', '96.70', '94.75', '96.70', '94.30', '97.15', '93.80', '97.65']"
-City Union Bank,live-20260730061349,2026-07-30,2026-07-30,2026-07-30,10:00 AM,94.60,https://cityunionbank.bank.in/foreign-exchange-rates,"['USD', '94.60', '96.55', '94.60', '96.55', '94.15', '97.00', '93.65', '97.50']"
+Bank,Currency,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+City Union Bank,USD,live-20260729232246,2026-07-29,2026-07-29,2026-07-29,10:00 AM,94.75,https://cityunionbank.bank.in/foreign-exchange-rates,"['USD', '94.75', '96.70', '94.75', '96.70', '94.30', '97.15', '93.80', '97.65']"
+City Union Bank,USD,live-20260730061349,2026-07-30,2026-07-30,2026-07-30,10:00 AM,94.60,https://cityunionbank.bank.in/foreign-exchange-rates,"['USD', '94.60', '96.55', '94.60', '96.55', '94.15', '97.00', '93.65', '97.50']"
+City Union Bank,AED,live-20260730184128,2026-07-30,2026-07-30,2026-07-30,10:00 AM,25.75,https://cityunionbank.bank.in/foreign-exchange-rates,"['AED', '25.75', '26.30', '25.75', '26.30', '-', '-', '-', '-']"
+City Union Bank,EUR,live-20260730184128,2026-07-30,2026-07-30,2026-07-30,10:00 AM,108.35,https://cityunionbank.bank.in/foreign-exchange-rates,"['EUR', '108.35', '110.55', '108.35', '110.55', '-', '-', '107.25', '111.65']"
+City Union Bank,GBP,live-20260730184128,2026-07-30,2026-07-30,2026-07-30,10:00 AM,126.25,https://cityunionbank.bank.in/foreign-exchange-rates,"['GBP', '126.25', '128.80', '126.25', '128.80', '-', '-', '125.00', '130.10']"

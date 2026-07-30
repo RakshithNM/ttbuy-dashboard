@@ -17,6 +17,10 @@ DEFAULT_HEADERS = {
 }
 REQUEST_DELAY_SECONDS = float(os.environ.get("WAYBACK_DELAY_SECONDS", "5"))
 
+# Currencies every bank publishes a TT Buy rate for in the same table/PDF we
+# already parse for USD — confirmed by auditing all 18 banks' raw pages.
+TARGET_CURRENCIES = ["USD", "GBP", "EUR", "AED"]
+
 
 def normalize_date(value):
     if not value:
@@ -85,12 +89,18 @@ def fetch_bytes(url, is_wayback=False):
     return content
 
 
-def fetch_rendered_html(url, timeout_ms=30000, settle_ms=2000):
+def fetch_rendered_html(url, timeout_ms=30000, settle_ms=4000):
     """Fetch a URL with a headless browser and return the fully rendered HTML.
 
     Only for banks whose rate page has no data in the raw HTTP response (the
     rate table is populated by client-side JS/AJAX after load). Playwright is
     imported lazily so it stays an optional dependency for everyone else.
+
+    Uses wait_until="load" rather than "networkidle": some sites (e.g. DBS)
+    keep a persistent background connection open (analytics/polling) that
+    never lets the network go idle, which made "networkidle" time out even
+    though the page had long finished rendering. A fixed settle delay after
+    "load" is used instead to give client-side JS time to populate the table.
     """
     from playwright.sync_api import sync_playwright
 
@@ -98,7 +108,7 @@ def fetch_rendered_html(url, timeout_ms=30000, settle_ms=2000):
         browser = p.chromium.launch()
         try:
             page = browser.new_page(user_agent=DEFAULT_HEADERS["User-Agent"])
-            page.goto(url, wait_until="networkidle", timeout=timeout_ms)
+            page.goto(url, wait_until="load", timeout=timeout_ms)
             page.wait_for_timeout(settle_ms)
             html = page.content()
         finally:

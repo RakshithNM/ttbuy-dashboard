@@ -3,7 +3,7 @@ import re
 
 import pdfplumber
 
-from ..core import normalize_date
+from ..core import TARGET_CURRENCIES, normalize_date
 from .base import BankPlugin
 
 UJJIVAN_LANDING_URL = "https://www.ujjivansfb.bank.in/forex-rates"
@@ -32,16 +32,21 @@ def parse(pdf_bytes, source_url):
     rate_date = normalize_date(date_match.group(1)) if date_match else None
     published_at = time_match.group(1).strip() if time_match else None
 
+    results = {}
     for row in table:
-        if not row or len(row) <= 2 or row[1] != "USD":
+        if not row or len(row) <= 2:
             continue
-        return {
+        code = row[1]
+        if code not in TARGET_CURRENCIES or code in results:
+            continue
+
+        results[code] = {
             "Rate_Date": rate_date,
             "Published_At": published_at,
             "TT_Buy": row[2],
             "Raw_Data_Row": row,
         }
-    return None
+    return results or None
 
 
 PLUGIN = BankPlugin(

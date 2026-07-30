@@ -3,7 +3,7 @@ import re
 
 import pdfplumber
 
-from ..core import normalize_date
+from ..core import TARGET_CURRENCIES, normalize_date
 from .base import BankPlugin
 
 CITI_URL = "https://www.citigroup.com/rcs/citigpa/storage/public/India/forex-rates.pdf"
@@ -21,16 +21,18 @@ def parse(pdf_bytes, source_url):
     rate_date = normalize_date(date_match.group(1)) if date_match else None
     published_at = time_match.group(1).strip() if time_match else None
 
-    match = re.search(r"USD/INR\s+([\d.]+)\s+([\d.]+)", text)
-    if not match:
-        return None
-
-    return {
-        "Rate_Date": rate_date,
-        "Published_At": published_at,
-        "TT_Buy": match.group(1),
-        "Raw_Data_Row": ["USD/INR", match.group(1), match.group(2)],
-    }
+    results = {}
+    for code in TARGET_CURRENCIES:
+        match = re.search(rf"{code}/INR\s+([\d.]+)\s+([\d.]+)", text)
+        if not match:
+            continue
+        results[code] = {
+            "Rate_Date": rate_date,
+            "Published_At": published_at,
+            "TT_Buy": match.group(1),
+            "Raw_Data_Row": [f"{code}/INR", match.group(1), match.group(2)],
+        }
+    return results or None
 
 
 PLUGIN = BankPlugin(

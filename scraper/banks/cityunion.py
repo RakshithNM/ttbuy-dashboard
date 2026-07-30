@@ -2,7 +2,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from ..core import normalize_date
+from ..core import TARGET_CURRENCIES, normalize_date
 from .base import BankPlugin
 
 CUB_URL = "https://cityunionbank.bank.in/foreign-exchange-rates"
@@ -19,22 +19,26 @@ def parse(html, source_url):
     rate_date = normalize_date(match.group(1)) if match else None
     published_at = match.group(2).strip() if match else None
 
+    results = {}
     for table in soup.find_all("table"):
         if "Telegraph Transfer" not in table.get_text(" ", strip=True):
             continue
 
         for row in table.find_all("tr"):
             cells = [cell.get_text(" ", strip=True) for cell in row.find_all(["td", "th"])]
-            if len(cells) <= 1 or cells[0].upper() != "USD":
+            if len(cells) <= 1:
+                continue
+            code = cells[0].upper()
+            if code not in TARGET_CURRENCIES or code in results:
                 continue
 
-            return {
+            results[code] = {
                 "Rate_Date": rate_date,
                 "Published_At": published_at,
                 "TT_Buy": cells[1],
                 "Raw_Data_Row": cells,
             }
-    return None
+    return results or None
 
 
 PLUGIN = BankPlugin(

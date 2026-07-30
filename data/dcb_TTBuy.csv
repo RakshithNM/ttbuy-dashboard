@@ -1,3 +1,6 @@
-Bank,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
-DCB Bank,live-20260729232636,2026-07-29,2026-07-29,2026-07-29,15:55:55,93.85,https://www.dcb.bank.in/rates/forex-rates,"['1', 'USD', '97.45', '93.85', '97.65', '93.65', '97.85', '93.45', '98.35', '92.95']"
-DCB Bank,live-20260730061359,2026-07-30,2026-07-30,2026-07-30,09:34:09,93.83,https://www.dcb.bank.in/rates/forex-rates,"['1', 'USD', '97.43', '93.83', '97.63', '93.63', '97.83', '93.43', '98.33', '92.93']"
+Bank,Currency,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+DCB Bank,USD,live-20260729232636,2026-07-29,2026-07-29,2026-07-29,15:55:55,93.85,https://www.dcb.bank.in/rates/forex-rates,"['1', 'USD', '97.45', '93.85', '97.65', '93.65', '97.85', '93.45', '98.35', '92.95']"
+DCB Bank,USD,live-20260730061359,2026-07-30,2026-07-30,2026-07-30,09:34:09,93.83,https://www.dcb.bank.in/rates/forex-rates,"['1', 'USD', '97.43', '93.83', '97.63', '93.63', '97.83', '93.43', '98.33', '92.93']"
+DCB Bank,GBP,live-20260730184142,2026-07-30,2026-07-30,2026-07-30,15:54:29,126.08,https://www.dcb.bank.in/rates/forex-rates,"['1', 'GBP', '130.08', '126.08', '130.28', '125.88', '131.13', '125.03', '131.23', '124.93']"
+DCB Bank,EUR,live-20260730184142,2026-07-30,2026-07-30,2026-07-30,15:54:29,107.78,https://www.dcb.bank.in/rates/forex-rates,"['1', 'EUR', '111.78', '107.78', '111.98', '107.58', '112.48', '107.08', '112.58', '106.98']"
+DCB Bank,AED,live-20260730184142,2026-07-30,2026-07-30,2026-07-30,15:54:29,25.05,https://www.dcb.bank.in/rates/forex-rates,"['1', 'AED', '27.05', '25.05', '27.25', '24.85', '27.45', '24.65', '27.55', '24.55']"

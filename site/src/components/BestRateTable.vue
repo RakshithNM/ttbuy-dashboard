@@ -2,9 +2,11 @@
 import { computed, ref } from "vue";
 import type { BankSeries } from "../types";
 import { shortName } from "../bankPalette";
+import { currencySymbol } from "../currencies";
 
 const props = defineProps<{
   series: BankSeries[];
+  currency: string;
 }>();
 
 const amount = ref(1000);
@@ -72,19 +74,19 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
     <div class="amount-control">
       <label for="remit-amount">If you receive</label>
       <div class="amount-field">
-        <span class="prefix">$</span>
+        <span class="prefix">{{ currencySymbol(currency) }}</span>
         <input id="remit-amount" v-model.number="amount" type="number" min="0" step="1" inputmode="decimal" class="amount-input" />
       </div>
-      <span class="suffix">USD, here's what each bank credits you</span>
+      <span class="suffix">{{ currency }}, here's what each bank credits you</span>
     </div>
 
     <div class="table-wrap">
       <table class="best-rate-table">
-        <caption>USD TT Buy rate by bank — most recent published rate per bank</caption>
+        <caption>{{ currency }} TT Buy rate by bank — most recent published rate per bank</caption>
         <thead>
           <tr>
             <th scope="col">Bank</th>
-            <th scope="col" class="num">TT Buy (₹ / USD)</th>
+            <th scope="col" class="num">TT Buy (₹ / {{ currency }})</th>
             <th scope="col" class="num">You receive (₹)</th>
             <th scope="col" class="num">vs best</th>
             <th scope="col">As of</th>

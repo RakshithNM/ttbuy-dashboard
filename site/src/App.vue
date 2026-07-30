@@ -3,9 +3,10 @@ import { computed, onMounted, ref, watch } from "vue";
 import LineChart from "./components/LineChart.vue";
 import BestRateTable from "./components/BestRateTable.vue";
 import { isWrappedSlot, shortName, slotForBank, sortByBankOrder } from "./bankPalette";
-import type { BankSeries, RatesByBank } from "./types";
+import { currencyName, sortByCurrencyOrder } from "./currencies";
+import type { BankSeries, RatesByCurrency } from "./types";
 
-const rawRates = ref<RatesByBank>({});
+const rawRates = ref<RatesByCurrency>({});
 const loading = ref(true);
 const loadError = ref<string | null>(null);
 const hidden = ref<Set<string>>(new Set());
@@ -28,6 +29,7 @@ const VIEW_STORAGE_KEY = "ttbuy-dashboard:view";
 interface StoredView {
   range?: RangeKey;
   showTable?: boolean;
+  currency?: string;
 }
 
 function loadStoredView(): StoredView {
@@ -45,10 +47,11 @@ const range = ref<RangeKey>(
   storedView.range && RANGE_OPTIONS.some((o) => o.key === storedView.range) ? storedView.range : "7d"
 );
 const showTable = ref(typeof storedView.showTable === "boolean" ? storedView.showTable : true);
+const currency = ref<string>(storedView.currency ?? "USD");
 
-watch([range, showTable], ([r, t]) => {
+watch([range, showTable, currency], ([r, t, c]) => {
   try {
-    localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ range: r, showTable: t }));
+    localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ range: r, showTable: t, currency: c }));
   } catch {
     // Persistence is best-effort; nothing to do if storage is unavailable.
   }
@@ -59,6 +62,9 @@ onMounted(async () => {
     const res = await fetch(`${import.meta.env.BASE_URL}data/rates.json`);
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     rawRates.value = await res.json();
+    if (!(currency.value in rawRates.value)) {
+      currency.value = sortByCurrencyOrder(Object.keys(rawRates.value))[0] ?? "USD";
+    }
   } catch (e) {
     loadError.value = e instanceof Error ? e.message : "Failed to load rate data";
   } finally {
@@ -66,13 +72,17 @@ onMounted(async () => {
   }
 });
 
+const availableCurrencies = computed(() => sortByCurrencyOrder(Object.keys(rawRates.value)));
+
+const bankRates = computed(() => rawRates.value[currency.value] ?? {});
+
 const allSeries = computed<BankSeries[]>(() => {
-  const banks = sortByBankOrder(Object.keys(rawRates.value));
+  const banks = sortByBankOrder(Object.keys(bankRates.value));
   return banks.map((name) => ({
     name,
     color: slotForBank(name),
     wrapped: isWrappedSlot(name),
-    points: rawRates.value[name] ?? [],
+    points: bankRates.value[name] ?? [],
   }));
 });
 
@@ -117,12 +127,12 @@ const lastUpdated = computed(() => {
 <template>
   <header class="page-header">
     <p class="eyebrow">Inward remittance rates</p>
-    <h1>USD TT Buy rate by Indian bank</h1>
+    <h1>{{ currency }} TT Buy rate by Indian bank</h1>
     <p class="lede">
       TT Buy is the rate a bank credits you at when you receive a foreign inward
       (telegraphic transfer) remittance — a higher TT Buy means more rupees for the
-      same dollar amount. Rates below are scraped directly from each bank's public
-      forex rate page.
+      same {{ currencyName(currency) }} amount. Rates below are scraped directly from
+      each bank's public forex rate page.
     </p>
     <p v-if="lastUpdated" class="updated">
       Data last updated {{ lastUpdated }}. Collected daily once at 11 AM IST, starting 28 July 2026.
@@ -130,19 +140,34 @@ const lastUpdated = computed(() => {
   </header>
 
   <main v-if="!loading && !loadError">
-    <div class="bank-search">
-      <svg class="search-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-        <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5" />
-        <line x1="11" y1="11" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-      </svg>
-      <input v-model="bankQuery" type="search" placeholder="Search banks…" aria-label="Search banks" class="bank-search-input" />
-      <button v-if="bankQuery" type="button" class="clear-search" aria-label="Clear search" @click="bankQuery = ''">✕</button>
+    <div class="toolbar">
+      <div v-if="availableCurrencies.length > 1" class="currency-filter" role="group" aria-label="Currency">
+        <button
+          v-for="code in availableCurrencies"
+          :key="code"
+          type="button"
+          class="currency-btn"
+          :class="{ active: currency === code }"
+          :aria-pressed="currency === code"
+          @click="currency = code"
+        >
+          {{ code }}
+        </button>
+      </div>
+      <div class="bank-search">
+        <svg class="search-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5" />
+          <line x1="11" y1="11" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        <input v-model="bankQuery" type="search" placeholder="Search banks…" aria-label="Search banks" class="bank-search-input" />
+        <button v-if="bankQuery" type="button" class="clear-search" aria-label="Clear search" @click="bankQuery = ''">✕</button>
+      </div>
     </div>
     <p v-if="bankQuery && searchedSeries.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
 
     <section class="panel">
       <h2>Best rate today</h2>
-      <BestRateTable :series="searchedSeries" />
+      <BestRateTable :series="searchedSeries" :currency="currency" />
     </section>
 
     <section class="panel">
@@ -167,7 +192,7 @@ const lastUpdated = computed(() => {
           </div>
         </div>
       </div>
-      <LineChart v-model:show-table="showTable" :series="filteredSeries" :hidden="hidden" @toggle="toggleBank" />
+      <LineChart v-model:show-table="showTable" :series="filteredSeries" :hidden="hidden" :currency="currency" @toggle="toggleBank" />
     </section>
   </main>
 
@@ -210,12 +235,46 @@ const lastUpdated = computed(() => {
   }
 }
 
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.currency-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.currency-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+
+  &.active {
+    background: var(--series-1);
+    border-color: var(--series-1);
+    color: #fff;
+  }
+}
+
 .bank-search {
   display: flex;
   align-items: center;
   gap: 6px;
   max-width: 280px;
-  margin-bottom: 16px;
+  flex: 1;
+  min-width: 160px;
+  margin-bottom: 0;
   padding: 0 10px;
   border: 1px solid var(--border);
   border-radius: 6px;

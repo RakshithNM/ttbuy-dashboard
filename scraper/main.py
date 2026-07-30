@@ -22,13 +22,16 @@ def main():
             print(f"Unknown bank slug: {slug} (known: {', '.join(REGISTRY)})")
             continue
 
-        snapshots = [] if max_snapshot_count == 0 else get_bank_snapshots(plugin, start_date, end_date)
-        if max_snapshot_count:
-            snapshots = snapshots[:max_snapshot_count]
+        try:
+            snapshots = [] if max_snapshot_count == 0 else get_bank_snapshots(plugin, start_date, end_date)
+            if max_snapshot_count:
+                snapshots = snapshots[:max_snapshot_count]
 
-        scrape_bank_history(plugin, snapshots)
-        if include_live:
-            add_live_row(plugin)
+            scrape_bank_history(plugin, snapshots)
+            if include_live:
+                add_live_row(plugin)
+        except Exception as e:
+            print(f"Skipping {plugin.name} after unrecoverable error: {e}")
 
     write_combined_outputs()
     print("\nSaved forex_TTBuy.csv and forex_TTBuy.md")
