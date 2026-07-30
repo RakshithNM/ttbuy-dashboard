@@ -20,6 +20,10 @@ interface Row {
   ttbuy: number;
   date: string;
   youReceive: number;
+  // Change vs this bank's previous scraped rate — not strictly "yesterday",
+  // since a bank can miss a day; null when there's no earlier point to
+  // compare against yet.
+  delta: number | null;
 }
 
 const rows = computed<Row[]>(() => {
@@ -27,6 +31,7 @@ const rows = computed<Row[]>(() => {
     .map((s) => {
       const last = s.points[s.points.length - 1];
       if (!last) return null;
+      const prev = s.points.length >= 2 ? s.points[s.points.length - 2] : null;
       return {
         bank: s.name,
         color: s.color,
@@ -34,6 +39,7 @@ const rows = computed<Row[]>(() => {
         ttbuy: last.ttbuy,
         date: last.date,
         youReceive: last.ttbuy * safeAmount.value,
+        delta: prev ? last.ttbuy - prev.ttbuy : null,
       };
     })
     .filter((r): r is Row => r !== null);
@@ -47,6 +53,12 @@ const bestBank = computed(() => rows.value[0]?.bank ?? null);
 
 function formatInr(value: number): string {
   return value.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+}
+
+function deltaDirection(delta: number): "up" | "down" | "flat" {
+  if (delta > 0.004) return "up";
+  if (delta < -0.004) return "down";
+  return "flat";
 }
 </script>
 
@@ -89,7 +101,20 @@ function formatInr(value: number): string {
                 <span class="badge-text">Best rate</span>
               </span>
             </th>
-            <td class="num">{{ row.ttbuy.toFixed(2) }}</td>
+            <td class="num">
+              {{ row.ttbuy.toFixed(2) }}
+              <span
+                v-if="row.delta !== null"
+                class="delta"
+                :class="deltaDirection(row.delta)"
+                :title="`${deltaDirection(row.delta) === 'flat' ? 'Unchanged' : deltaDirection(row.delta) === 'up' ? 'Up' : 'Down'} ${Math.abs(row.delta).toFixed(2)} vs previous rate`"
+              >
+                <template v-if="deltaDirection(row.delta) === 'up'">▲</template>
+                <template v-else-if="deltaDirection(row.delta) === 'down'">▼</template>
+                <template v-else>–</template>
+                {{ Math.abs(row.delta).toFixed(2) }}
+              </span>
+            </td>
             <td class="num receive">₹{{ formatInr(row.youReceive) }}</td>
             <td class="muted">{{ row.date }}</td>
           </tr>
@@ -211,6 +236,26 @@ function formatInr(value: number): string {
   .receive {
     color: var(--text-primary);
     font-weight: 600;
+  }
+
+  .delta {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+
+    &.up {
+      color: var(--success-text);
+    }
+
+    &.down {
+      color: var(--status-critical);
+    }
+
+    &.flat {
+      color: var(--text-muted);
+    }
   }
 
   .muted {
