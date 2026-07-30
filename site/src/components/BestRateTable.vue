@@ -24,10 +24,13 @@ interface Row {
   // since a bank can miss a day; null when there's no earlier point to
   // compare against yet.
   delta: number | null;
+  // Rupees you'd receive less than the best bank, at the chosen amount —
+  // 0 for the best bank itself.
+  gapToBest: number;
 }
 
 const rows = computed<Row[]>(() => {
-  const latest = props.series
+  const withoutGap = props.series
     .map((s) => {
       const last = s.points[s.points.length - 1];
       if (!last) return null;
@@ -42,11 +45,13 @@ const rows = computed<Row[]>(() => {
         delta: prev ? last.ttbuy - prev.ttbuy : null,
       };
     })
-    .filter((r): r is Row => r !== null);
+    .filter((r): r is Omit<Row, "gapToBest"> => r !== null)
+    // Sorting by TT Buy is equivalent to sorting by amount received (a
+    // positive linear scale of it), so one sort serves both columns.
+    .sort((a, b) => b.ttbuy - a.ttbuy);
 
-  // Sorting by TT Buy is equivalent to sorting by amount received (a
-  // positive linear scale of it), so one sort serves both columns.
-  return latest.sort((a, b) => b.ttbuy - a.ttbuy);
+  const bestTtbuy = withoutGap[0]?.ttbuy ?? 0;
+  return withoutGap.map((r) => ({ ...r, gapToBest: (bestTtbuy - r.ttbuy) * safeAmount.value }));
 });
 
 const bestBank = computed(() => rows.value[0]?.bank ?? null);
@@ -81,6 +86,7 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
             <th scope="col">Bank</th>
             <th scope="col" class="num">TT Buy (₹ / USD)</th>
             <th scope="col" class="num">You receive (₹)</th>
+            <th scope="col" class="num">vs best</th>
             <th scope="col">As of</th>
           </tr>
         </thead>
@@ -116,6 +122,10 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
               </span>
             </td>
             <td class="num receive">₹{{ formatInr(row.youReceive) }}</td>
+            <td class="num gap" :class="{ muted: row.bank === bestBank }">
+              <template v-if="row.bank === bestBank">—</template>
+              <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
+            </td>
             <td class="muted">{{ row.date }}</td>
           </tr>
         </tbody>
@@ -236,6 +246,10 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
   .receive {
     color: var(--text-primary);
     font-weight: 600;
+  }
+
+  .gap {
+    color: var(--text-secondary);
   }
 
   .delta {
