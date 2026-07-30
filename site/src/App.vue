@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import LineChart from "./components/LineChart.vue";
 import BestRateTable from "./components/BestRateTable.vue";
-import { isWrappedSlot, slotForBank, sortByBankOrder } from "./bankPalette";
+import { isWrappedSlot, shortName, slotForBank, sortByBankOrder } from "./bankPalette";
 import type { BankSeries, RatesByBank } from "./types";
 
 const rawRates = ref<RatesByBank>({});
@@ -10,6 +10,7 @@ const loading = ref(true);
 const loadError = ref<string | null>(null);
 const hidden = ref<Set<string>>(new Set());
 const showTable = ref(true);
+const bankQuery = ref("");
 
 type RangeKey = "7d" | "30d" | "90d" | "1y" | "all";
 const range = ref<RangeKey>("7d");
@@ -43,15 +44,25 @@ const allSeries = computed<BankSeries[]>(() => {
   }));
 });
 
+// Matches against both the full and short bank name, so "SBI" finds
+// "State Bank of India" and vice versa.
+const searchedSeries = computed<BankSeries[]>(() => {
+  const q = bankQuery.value.trim().toLowerCase();
+  if (!q) return allSeries.value;
+  return allSeries.value.filter(
+    (s) => s.name.toLowerCase().includes(q) || shortName(s.name).toLowerCase().includes(q)
+  );
+});
+
 const filteredSeries = computed<BankSeries[]>(() => {
   const opt = RANGE_OPTIONS.find((o) => o.key === range.value);
-  if (!opt || opt.days === null) return allSeries.value;
+  if (!opt || opt.days === null) return searchedSeries.value;
 
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - opt.days);
   const cutoffStr = cutoff.toISOString().slice(0, 10);
 
-  return allSeries.value.map((s) => ({
+  return searchedSeries.value.map((s) => ({
     ...s,
     points: s.points.filter((p) => p.date >= cutoffStr),
   }));
@@ -87,9 +98,19 @@ const lastUpdated = computed(() => {
   </header>
 
   <main v-if="!loading && !loadError">
+    <div class="bank-search">
+      <svg class="search-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5" />
+        <line x1="11" y1="11" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+      <input v-model="bankQuery" type="search" placeholder="Search banks…" aria-label="Search banks" class="bank-search-input" />
+      <button v-if="bankQuery" type="button" class="clear-search" aria-label="Clear search" @click="bankQuery = ''">✕</button>
+    </div>
+    <p v-if="bankQuery && searchedSeries.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
+
     <section class="panel">
       <h2>Best rate today</h2>
-      <BestRateTable :series="allSeries" />
+      <BestRateTable :series="searchedSeries" />
     </section>
 
     <section class="panel">
@@ -155,6 +176,67 @@ const lastUpdated = computed(() => {
     font-size: 13px;
     margin: 0;
   }
+}
+
+.bank-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 280px;
+  margin-bottom: 16px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-1);
+
+  .search-icon {
+    color: var(--text-muted);
+    flex: none;
+  }
+}
+
+.bank-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  padding: 8px 4px;
+  font-size: 13px;
+  color: var(--text-primary);
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  // Hide the native cancel button — the .clear-search button replaces it
+  // so it matches the rest of the app's styling.
+  &::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+}
+
+.clear-search {
+  flex: none;
+  background: none;
+  border: none;
+  padding: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+.no-results {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: -8px 0 16px;
 }
 
 .panel {
