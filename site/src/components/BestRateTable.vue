@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import type { BankSeries } from "../types";
+import type { BankSeries, FeesByBank } from "../types";
 import { shortName } from "../bankPalette";
 import { currencySymbol } from "../currencies";
 
 const props = defineProps<{
   series: BankSeries[];
   currency: string;
+  fees: FeesByBank;
 }>();
 
 const amount = ref(1000);
@@ -94,6 +95,45 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
   if (delta < -0.004) return "down";
   return "flat";
 }
+
+// Fee tooltip is positioned via getBoundingClientRect + position:fixed rather
+// than a plain CSS :hover reveal, so it isn't clipped by .table-wrap's
+// overflow:auto (needed for horizontal scroll on narrow screens) — same
+// approach LineChart.vue uses for its own tooltip for the same reason.
+const activeFeeBank = ref<string | null>(null);
+const feeTooltipPos = ref({ top: 0, left: 0 });
+let hideFeeTimer: ReturnType<typeof setTimeout> | null = null;
+
+function cancelHideFeeTooltip() {
+  if (hideFeeTimer !== null) {
+    clearTimeout(hideFeeTimer);
+    hideFeeTimer = null;
+  }
+}
+
+function scheduleHideFeeTooltip() {
+  cancelHideFeeTooltip();
+  hideFeeTimer = setTimeout(() => {
+    activeFeeBank.value = null;
+  }, 100);
+}
+
+function showFeeTooltip(bank: string, evt: Event) {
+  cancelHideFeeTooltip();
+  const target = evt.currentTarget as HTMLElement;
+  const rect = target.getBoundingClientRect();
+  const tooltipWidth = 280;
+  const left = Math.min(rect.left, window.innerWidth - tooltipWidth - 12);
+  feeTooltipPos.value = { top: rect.bottom + 6, left: Math.max(12, left) };
+  activeFeeBank.value = bank;
+}
+
+const feeTooltipStyle = computed(() => ({
+  top: `${feeTooltipPos.value.top}px`,
+  left: `${feeTooltipPos.value.left}px`,
+}));
+
+const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank.value] ?? null : null));
 </script>
 
 <template>
@@ -129,6 +169,22 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
                 aria-hidden="true"
               ></span>
               <span class="bank-name">{{ shortName(row.bank) }}</span>
+              <button
+                v-if="fees[row.bank]"
+                type="button"
+                class="fee-info"
+                aria-label="Inward remittance fee info"
+                @mouseenter="showFeeTooltip(row.bank, $event)"
+                @mouseleave="scheduleHideFeeTooltip"
+                @focus="showFeeTooltip(row.bank, $event)"
+                @blur="scheduleHideFeeTooltip"
+              >
+                <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                  <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.3" />
+                  <line x1="8" y1="7" x2="8" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                  <circle cx="8" cy="4.6" r="0.9" fill="currentColor" />
+                </svg>
+              </button>
               <span v-if="row.bank === bestBank" class="badge">
                 <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
                   <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -162,6 +218,24 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div
+      v-if="activeFee"
+      class="fee-tooltip"
+      :style="feeTooltipStyle"
+      @mouseenter="cancelHideFeeTooltip"
+      @mouseleave="scheduleHideFeeTooltip"
+    >
+      <div class="fee-tooltip-title">{{ shortName(activeFee.bank) }} — inward remittance fee</div>
+      <div v-for="rule in activeFee.rules" :key="rule.label" class="fee-rule">
+        <span class="fee-label">{{ rule.label }}</span>
+        <span class="fee-charge">{{ rule.charge }}</span>
+      </div>
+      <p v-if="activeFee.note" class="fee-note">{{ activeFee.note }}</p>
+      <a :href="activeFee.source_url" target="_blank" rel="noopener noreferrer" class="fee-source">
+        Bank's published schedule ↗
+      </a>
     </div>
   </div>
 </template>
@@ -353,6 +427,79 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
 
   tr.best {
     background: color-mix(in srgb, var(--status-good) 8%, transparent);
+  }
+}
+
+.fee-info {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--text-primary);
+    background: var(--gridline);
+  }
+}
+
+.fee-tooltip {
+  position: fixed;
+  z-index: 20;
+  width: 280px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.fee-tooltip-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.fee-rule {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  color: var(--text-secondary);
+
+  .fee-charge {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: right;
+    flex: none;
+  }
+}
+
+.fee-note {
+  margin: 6px 0 0;
+  padding-top: 6px;
+  border-top: 1px solid var(--gridline);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.fee-source {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--series-1);
+  font-size: 11px;
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 </style>

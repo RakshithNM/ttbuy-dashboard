@@ -4,9 +4,10 @@ import LineChart from "./components/LineChart.vue";
 import BestRateTable from "./components/BestRateTable.vue";
 import { isWrappedSlot, shortName, slotForBank, sortByBankOrder } from "./bankPalette";
 import { currencyName, sortByCurrencyOrder } from "./currencies";
-import type { BankSeries, RatesByCurrency } from "./types";
+import type { BankSeries, FeesByBank, RatesByCurrency } from "./types";
 
 const rawRates = ref<RatesByCurrency>({});
+const fees = ref<FeesByBank>({});
 const loading = ref(true);
 const loadError = ref<string | null>(null);
 const hidden = ref<Set<string>>(new Set());
@@ -69,6 +70,15 @@ onMounted(async () => {
     loadError.value = e instanceof Error ? e.message : "Failed to load rate data";
   } finally {
     loading.value = false;
+  }
+
+  // Fee data only covers a handful of banks so far and is a nice-to-have —
+  // never worth failing the whole page load over.
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}data/fees.json`);
+    if (res.ok) fees.value = await res.json();
+  } catch {
+    // No fee info shown for any bank is an acceptable degraded state.
   }
 });
 
@@ -167,7 +177,7 @@ const lastUpdated = computed(() => {
 
     <section class="panel">
       <h2>Best rate today</h2>
-      <BestRateTable :series="searchedSeries" :currency="currency" />
+      <BestRateTable :series="searchedSeries" :currency="currency" :fees="fees" />
     </section>
 
     <section class="panel">

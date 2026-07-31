@@ -1,0 +1,70 @@
+{
+  "Axis Bank": {
+    "bank": "Axis Bank",
+    "rules": [
+      {
+        "label": "Resident (standard tier)",
+        "charge": "Rs.250 + GST"
+      },
+      {
+        "label": "Non-Resident (standard tier)",
+        "charge": "Rs.100 + GST"
+      },
+      {
+        "label": "Individuals remitting into a Current Account",
+        "charge": "Flat Rs.300 + GST (regardless of segment)"
+      }
+    ],
+    "note": "Premium banking segments (Burgundy/Priority) get lower or nil charges than the standard tier shown here.",
+    "source_url": "https://www.axis.bank.in/docs/default-source/default-document-library/inward-wire-schedule-of-charges.pdf",
+    "checked_at": "2026-07-31"
+  },
+  "Indian Overseas Bank": {
+    "bank": "Indian Overseas Bank",
+    "rules": [
+      {
+        "label": "Individual / Non-Trade",
+        "charge": "Flat Rs.150"
+      },
+      {
+        "label": "Trade",
+        "charge": "0.10% Min Rs.500 and Max Rs.2500/-"
+      }
+    ],
+    "note": "If paid out in foreign currency (DD/MT/PO/TT): Rs.575 + SWIFT charges",
+    "source_url": "https://www.iob.bank.in/documents/d/guest/schedule-forex-service-charges-01092015",
+    "checked_at": "2026-07-31"
+  },
+  "Bank of Baroda": {
+    "bank": "Bank of Baroda",
+    "rules": [
+      {
+        "label": "Credited to a Bank of Baroda account",
+        "charge": "Nil"
+      },
+      {
+        "label": "Otherwise (e.g. paid out elsewhere)",
+        "charge": "Rs.100.00"
+      }
+    ],
+    "note": null,
+    "source_url": "https://bankofbaroda.bank.in/interest-rate-and-service-charges/service-charges",
+    "checked_at": "2026-07-31"
+  },
+  "Canara Bank": {
+    "bank": "Canara Bank",
+    "rules": [
+      {
+        "label": "Individual",
+        "charge": "Nil"
+      },
+      {
+        "label": "Non-Individual / Trade",
+        "charge": "Flat Rs.300 per payment"
+      }
+    ],
+    "note": null,
+    "source_url": "https://www.canarabank.bank.in/documents/d/guest/forex-20service-20charges-20annex-20wef-2002022026",
+    "checked_at": "2026-07-31"
+  }
+}

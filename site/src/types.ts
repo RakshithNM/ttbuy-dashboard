@@ -14,3 +14,18 @@ export interface BankSeries {
   wrapped: boolean;
   points: RatePoint[];
 }
+
+export interface FeeRule {
+  label: string;
+  charge: string;
+}
+
+export interface BankFee {
+  bank: string;
+  rules: FeeRule[];
+  note: string | null;
+  source_url: string;
+  checked_at: string;
+}
+
+export type FeesByBank = Record<string, BankFee>;
