@@ -142,6 +142,7 @@ Axis Bank | AED | 2026-04-16 | 24.58
 Axis Bank | AED | 2026-04-17 | 24.48
 Axis Bank | AED | 2026-05-11 | 25.04
 Axis Bank | AED | 2026-07-30 | 25.23
+Axis Bank | AED | 2026-07-31 | 25.15
 Axis Bank | EUR | 2025-10-28 | 100.78
 Axis Bank | EUR | 2025-10-31 | 100.28
 Axis Bank | EUR | 2025-11-03 | 100.15
@@ -284,6 +285,7 @@ Axis Bank | EUR | 2026-04-16 | 107.94
 Axis Bank | EUR | 2026-04-17 | 107.20
 Axis Bank | EUR | 2026-05-11 | 109.40
 Axis Bank | EUR | 2026-07-30 | 107.29
+Axis Bank | EUR | 2026-07-31 | 107.49
 Axis Bank | GBP | 2025-10-28 | 115.29
 Axis Bank | GBP | 2025-10-31 | 113.85
 Axis Bank | GBP | 2025-11-03 | 113.97
@@ -426,6 +428,7 @@ Axis Bank | GBP | 2026-04-16 | 123.96
 Axis Bank | GBP | 2026-04-17 | 122.90
 Axis Bank | GBP | 2026-05-11 | 126.35
 Axis Bank | GBP | 2026-07-30 | 124.96
+Axis Bank | GBP | 2026-07-31 | 125.52
 Axis Bank | USD | 2025-10-28 | 86.72
 Axis Bank | USD | 2025-10-31 | 86.95
 Axis Bank | USD | 2025-11-03 | 87.12
@@ -570,6 +573,7 @@ Axis Bank | USD | 2026-05-11 | 93.28
 Axis Bank | USD | 2026-07-28 | 94.04
 Axis Bank | USD | 2026-07-29 | 94.08
 Axis Bank | USD | 2026-07-30 | 93.98
+Axis Bank | USD | 2026-07-31 | 93.68
 Bandhan Bank | AED | 2025-11-12 | 23.53
 Bandhan Bank | AED | 2025-11-13 | 23.54
 Bandhan Bank | AED | 2025-11-21 | 23.76
@@ -579,6 +583,7 @@ Bandhan Bank | AED | 2026-02-17 | 24.10
 Bandhan Bank | AED | 2026-04-10 | 24.59
 Bandhan Bank | AED | 2026-05-21 | 25.63
 Bandhan Bank | AED | 2026-07-30 | 25.43
+Bandhan Bank | AED | 2026-07-31 | 25.35
 Bandhan Bank | EUR | 2025-11-12 | 101.48
 Bandhan Bank | EUR | 2025-11-13 | 101.61
 Bandhan Bank | EUR | 2025-11-21 | 102.09
@@ -588,6 +593,7 @@ Bandhan Bank | EUR | 2026-02-17 | 106.29
 Bandhan Bank | EUR | 2026-04-10 | 107.06
 Bandhan Bank | EUR | 2026-05-21 | 110.94
 Bandhan Bank | EUR | 2026-07-30 | 108.35
+Bandhan Bank | EUR | 2026-07-31 | 108.55
 Bandhan Bank | GBP | 2025-11-12 | 115.20
 Bandhan Bank | GBP | 2025-11-13 | 115.13
 Bandhan Bank | GBP | 2025-11-21 | 115.84
@@ -597,6 +603,7 @@ Bandhan Bank | GBP | 2026-02-17 | 122.22
 Bandhan Bank | GBP | 2026-04-10 | 122.96
 Bandhan Bank | GBP | 2026-05-21 | 128.31
 Bandhan Bank | GBP | 2026-07-30 | 126.38
+Bandhan Bank | GBP | 2026-07-31 | 126.93
 Bandhan Bank | USD | 2025-11-12 | 87.98
 Bandhan Bank | USD | 2025-11-13 | 88.02
 Bandhan Bank | USD | 2025-11-21 | 88.82
@@ -608,15 +615,20 @@ Bandhan Bank | USD | 2026-05-21 | 95.70
 Bandhan Bank | USD | 2026-07-06 | 94.61
 Bandhan Bank | USD | 2026-07-29 | 95.13
 Bandhan Bank | USD | 2026-07-30 | 94.96
+Bandhan Bank | USD | 2026-07-31 | 94.65
 Bank of Baroda | AED | 2026-07-30 | 25.78
+Bank of Baroda | AED | 2026-07-31 | 25.70
 Bank of Baroda | EUR | 2026-07-30 | 108.47
+Bank of Baroda | EUR | 2026-07-31 | 108.69
 Bank of Baroda | GBP | 2026-07-30 | 126.86
+Bank of Baroda | GBP | 2026-07-31 | 127.49
 Bank of Baroda | USD | 2025-10-10 | 88.27
 Bank of Baroda | USD | 2025-10-17 | 87.26
 Bank of Baroda | USD | 2025-12-10 | 89.49
 Bank of Baroda | USD | 2026-07-28 | 95.21
 Bank of Baroda | USD | 2026-07-29 | 95.24
 Bank of Baroda | USD | 2026-07-30 | 95.08
+Bank of Baroda | USD | 2026-07-31 | 94.79
 Canara Bank | AED | 2025-10-10 | 23.9250
 Canara Bank | AED | 2026-01-21 | 25.1625
 Canara Bank | AED | 2026-01-25 | 25.2250
@@ -624,6 +636,7 @@ Canara Bank | AED | 2026-02-13 | 25.0125
 Canara Bank | AED | 2026-04-06 | 25.6150
 Canara Bank | AED | 2026-05-18 | 26.5300
 Canara Bank | AED | 2026-07-30 | 25.7850
+Canara Bank | AED | 2026-07-31 | 25.7000
 Canara Bank | EUR | 2025-10-10 | 101.9525
 Canara Bank | EUR | 2026-01-21 | 107.8650
 Canara Bank | EUR | 2026-01-25 | 108.3650
@@ -631,6 +644,7 @@ Canara Bank | EUR | 2026-02-13 | 108.5725
 Canara Bank | EUR | 2026-04-06 | 107.9550
 Canara Bank | EUR | 2026-05-18 | 112.7925
 Canara Bank | EUR | 2026-07-30 | 108.7000
+Canara Bank | EUR | 2026-07-31 | 108.9175
 Canara Bank | GBP | 2025-10-10 | 117.2050
 Canara Bank | GBP | 2026-01-21 | 123.8500
 Canara Bank | GBP | 2026-01-25 | 124.6375
@@ -638,6 +652,7 @@ Canara Bank | GBP | 2026-02-13 | 124.7125
 Canara Bank | GBP | 2026-04-06 | 123.9300
 Canara Bank | GBP | 2026-05-18 | 129.3650
 Canara Bank | GBP | 2026-07-30 | 126.6550
+Canara Bank | GBP | 2026-07-31 | 127.2200
 Canara Bank | USD | 2025-10-10 | 88.3775
 Canara Bank | USD | 2026-01-21 | 91.8000
 Canara Bank | USD | 2026-01-25 | 92.0300
@@ -647,37 +662,57 @@ Canara Bank | USD | 2026-05-18 | 96.7725
 Canara Bank | USD | 2026-07-28 | 95.3325
 Canara Bank | USD | 2026-07-29 | 95.3950
 Canara Bank | USD | 2026-07-30 | 95.2500
+Canara Bank | USD | 2026-07-31 | 94.9350
 Citibank | AED | 2025-06-17 | 22.93
 Citibank | AED | 2025-10-29 | 23.5400
 Citibank | AED | 2026-07-30 | 25.4907
+Citibank | AED | 2026-07-31 | 25.4402
 Citibank | EUR | 2025-06-17 | 97.38
 Citibank | EUR | 2025-10-29 | 100.6615
 Citibank | EUR | 2026-07-30 | 107.2301
+Citibank | EUR | 2026-07-31 | 107.5482
 Citibank | GBP | 2025-06-17 | 114.32
 Citibank | GBP | 2025-10-29 | 114.6105
 Citibank | GBP | 2026-07-30 | 124.9598
+Citibank | GBP | 2026-07-31 | 125.6614
 Citibank | USD | 2025-06-17 | 84.22
 Citibank | USD | 2025-10-29 | 86.4802
 Citibank | USD | 2026-07-29 | 93.7870
 Citibank | USD | 2026-07-30 | 93.6519
+Citibank | USD | 2026-07-31 | 93.4646
 City Union Bank | AED | 2026-07-30 | 25.75
+City Union Bank | AED | 2026-07-31 | 25.70
 City Union Bank | EUR | 2026-07-30 | 108.35
+City Union Bank | EUR | 2026-07-31 | 108.70
 City Union Bank | GBP | 2026-07-30 | 126.25
+City Union Bank | GBP | 2026-07-31 | 127.00
 City Union Bank | USD | 2026-07-29 | 94.75
 City Union Bank | USD | 2026-07-30 | 94.60
+City Union Bank | USD | 2026-07-31 | 94.45
 DBS Bank India | AED | 2026-07-30 | 25.4472
+DBS Bank India | AED | 2026-07-31 | 25.3724
 DBS Bank India | EUR | 2026-07-30 | 107.0242
+DBS Bank India | EUR | 2026-07-31 | 107.2288
 DBS Bank India | GBP | 2026-07-30 | 124.7378
+DBS Bank India | GBP | 2026-07-31 | 125.3119
 DBS Bank India | USD | 2026-07-29 | 93.8352
 DBS Bank India | USD | 2026-07-30 | 93.6968
+DBS Bank India | USD | 2026-07-31 | 93.4211
 DCB Bank | AED | 2026-07-30 | 25.05
+DCB Bank | AED | 2026-07-31 | 24.96
 DCB Bank | EUR | 2026-07-30 | 107.78
+DCB Bank | EUR | 2026-07-31 | 107.78
 DCB Bank | GBP | 2026-07-30 | 126.08
+DCB Bank | GBP | 2026-07-31 | 126.26
 DCB Bank | USD | 2026-07-29 | 93.85
 DCB Bank | USD | 2026-07-30 | 93.83
+DCB Bank | USD | 2026-07-31 | 93.55
 HDFC Bank | AED | 2026-07-30 | 25.23
+HDFC Bank | AED | 2026-07-31 | 25.15
 HDFC Bank | EUR | 2026-07-30 | 107.09
+HDFC Bank | EUR | 2026-07-31 | 107.32
 HDFC Bank | GBP | 2026-07-30 | 124.14
+HDFC Bank | GBP | 2026-07-31 | 124.64
 HDFC Bank | USD | 2026-02-09 | 89.01
 HDFC Bank | USD | 2026-02-13 | 89.03
 HDFC Bank | USD | 2026-06-03 | 94.04
@@ -685,9 +720,13 @@ HDFC Bank | USD | 2026-07-02 | 93.63
 HDFC Bank | USD | 2026-07-28 | 93.99
 HDFC Bank | USD | 2026-07-29 | 94.01
 HDFC Bank | USD | 2026-07-30 | 93.86
+HDFC Bank | USD | 2026-07-31 | 93.61
 HSBC | AED | 2026-07-30 | 25.31
+HSBC | AED | 2026-07-31 | 25.23
 HSBC | EUR | 2026-07-30 | 106.77
+HSBC | EUR | 2026-07-31 | 106.97
 HSBC | GBP | 2026-07-30 | 124.44
+HSBC | GBP | 2026-07-31 | 124.99
 HSBC | USD | 2025-06-30 | 83.84
 HSBC | USD | 2025-07-25 | 84.87
 HSBC | USD | 2025-09-04 | 86.35
@@ -707,6 +746,7 @@ HSBC | USD | 2026-07-09 | 93.66
 HSBC | USD | 2026-07-17 | 94.47
 HSBC | USD | 2026-07-29 | 93.92
 HSBC | USD | 2026-07-30 | 93.79
+HSBC | USD | 2026-07-31 | 93.49
 ICICI Bank | AED | 2025-11-14 | 23.4
 ICICI Bank | AED | 2025-11-18 | 23.39
 ICICI Bank | AED | 2025-11-24 | 23.5
@@ -765,6 +805,7 @@ ICICI Bank | AED | 2026-05-15 | 25.28
 ICICI Bank | AED | 2026-05-20 | 25.55
 ICICI Bank | AED | 2026-05-21 | 25.42
 ICICI Bank | AED | 2026-07-30 | 25.21
+ICICI Bank | AED | 2026-07-31 | 25.15
 ICICI Bank | EUR | 2025-11-14 | 100.9
 ICICI Bank | EUR | 2025-11-18 | 100.41
 ICICI Bank | EUR | 2025-11-24 | 100.26
@@ -823,6 +864,7 @@ ICICI Bank | EUR | 2026-05-15 | 109.09
 ICICI Bank | EUR | 2026-05-20 | 109.81
 ICICI Bank | EUR | 2026-05-21 | 109.37
 ICICI Bank | EUR | 2026-07-30 | 106.92
+ICICI Bank | EUR | 2026-07-31 | 107.21
 ICICI Bank | GBP | 2025-11-14 | 113.78
 ICICI Bank | GBP | 2025-11-18 | 113.68
 ICICI Bank | GBP | 2025-11-24 | 113.79
@@ -881,6 +923,7 @@ ICICI Bank | GBP | 2026-05-15 | 124.97
 ICICI Bank | GBP | 2026-05-20 | 126.55
 ICICI Bank | GBP | 2026-05-21 | 126.14
 ICICI Bank | GBP | 2026-07-30 | 124.36
+ICICI Bank | GBP | 2026-07-31 | 125.02
 ICICI Bank | USD | 2025-11-14 | 87.01
 ICICI Bank | USD | 2025-11-18 | 86.98
 ICICI Bank | USD | 2025-11-24 | 87.41
@@ -945,6 +988,7 @@ ICICI Bank | USD | 2026-07-14 | 94.29
 ICICI Bank | USD | 2026-07-28 | 94.01
 ICICI Bank | USD | 2026-07-29 | 94.01
 ICICI Bank | USD | 2026-07-30 | 93.89
+ICICI Bank | USD | 2026-07-31 | 93.68
 IDBI Bank | AED | 2026-06-29 | 24.85
 IDBI Bank | EUR | 2026-06-29 | 105.02
 IDBI Bank | GBP | 2026-06-29 | 121.78
@@ -952,10 +996,14 @@ IDBI Bank | USD | 2026-07-28 | 94.17
 IDBI Bank | USD | 2026-07-29 | 94.20
 IDBI Bank | USD | 2026-06-29 | 92.83
 IDFC FIRST Bank | AED | 2026-07-30 | 24.81
+IDFC FIRST Bank | AED | 2026-07-31 | 24.99
 IDFC FIRST Bank | EUR | 2026-07-30 | 106.6
+IDFC FIRST Bank | EUR | 2026-07-31 | 107.26
 IDFC FIRST Bank | GBP | 2026-07-30 | 124.51
+IDFC FIRST Bank | GBP | 2026-07-31 | 125.49
 IDFC FIRST Bank | USD | 2026-07-29 | 93.93
 IDFC FIRST Bank | USD | 2026-07-30 | 93.85
+IDFC FIRST Bank | USD | 2026-07-31 | 93.66
 Indian Overseas Bank | AED | 2026-07-30 | 25.81
 Indian Overseas Bank | EUR | 2026-07-30 | 108.94
 Indian Overseas Bank | GBP | 2026-07-30 | 126.92
@@ -981,23 +1029,38 @@ Indian Overseas Bank | USD | 2026-07-28 | 95.42
 Indian Overseas Bank | USD | 2026-07-29 | 95.46
 Indian Overseas Bank | USD | 2026-07-30 | 95.30
 Jammu & Kashmir Bank | AED | 2026-07-30 | 24.21
+Jammu & Kashmir Bank | AED | 2026-07-31 | 24.14
 Jammu & Kashmir Bank | EUR | 2026-07-30 | 108.750000
+Jammu & Kashmir Bank | EUR | 2026-07-31 | 108.920000
 Jammu & Kashmir Bank | GBP | 2026-07-30 | 126.800000
+Jammu & Kashmir Bank | GBP | 2026-07-31 | 127.330000
 Jammu & Kashmir Bank | USD | 2026-07-29 | 95.200000
 Jammu & Kashmir Bank | USD | 2026-07-30 | 95.100000
+Jammu & Kashmir Bank | USD | 2026-07-31 | 94.750000
 Karur Vysya Bank | AED | 2026-07-29 | 25.73
+Karur Vysya Bank | AED | 2026-07-31 | 25.61
 Karur Vysya Bank | EUR | 2026-07-29 | 107.74
+Karur Vysya Bank | EUR | 2026-07-31 | 108.25
 Karur Vysya Bank | GBP | 2026-07-29 | 125.65
+Karur Vysya Bank | GBP | 2026-07-31 | 126.49
 Karur Vysya Bank | USD | 2026-07-29 | 95.00
 Karur Vysya Bank | USD | 2026-07-30 | 94.85
+Karur Vysya Bank | USD | 2026-07-31 | 94.53
 Kotak Mahindra Bank | AED | 2026-07-30 | 25.03
+Kotak Mahindra Bank | AED | 2026-07-31 | 24.98
 Kotak Mahindra Bank | EUR | 2026-07-30 | 107.03
+Kotak Mahindra Bank | EUR | 2026-07-31 | 107.35
 Kotak Mahindra Bank | GBP | 2026-07-30 | 124.83
+Kotak Mahindra Bank | GBP | 2026-07-31 | 125.53
 Kotak Mahindra Bank | USD | 2026-07-29 | 94.05
 Kotak Mahindra Bank | USD | 2026-07-30 | 93.95
+Kotak Mahindra Bank | USD | 2026-07-31 | 93.75
 State Bank of India | AED | 2026-07-30 | 25.41
+State Bank of India | AED | 2026-07-31 | 25.35
 State Bank of India | EUR | 2026-07-30 | 108.2
+State Bank of India | EUR | 2026-07-31 | 108.5
 State Bank of India | GBP | 2026-07-30 | 126.2
+State Bank of India | GBP | 2026-07-31 | 126.9
 State Bank of India | USD | 2025-09-08 | 87.6
 State Bank of India | USD | 2025-09-12 | 87.95
 State Bank of India | USD | 2025-09-16 | 87.65
@@ -1011,6 +1074,7 @@ State Bank of India | USD | 2026-07-14 | 95.7
 State Bank of India | USD | 2026-07-28 | 95.34
 State Bank of India | USD | 2026-07-29 | 95.3
 State Bank of India | USD | 2026-07-30 | 95.2
+State Bank of India | USD | 2026-07-31 | 95
 Ujjivan Small Finance Bank | AED | 2026-07-30 | 25.21
 Ujjivan Small Finance Bank | EUR | 2026-07-30 | 107.83
 Ujjivan Small Finance Bank | GBP | 2026-07-30 | 125.69
