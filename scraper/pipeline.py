@@ -48,10 +48,6 @@ def _csv_path(slug):
     return os.path.join(DATA_DIR, f"{slug}_TTBuy.csv")
 
 
-def _md_path(slug):
-    return os.path.join(DATA_DIR, f"{slug}_TTBuy.md")
-
-
 def prepare_output_df(df, bank_name=None):
     if df.empty:
         return pd.DataFrame(columns=OUTPUT_COLUMNS)
@@ -91,12 +87,6 @@ def write_bank_outputs(slug, bank_name, df):
     df = prepare_output_df(df, bank_name)
     df.to_csv(_csv_path(slug), index=False)
 
-    with open(_md_path(slug), "w", encoding="utf-8") as output:
-        output.write("Date       | Currency | TT Buy\n")
-        output.write("--------------------------------\n")
-        for _, row in df.iterrows():
-            output.write(f"{row['Date']} | {row['Currency']} | {row['TT_Buy']}\n")
-
 
 def write_combined_outputs():
     dfs = [load_existing_output(slug, plugin.name) for slug, plugin in REGISTRY.items()]
@@ -108,12 +98,6 @@ def write_combined_outputs():
     combined = combined.sort_values(["Bank", "Currency", "Snapshot_Timestamp"])
     os.makedirs(DATA_DIR, exist_ok=True)
     combined.to_csv(os.path.join(DATA_DIR, "forex_TTBuy.csv"), index=False)
-
-    with open(os.path.join(DATA_DIR, "forex_TTBuy.md"), "w", encoding="utf-8") as output:
-        output.write("Bank | Currency | Date | TT Buy\n")
-        output.write("-------------------------------\n")
-        for _, row in combined.iterrows():
-            output.write(f"{row['Bank']} | {row['Currency']} | {row['Date']} | {row['TT_Buy']}\n")
 
 
 def print_snapshot_coverage(bank_name, snapshots):
@@ -202,7 +186,7 @@ def scrape_bank_history(plugin, snapshots):
     print(f"\n{plugin.name} rows parsed: {len(df)}")
     if not df.empty:
         write_bank_outputs(plugin.slug, plugin.name, df)
-        print(f"Saved {plugin.slug}_TTBuy.csv and {plugin.slug}_TTBuy.md")
+        print(f"Saved {plugin.slug}_TTBuy.csv")
 
     if skipped:
         print(f"\n{plugin.name} snapshots skipped: {len(skipped)}")

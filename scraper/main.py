@@ -34,7 +34,7 @@ def main():
             print(f"Skipping {plugin.name} after unrecoverable error: {e}")
 
     write_combined_outputs()
-    print("\nSaved forex_TTBuy.csv and forex_TTBuy.md")
+    print("\nSaved forex_TTBuy.csv")
 
 
 if __name__ == "__main__":

@@ -51,7 +51,7 @@ and over time.
   (`scraper/core.py`'s `TARGET_CURRENCIES`). `scraper/pipeline.py` handles
   fetching, Wayback Machine backfill, and CSV I/O; `scraper/main.py` is the
   CLI entrypoint.
-- `data/` — per-bank CSV/MD outputs, a combined `forex_TTBuy.csv`/`.md`, and the
+- `data/` — per-bank CSV outputs, a combined `forex_TTBuy.csv`, and the
   `rates.json` the site consumes (nested by currency, then bank).
 - `site/` — the dashboard (Vite + Vue 3 + TypeScript + SCSS).
 - `.github/workflows/scrape.yml` — daily cron (11:00 IST) that re-scrapes live
