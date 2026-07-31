@@ -37,6 +37,11 @@ and over time.
   next time you visit.
 - **Updates automatically every day** at 11 AM IST — no one has to run
   anything manually for the site to stay current.
+- **Inward remittance fee info** — a small ⓘ next to a bank's name shows what
+  it actually charges to receive the money (or, for a few banks whose fee
+  schedules aren't publicly reachable, a note explaining why), since a
+  better TT Buy rate can still net you less once the bank's own fee is
+  taken out.
 
 ## Layout
 
@@ -50,15 +55,23 @@ and over time.
   from it before fetching). Each `parse()` returns one row per currency found
   (`scraper/core.py`'s `TARGET_CURRENCIES`). `scraper/pipeline.py` handles
   fetching, Wayback Machine backfill, and CSV I/O; `scraper/main.py` is the
-  CLI entrypoint.
-- `data/` — per-bank CSV outputs, a combined `forex_TTBuy.csv`, and the
-  `rates.json` the site consumes (nested by currency, then bank).
+  CLI entrypoint. `scraper/fees/` mirrors this structure for inward
+  remittance fee schedules (one plugin per bank, `scraper/fees_main.py` is
+  the entrypoint) — a much less standardized set of documents than the daily
+  rate pages, so each plugin returns a flexible `{rules, note}` shape rather
+  than forcing every bank into the same fee-category axis.
+- `data/` — per-bank CSV outputs, a combined `forex_TTBuy.csv`, the
+  `rates.json` the site consumes (nested by currency, then bank), and
+  `fees.json` (inward remittance fee info, nested by bank).
 - `site/` — the dashboard (Vite + Vue 3 + TypeScript + SCSS).
 - `.github/workflows/scrape.yml` — daily cron (11:00 IST, plus a 16:00 IST
   retry — harmless no-op for banks that already got today's rate, since
   `add_live_row` dedups per date) that re-scrapes live rates, regenerates
   `rates.json`, and commits the update (Netlify auto-deploys
   on push once connected to this repo).
+- `.github/workflows/scrape-fees.yml` — monthly cron (1st of the month) that
+  re-scrapes fee schedules. Separate from the daily rate cron since fee
+  schedules barely ever change, unlike rates.
 - `netlify.toml` — base `site/`, publishes `dist/`.
 
 ## Running the scraper
@@ -103,6 +116,17 @@ cp data/rates.json site/public/data/rates.json
 This walks ~14 months of history per bank against the Wayback CDX API, so it
 takes a while and can hit transient timeouts — that's normal, just re-run the
 same command again afterward to pick up whatever got skipped.
+
+## Running the fee scraper
+
+Fee schedules change far less often than daily rates (this is what the
+monthly `scrape-fees.yml` cron runs), so there's no backfill/history to
+manage here — just re-fetch and overwrite:
+
+```bash
+.venv/bin/python3 -m scraper.fees_main
+cp data/fees.json site/public/data/fees.json
+```
 
 ## Running the site
 

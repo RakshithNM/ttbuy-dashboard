@@ -18,4 +18,6 @@ class FeePlugin:
     slug: str
     source_url: str
     parse: ParseFn
-    kind: str = "html"  # "html" (decoded text) or "pdf" (raw bytes)
+    kind: str = "html"  # "html" (decoded text), "pdf" (raw bytes), or
+    # "browser" (Playwright-rendered HTML, for pages whose content loads via
+    # client-side JS)

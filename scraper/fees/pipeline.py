@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 
-from ..core import fetch_bytes, fetch_html
+from ..core import fetch_bytes, fetch_html, fetch_rendered_html
 
 DATA_DIR = os.environ.get("TTBUY_DATA_DIR", "data")
 
@@ -10,6 +10,8 @@ DATA_DIR = os.environ.get("TTBUY_DATA_DIR", "data")
 def fetch_content(plugin):
     if plugin.kind == "pdf":
         return fetch_bytes(plugin.source_url)
+    if plugin.kind == "browser":
+        return fetch_rendered_html(plugin.source_url)
     return fetch_html(plugin.source_url)
 
 

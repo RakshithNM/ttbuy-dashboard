@@ -128,6 +128,21 @@ function showFeeTooltip(bank: string, evt: Event) {
   activeFeeBank.value = bank;
 }
 
+// Click/tap needs its own toggle rather than relying on :focus — clicking a
+// <button> doesn't reliably move keyboard focus to it (WebKit in particular
+// never does), so a focus-only "open" handler leaves click/tap silently
+// doing nothing. Native buttons already fire "click" on Enter/Space, so this
+// alone covers keyboard activation too — no separate @focus handler needed
+// (which previously caused a double-toggle: click also focusing the button
+// in browsers that do focus on click, opening then immediately re-closing).
+function toggleFeeTooltip(bank: string, evt: Event) {
+  if (activeFeeBank.value === bank) {
+    activeFeeBank.value = null;
+  } else {
+    showFeeTooltip(bank, evt);
+  }
+}
+
 const feeTooltipStyle = computed(() => ({
   top: `${feeTooltipPos.value.top}px`,
   left: `${feeTooltipPos.value.left}px`,
@@ -176,7 +191,7 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                 aria-label="Inward remittance fee info"
                 @mouseenter="showFeeTooltip(row.bank, $event)"
                 @mouseleave="scheduleHideFeeTooltip"
-                @focus="showFeeTooltip(row.bank, $event)"
+                @click="toggleFeeTooltip(row.bank, $event)"
                 @blur="scheduleHideFeeTooltip"
               >
                 <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
@@ -227,14 +242,16 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
       @mouseenter="cancelHideFeeTooltip"
       @mouseleave="scheduleHideFeeTooltip"
     >
-      <div class="fee-tooltip-title">{{ shortName(activeFee.bank) }} — inward remittance fee</div>
+      <div class="fee-tooltip-title">
+        {{ shortName(activeFee.bank) }} — {{ activeFee.rules.length ? "inward remittance fee" : "note" }}
+      </div>
       <div v-for="rule in activeFee.rules" :key="rule.label" class="fee-rule">
-        <span class="fee-label">{{ rule.label }}</span>
-        <span class="fee-charge">{{ rule.charge }}</span>
+        <div class="fee-label">{{ rule.label }}</div>
+        <div class="fee-charge">{{ rule.charge }}</div>
       </div>
       <p v-if="activeFee.note" class="fee-note">{{ activeFee.note }}</p>
       <a :href="activeFee.source_url" target="_blank" rel="noopener noreferrer" class="fee-source">
-        Bank's published schedule ↗
+        {{ activeFee.rules.length ? "Bank's published schedule ↗" : "Learn more ↗" }}
       </a>
     </div>
   </div>
@@ -455,12 +472,14 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
   position: fixed;
   z-index: 20;
   width: 280px;
+  max-width: calc(100vw - 24px);
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  overflow-wrap: break-word;
 }
 
 .fee-tooltip-title {
@@ -469,18 +488,22 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
   margin-bottom: 6px;
 }
 
+// Charge descriptions can be a short word ("Nil") or a long multi-tier
+// string ("Rs.500 (up to Rs.5 lakhs), Rs.1000 (up to Rs.10 Lakhs), ...") —
+// stacking label above charge (rather than a space-between row) avoids
+// ever having to squeeze the charge into the remaining row width.
 .fee-rule {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 3px 0;
+  padding: 4px 0;
   color: var(--text-secondary);
+
+  .fee-label {
+    font-size: 11px;
+  }
 
   .fee-charge {
     color: var(--text-primary);
     font-weight: 500;
-    text-align: right;
-    flex: none;
+    line-height: 1.4;
   }
 }
 
