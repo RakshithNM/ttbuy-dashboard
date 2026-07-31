@@ -2,7 +2,8 @@ name: Scrape TT Buy rates
 
 on:
   schedule:
-    - cron: "30 5 * * *" # 11:00 IST daily
+    - cron: "30 5 * * *"  # 11:00 IST daily
+    - cron: "30 10 * * *" # 16:00 IST daily — retry for banks the morning run missed
   workflow_dispatch: {}
 
 jobs:

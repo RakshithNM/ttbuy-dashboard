@@ -54,8 +54,10 @@ and over time.
 - `data/` — per-bank CSV outputs, a combined `forex_TTBuy.csv`, and the
   `rates.json` the site consumes (nested by currency, then bank).
 - `site/` — the dashboard (Vite + Vue 3 + TypeScript + SCSS).
-- `.github/workflows/scrape.yml` — daily cron (11:00 IST) that re-scrapes live
-  rates, regenerates `rates.json`, and commits the update (Netlify auto-deploys
+- `.github/workflows/scrape.yml` — daily cron (11:00 IST, plus a 16:00 IST
+  retry — harmless no-op for banks that already got today's rate, since
+  `add_live_row` dedups per date) that re-scrapes live rates, regenerates
+  `rates.json`, and commits the update (Netlify auto-deploys
   on push once connected to this repo).
 - `netlify.toml` — base `site/`, publishes `dist/`.
 
