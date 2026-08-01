@@ -58,16 +58,16 @@
     "bank": "Canara Bank",
     "rules": [
       {
-        "label": "Individual",
-        "charge": "Nil"
+        "label": "Canara account holders",
+        "charge": "Rs.75"
       },
       {
-        "label": "Non-Individual / Trade",
-        "charge": "Flat Rs.300 per payment"
+        "label": "No Canara account",
+        "charge": "Rs.150"
       }
     ],
-    "note": null,
-    "fee_inr": 0.0,
+    "note": "Rs.100 instead if the remittance is routed via Alrajhi Banking and Investment Corp.",
+    "fee_inr": 75.0,
     "source_url": "https://www.canarabank.bank.in/documents/d/guest/forex-20service-20charges-20annex-20wef-2002022026",
     "checked_at": "2026-08-01"
   },
@@ -75,13 +75,13 @@
     "bank": "State Bank of India",
     "rules": [
       {
-        "label": "Inward remittance via SWIFT / Wire Transfer",
-        "charge": "Rs.25"
+        "label": "Inward remittance (credited once cover reaches SBI)",
+        "charge": "No Charges"
       }
     ],
-    "note": "SBI's branded Express Remit corridors (UK/Canada/Worldwide) have a separate fee structure for specific remittance products.",
-    "fee_inr": 25.0,
-    "source_url": "https://sbi.bank.in/webfiles/uploads/nri/NRI_SERVICE%20CHARGES.pdf",
+    "note": "Separate charges apply if you want the funds paid out as a foreign currency instrument (DD/MT/PO/TT) instead of credited to your account, or for FCY cheque collection.",
+    "fee_inr": 0.0,
+    "source_url": "https://sbi.bank.in/documents/16012/76239/Foreign_Exchange_Transaction_Related_Service_Charges.pdf",
     "checked_at": "2026-08-01"
   },
   "HDFC Bank": {

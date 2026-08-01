@@ -1,7 +1,7 @@
+import io
 import re
 
 import pdfplumber
-import io
 
 from .base import FeePlugin
 
@@ -9,42 +9,50 @@ CANARA_FEE_URL = "https://www.canarabank.bank.in/documents/d/guest/forex-20servi
 
 
 def parse(pdf_bytes, source_url):
-    """Canara's forex charges PDF splits inward (non-export) remittance
-    charges by individual vs non-individual (trade), not account type."""
+    """Canara's forex charges PDF has two different "inward" sections — the
+    one under "4. CLEAN INSTRUMENTS" is for cheque/DD/money-order
+    encashment, not a SWIFT wire; the right one is "C.2 SWIFT Inward
+    Remittances in Rupees" under the SWIFT section, split by whether the
+    recipient holds a Canara account. Table extraction (not flat text)
+    keeps the cell intact, since the page's column layout otherwise
+    interleaves it with the adjacent Sl.No./Nature-of-charges columns."""
+    cell = None
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-        text = "\n".join((p.extract_text() or "") for p in pdf.pages)
+        for page in pdf.pages:
+            if "SWIFT Inward Remittances" not in (page.extract_text() or ""):
+                continue
+            for table in page.extract_tables():
+                for row in table:
+                    if row and row[1] and "SWIFT Inward Remittances" in row[1]:
+                        cell = row[2] or ""
 
-    section = re.search(
-        r"Inward Remittances \(Non-Export\).*?(?=\n[A-Z]\.\d|\nB\.|\Z)", text, re.S
-    )
-    if not section:
+    if cell is None:
         return None
-    block = section.group(0)
 
-    individual = re.search(r"For Individuals:\s*(Nil|Rs\.?\s*[\d,.]+)", block)
-    trade = re.search(
-        r"For other than Individuals:\s*Flat Rs\.?\s*([\d,.]+)/?-?\s*per\s*payment", block, re.S
-    )
+    our_customers = re.search(r"For our customers\s*Rs\.?\s*([\d,]+)", cell)
+    others = re.search(r"For others\s*Rs\.?\s*([\d,]+)", cell)
+    correspondent = re.search(r"Alrajhi\s*Banking and Investment Corp:\s*Rs\.?\s*([\d,]+)", cell, re.S)
 
-    if not individual and not trade:
+    if not our_customers and not others:
         return None
 
     rules = []
-    if individual:
-        rules.append({"label": "Individual", "charge": individual.group(1).strip()})
-    if trade:
-        rules.append({"label": "Non-Individual / Trade", "charge": f"Flat Rs.{trade.group(1)} per payment"})
+    if our_customers:
+        rules.append({"label": "Canara account holders", "charge": f"Rs.{our_customers.group(1)}"})
+    if others:
+        rules.append({"label": "No Canara account", "charge": f"Rs.{others.group(1)}"})
 
     note = None
-    if "commission in lieu of exchange" in block.lower():
-        note = "If the remittance is paid out in foreign currency, commission in lieu of exchange is charged in addition."
+    if correspondent:
+        note = f"Rs.{correspondent.group(1)} instead if the remittance is routed via Alrajhi Banking and Investment Corp."
 
-    fee_inr = None
-    if individual:
-        value = individual.group(1).strip()
-        fee_inr = 0.0 if value.lower() == "nil" else float(re.sub(r"[^\d.]", "", value))
-
-    return {"rules": rules, "note": note, "fee_inr": fee_inr}
+    return {
+        "rules": rules,
+        "note": note,
+        # fee_inr uses the "our customers" figure — the relevant case for
+        # someone deciding whether to receive money at Canara.
+        "fee_inr": float(our_customers.group(1).replace(",", "")) if our_customers else None,
+    }
 
 
 PLUGIN = FeePlugin(

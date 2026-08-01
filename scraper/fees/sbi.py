@@ -1,43 +1,46 @@
-import io
 import re
 
 import pdfplumber
+import io
 
 from .base import FeePlugin
 
-SBI_FEE_URL = "https://sbi.bank.in/webfiles/uploads/nri/NRI_SERVICE%20CHARGES.pdf"
+# SBI's general (non-NRI) forex service charges notice — a revision effective
+# 01.05.2025. Deliberately not the NRI-specific service charges document:
+# that one covers NRI account holders, who often get preferential/waived
+# treatment, so it isn't representative of the general/individual case this
+# site's calculator is about.
+SBI_FEE_URL = "https://sbi.bank.in/documents/16012/76239/Foreign_Exchange_Transaction_Related_Service_Charges.pdf"
 
 
 def parse(pdf_bytes, source_url):
-    """SBI's NRI service charges PDF has an "Inward Remittance to India"
-    section; the generic SWIFT/Wire Transfer charge isn't split by account
-    type or purpose. Separate branded "Express Remit" corridors (UK/Canada/
-    Worldwide) have their own fee structure, called out as a note rather
-    than parsed in full — they're a specific product, not the general case."""
-    fee = None
+    """SBI's "8. INWARD REMITTANCE (Other than Export/FDI/FCRA)" section
+    states "No Charges" for the general case — TTs/MTs/DDs credited once
+    cover has reached SBI's Nostro account, which is what a plain SWIFT
+    inward remittance is. Sub-items a-d cover specific edge cases (payout
+    as a foreign currency instrument, foreign correspondent bank prefunded
+    instructions, FCY cheque collection) rather than the general case."""
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text() or ""
-            if "Inward Remittance to India" not in text:
-                continue
-            # The PDF's two-column layout means the figure (₹25/-) appears
-            # between "SWIFT /" and "Wire Transfer mechanism" in flat text,
-            # not after it — anchor on the SWIFT phrase, not the full label.
-            match = re.search(r"Funds transfer through SWIFT\s*/?\s*Rs\.?\s*([\d,]+)/?-?", text.replace("₹", "Rs."))
-            if match:
-                fee = match.group(1)
-            break
+        text = "\n".join((p.extract_text() or "") for p in pdf.pages)
 
-    if fee is None:
+    match = re.search(
+        r"INWARD REMITTANCE \(Other than Export/FDI/FCRA\)\s*"
+        r"(No Charges|Rs\.?\s*[\d,]+/?-?)[^(]*\(Out of Pocket Expenses",
+        text,
+    )
+    if not match:
         return None
 
+    value = match.group(1).strip()
+    fee_inr = 0.0 if value == "No Charges" else float(re.sub(r"[^\d.]", "", value))
+
     return {
-        "rules": [{"label": "Inward remittance via SWIFT / Wire Transfer", "charge": f"Rs.{fee}"}],
+        "rules": [{"label": "Inward remittance (credited once cover reaches SBI)", "charge": value}],
         "note": (
-            "SBI's branded Express Remit corridors (UK/Canada/Worldwide) have a "
-            "separate fee structure for specific remittance products."
+            "Separate charges apply if you want the funds paid out as a foreign currency "
+            "instrument (DD/MT/PO/TT) instead of credited to your account, or for FCY cheque collection."
         ),
-        "fee_inr": float(fee.replace(",", "")),
+        "fee_inr": fee_inr,
     }
 
 
