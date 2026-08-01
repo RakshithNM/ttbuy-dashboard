@@ -347,7 +347,6 @@ const lastUpdated = computed(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  max-width: 280px;
   flex: 1;
   min-width: 160px;
   margin-bottom: 0;
