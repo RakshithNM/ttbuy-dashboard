@@ -119,7 +119,7 @@ const rows = computed<Row[]>(() => {
 
 const bestBank = computed(() => rows.value.find((r) => r.hasData && r.category === "bank")?.bank ?? null);
 const bestPlatform = computed(() => rows.value.find((r) => r.hasData && r.category === "platform")?.bank ?? null);
-const hasPlatforms = computed(() => rows.value.some((r) => r.category === "platform"));
+
 const firstPlatformIndex = computed(() => rows.value.findIndex((r) => r.category === "platform"));
 
 function formatInr(value: number): string {
