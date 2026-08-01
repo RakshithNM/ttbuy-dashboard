@@ -18,6 +18,7 @@ from . import (
     kvb,
     pnb,
     rbl,
+    remitly,
     sbi,
     skydo,
     ujjivan,
@@ -48,4 +49,5 @@ REGISTRY = {
     rbl.PLUGIN.slug: rbl.PLUGIN,
     unionbank.PLUGIN.slug: unionbank.PLUGIN,
     skydo.PLUGIN.slug: skydo.PLUGIN,
+    remitly.PLUGIN.slug: remitly.PLUGIN,
 }
