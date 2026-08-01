@@ -31,6 +31,7 @@ interface StoredView {
   range?: RangeKey;
   showTable?: boolean;
   currency?: string;
+  amount?: number;
 }
 
 function loadStoredView(): StoredView {
@@ -42,21 +43,73 @@ function loadStoredView(): StoredView {
   }
 }
 
+// A shared link's query string wins over whatever the visitor had saved
+// locally — someone opening a link expects to see the sender's view, not
+// their own last one.
+function loadQueryView(): StoredView {
+  const params = new URLSearchParams(window.location.search);
+  const view: StoredView = {};
+
+  const range = params.get("range");
+  if (range && RANGE_OPTIONS.some((o) => o.key === range)) view.range = range as RangeKey;
+
+  const currency = params.get("currency");
+  if (currency) view.currency = currency;
+
+  const shown = params.get("view");
+  if (shown === "table" || shown === "chart") view.showTable = shown === "table";
+
+  const amount = params.get("amount");
+  if (amount !== null && Number.isFinite(Number(amount)) && Number(amount) >= 0) view.amount = Number(amount);
+
+  return view;
+}
+
 const storedView = loadStoredView();
+const queryView = loadQueryView();
 
 const range = ref<RangeKey>(
-  storedView.range && RANGE_OPTIONS.some((o) => o.key === storedView.range) ? storedView.range : "7d"
+  queryView.range ??
+    (storedView.range && RANGE_OPTIONS.some((o) => o.key === storedView.range) ? storedView.range : "7d")
 );
-const showTable = ref(typeof storedView.showTable === "boolean" ? storedView.showTable : true);
-const currency = ref<string>(storedView.currency ?? "USD");
+const showTable = ref(
+  queryView.showTable ?? (typeof storedView.showTable === "boolean" ? storedView.showTable : true)
+);
+const currency = ref<string>(queryView.currency ?? storedView.currency ?? "USD");
+const amount = ref<number>(queryView.amount ?? storedView.amount ?? 1000);
 
-watch([range, showTable, currency], ([r, t, c]) => {
+watch([range, showTable, currency, amount], ([r, t, c, a]) => {
   try {
-    localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ range: r, showTable: t, currency: c }));
+    localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ range: r, showTable: t, currency: c, amount: a }));
   } catch {
     // Persistence is best-effort; nothing to do if storage is unavailable.
   }
-});
+
+  // Keep the address bar in sync so the current view is shareable just by
+  // copying the URL, not only via the explicit "Copy link" button.
+  const params = new URLSearchParams();
+  params.set("currency", c);
+  params.set("range", r);
+  params.set("view", t ? "table" : "chart");
+  params.set("amount", String(a));
+  history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+}, { immediate: true });
+
+const copied = ref(false);
+let copiedTimer: ReturnType<typeof setTimeout> | null = null;
+
+async function copyShareLink() {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    copied.value = true;
+    if (copiedTimer) clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(() => (copied.value = false), 1800);
+  } catch {
+    // Clipboard access can fail (permissions, insecure context) — the URL
+    // bar already reflects the current view, so this is a convenience on
+    // top of that, not the only way to share it.
+  }
+}
 
 onMounted(async () => {
   try {
@@ -172,12 +225,24 @@ const lastUpdated = computed(() => {
         <input v-model="bankQuery" type="search" placeholder="Search banks…" aria-label="Search banks" class="bank-search-input" />
         <button v-if="bankQuery" type="button" class="clear-search" aria-label="Clear search" @click="bankQuery = ''">✕</button>
       </div>
+      <button type="button" class="share-btn" :class="{ copied }" @click="copyShareLink">
+        <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+          <path
+            d="M6.5 9.5l3-3M6.8 5.3l.9-.9a2.2 2.2 0 013.1 3.1l-.9.9M9.2 10.7l-.9.9a2.2 2.2 0 01-3.1-3.1l.9-.9"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+          />
+        </svg>
+        {{ copied ? "Copied!" : "Copy link" }}
+      </button>
     </div>
     <p v-if="bankQuery && searchedSeries.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
 
     <section class="panel">
       <h2>Best value today</h2>
-      <BestRateTable :series="searchedSeries" :currency="currency" :fees="fees" />
+      <BestRateTable v-model:amount="amount" :series="searchedSeries" :currency="currency" :fees="fees" />
     </section>
 
     <section class="panel">
@@ -331,6 +396,31 @@ const lastUpdated = computed(() => {
 
   &:hover {
     color: var(--text-primary);
+  }
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  &.copied {
+    color: var(--success-text);
+    border-color: var(--success-text);
   }
 }
 

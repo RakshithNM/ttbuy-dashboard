@@ -36,6 +36,9 @@ and over time.
 - **Search** to quickly find a specific bank in a long list.
 - **Remembers your last view** (currency, date range, chart vs. table) the
   next time you visit.
+- **Shareable links** — the URL always reflects the current currency, date
+  range, chart/table toggle, and calculator amount, and a "Copy link" button
+  copies it — so you can send someone the exact view you're looking at.
 - **Updates automatically every day** at 11 AM IST — no one has to run
   anything manually for the site to stay current.
 - **Inward remittance fee info** — a small ⓘ next to a bank's name shows what

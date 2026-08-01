@@ -10,7 +10,7 @@ const props = defineProps<{
   fees: FeesByBank;
 }>();
 
-const amount = ref(1000);
+const amount = defineModel<number>("amount", { default: 1000 });
 const safeAmount = computed(() => {
   const n = Number(amount.value);
   return Number.isFinite(n) && n > 0 ? n : 0;
