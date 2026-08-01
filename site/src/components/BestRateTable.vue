@@ -231,18 +231,22 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
             </th>
             <template v-if="row.hasData">
               <td class="num">
-                {{ row.ttbuy.toFixed(2) }}
-                <span
-                  v-if="row.delta !== null"
-                  class="delta"
-                  :class="deltaDirection(row.delta)"
-                  :title="`${deltaDirection(row.delta) === 'flat' ? 'Unchanged' : deltaDirection(row.delta) === 'up' ? 'Up' : 'Down'} ${Math.abs(row.delta).toFixed(2)} vs previous rate`"
-                >
-                  <template v-if="deltaDirection(row.delta) === 'up'">▲</template>
-                  <template v-else-if="deltaDirection(row.delta) === 'down'">▼</template>
-                  <template v-else>–</template>
-                  {{ Math.abs(row.delta).toFixed(2) }}
-                </span>
+                <div class="ttbuy-inner">
+                  <span class="rate-val">{{ row.ttbuy.toFixed(2) }}</span>
+                  <span class="delta-slot">
+                    <span
+                      v-if="row.delta !== null"
+                      class="delta"
+                      :class="deltaDirection(row.delta)"
+                      :title="`${deltaDirection(row.delta) === 'flat' ? 'Unchanged' : deltaDirection(row.delta) === 'up' ? 'Up' : 'Down'} ${Math.abs(row.delta).toFixed(2)} vs previous rate`"
+                    >
+                      <template v-if="deltaDirection(row.delta) === 'up'">▲</template>
+                      <template v-else-if="deltaDirection(row.delta) === 'down'">▼</template>
+                      <template v-else>–</template>
+                      {{ Math.abs(row.delta).toFixed(2) }}
+                    </span>
+                  </span>
+                </div>
               </td>
               <td class="num receive">
                 <span
@@ -421,9 +425,22 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
     color: var(--text-secondary);
   }
 
+  .ttbuy-inner {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+  }
+
+  // Fixed-width slot so the rate-val column stays aligned regardless of
+  // whether a delta indicator is present for that row.
+  .delta-slot {
+    flex: none;
+    min-width: 52px;
+  }
+
   .delta {
     display: inline-block;
-    margin-left: 6px;
     font-size: 11px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
