@@ -218,7 +218,7 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
             <tr v-if="row.category === 'platform' && i === firstPlatformIndex" class="platform-divider">
               <td colspan="5" class="platform-section-header">
                 Remittance platforms
-                <span class="platform-section-note">Rate credited to recipient — sender pays platform fee separately</span>
+                <span class="platform-section-note">Rate applied to your transfer, no deduction on recipient side</span>
               </td>
             </tr>
             <tr :class="{ best: row.bank === bestBank }">
