@@ -726,6 +726,18 @@
         "ttbuy": 24.98
       }
     ],
+    "Punjab National Bank": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 25.77
+      }
+    ],
+    "RBL Bank": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 24.77
+      }
+    ],
     "State Bank of India": [
       {
         "date": "2026-07-30",
@@ -744,6 +756,12 @@
       {
         "date": "2026-07-30",
         "ttbuy": 25.21
+      }
+    ],
+    "Union Bank of India": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 25.86
       }
     ]
   },
@@ -1474,6 +1492,18 @@
         "ttbuy": 107.35
       }
     ],
+    "Punjab National Bank": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 109.1
+      }
+    ],
+    "RBL Bank": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 106.95
+      }
+    ],
     "State Bank of India": [
       {
         "date": "2026-07-30",
@@ -1492,6 +1522,12 @@
       {
         "date": "2026-07-30",
         "ttbuy": 107.83
+      }
+    ],
+    "Union Bank of India": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 109.1
       }
     ]
   },
@@ -2222,6 +2258,18 @@
         "ttbuy": 125.53
       }
     ],
+    "Punjab National Bank": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 127.72
+      }
+    ],
+    "RBL Bank": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 124.96
+      }
+    ],
     "State Bank of India": [
       {
         "date": "2026-07-30",
@@ -2240,6 +2288,12 @@
       {
         "date": "2026-07-30",
         "ttbuy": 125.69
+      }
+    ],
+    "Union Bank of India": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 127.55
       }
     ]
   },
@@ -3250,6 +3304,18 @@
         "ttbuy": 93.75
       }
     ],
+    "Punjab National Bank": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 95.09
+      }
+    ],
+    "RBL Bank": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 92.91
+      }
+    ],
     "State Bank of India": [
       {
         "date": "2025-09-08",
@@ -3320,6 +3386,12 @@
       {
         "date": "2026-07-30",
         "ttbuy": 94.18
+      }
+    ],
+    "Union Bank of India": [
+      {
+        "date": "2026-07-31",
+        "ttbuy": 95.06
       }
     ]
   }

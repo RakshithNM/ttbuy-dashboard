@@ -1,0 +1,5 @@
+Bank,Currency,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+Punjab National Bank,USD,live-20260801121516,2026-08-01,2026-07-31,2026-07-31,04:00,95.09,https://pnb.bank.in/downloadprocess.aspx?fid=A+rrvZeJc+PIaxfEqVTIQQ==,"['USD', '95.09', '95.79', '94.53', '96.36', '95.03', '95.95', '95.00', '94.12', '96.53']"
+Punjab National Bank,EUR,live-20260801121516,2026-08-01,2026-07-31,2026-07-31,04:00,109.10,https://pnb.bank.in/downloadprocess.aspx?fid=A+rrvZeJc+PIaxfEqVTIQQ==,"['EUR', '109.10', '110.38', '108.34', '111.42', '109.00', '110.58', '109.09', '107.49', '111.54']"
+Punjab National Bank,GBP,live-20260801121516,2026-08-01,2026-07-31,2026-07-31,04:00,127.72,https://pnb.bank.in/downloadprocess.aspx?fid=A+rrvZeJc+PIaxfEqVTIQQ==,"['GBP', '127.72', '128.98', '126.88', '129.98', '127.65', '129.16', '127.63', '126.03', '130.10']"
+Punjab National Bank,AED,live-20260801121516,2026-08-01,2026-07-31,2026-07-31,04:00,25.77,https://pnb.bank.in/downloadprocess.aspx?fid=A+rrvZeJc+PIaxfEqVTIQQ==,"['AED', '25.77', '26.22', '25.76', '26.26', '25.75', '26.27', '25.87', '25.59', '26.26']"
