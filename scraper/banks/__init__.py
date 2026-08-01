@@ -16,8 +16,11 @@ from . import (
     jkbank,
     kotak,
     kvb,
+    pnb,
+    rbl,
     sbi,
     ujjivan,
+    unionbank,
 )
 
 REGISTRY = {
@@ -40,4 +43,7 @@ REGISTRY = {
     dcb.PLUGIN.slug: dcb.PLUGIN,
     idfcfirst.PLUGIN.slug: idfcfirst.PLUGIN,
     dbs.PLUGIN.slug: dbs.PLUGIN,
+    pnb.PLUGIN.slug: pnb.PLUGIN,
+    rbl.PLUGIN.slug: rbl.PLUGIN,
+    unionbank.PLUGIN.slug: unionbank.PLUGIN,
 }

@@ -13,14 +13,14 @@ the same transfer. Each bank only publishes its own rate, on its own page, in
 its own format, with no history — so there's no single place to check "who's
 paying the most today" or "how has this bank's rate moved over time."
 
-This project scrapes that rate directly from ~19 major Indian banks' public
+This project scrapes that rate directly from ~22 major Indian banks' public
 forex pages every day, keeps the history, and puts it all in one place so
 anyone receiving foreign money can quickly see who pays the best rate — today
 and over time.
 
 ## What the dashboard does
 
-- **Compares TT Buy rates across ~19 Indian banks** side by side, for four
+- **Compares TT Buy rates across ~22 Indian banks** side by side, for four
   currencies: USD, GBP, EUR, and AED.
 - **"Best value today" table** — banks ranked by what you'd actually receive
   after each bank's own inward remittance fee (where known), not just the raw
@@ -93,7 +93,7 @@ Day-to-day: fetch today's live rate for every bank (this is what the daily
 cron runs) and refresh the site's data:
 
 ```bash
-BANKS=axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi,bandhan,cityunion,hsbc,jkbank,kvb,citibank,ujjivan,dcb,idfcfirst,dbs \
+BANKS=axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi,bandhan,cityunion,hsbc,jkbank,kvb,citibank,ujjivan,dcb,idfcfirst,dbs,pnb,rbl,unionbank \
   MAX_SNAPSHOTS=0 .venv/bin/python3 -m scraper.main
 .venv/bin/python3 -m scraper.export_json
 cp data/rates.json site/public/data/rates.json
@@ -111,7 +111,7 @@ missing (useful after adding a new currency, or if a run got interrupted or
 hit a Wayback API outage partway through):
 
 ```bash
-BANKS=axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi,bandhan,cityunion,hsbc,jkbank,kvb,citibank,ujjivan,dcb,idfcfirst,dbs \
+BANKS=axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi,bandhan,cityunion,hsbc,jkbank,kvb,citibank,ujjivan,dcb,idfcfirst,dbs,pnb,rbl,unionbank \
   INCLUDE_LIVE=0 .venv/bin/python3 -m scraper.main
 .venv/bin/python3 -m scraper.export_json
 cp data/rates.json site/public/data/rates.json
@@ -142,15 +142,16 @@ npm run dev
 
 ## Banks
 
-19 banks scraped:
+22 banks scraped:
 
 | Bank | Status |
 |---|---|
 | Axis Bank, IOB, Bank of Baroda, Canara Bank, ICICI Bank, IDBI Bank, Bandhan Bank, City Union Bank, HSBC | Scraped — plain HTML |
-| SBI, HDFC Bank, Jammu & Kashmir Bank, Karur Vysya Bank, Citibank | Scraped — daily PDF, parsed with pdfplumber |
+| SBI, HDFC Bank, Jammu & Kashmir Bank, Karur Vysya Bank, Citibank, Punjab National Bank, Union Bank of India | Scraped — stable daily PDF, parsed with pdfplumber |
 | Ujjivan Small Finance Bank | Scraped — PDF filename rotates behind an opaque hash; a stable landing page (`/forex-rates`) always links to the current one, so this is a two-step fetch (`kind="pdf_discover"`) |
+| RBL Bank | Scraped — `/fxadmin_getfx` endpoint returns the current PDF filename; a second fetch retrieves the PDF from the CDN. `kind="pdf_discover"` |
 | Kotak Mahindra Bank, DCB Bank, IDFC FIRST Bank, DBS Bank India | Scraped — rates load via client-side JS, rendered with Playwright. No Wayback backfill (archived HTML wouldn't contain the rendered data), so history only starts accumulating from whenever the daily cron first ran. |
-| PNB, Central Bank of India, Bank of Maharashtra | Rate is on a PDF whose URL/filename changes daily behind an opaque token or dated path, with no stable landing page found linking to it during research — needs a human to click through the site and find the current link |
+| Central Bank of India, Bank of Maharashtra | Rate is on a PDF whose URL/filename changes daily behind an opaque token or dated path, with no stable landing page found linking to it during research — needs a human to click through the site and find the current link |
 | Karnataka Bank | PDF-only; the landing page also has a hidden decoy HTML table with fake data — do not scrape that table if this gets implemented |
 | Union Bank of India | PDF is image-based (no extractable text) — would need OCR |
 | Federal Bank, Indian Bank, Dhanlaxmi Bank, Tamilnad Mercantile Bank | PDF-only or no accessible rate page found |
