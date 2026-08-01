@@ -13,6 +13,7 @@ export interface BankSeries {
   color: string;
   wrapped: boolean;
   points: RatePoint[];
+  category: "bank" | "platform";
 }
 
 export interface FeeRule {

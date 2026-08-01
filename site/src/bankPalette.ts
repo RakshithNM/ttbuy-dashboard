@@ -13,6 +13,14 @@ export const CATEGORICAL_SLOTS = [
   "--series-8", // red
 ] as const;
 
+// Remittance platform names. These appear in rates.json alongside banks but
+// are displayed in a separate section in the UI.
+export const PLATFORM_NAMES = new Set(["Skydo"]);
+
+export function isPlatform(name: string): boolean {
+  return PLATFORM_NAMES.has(name);
+}
+
 // Known banks in a stable order. New banks get appended here (never inserted)
 // so existing colors never repaint. Includes a few not-yet-scraped banks
 // (Punjab National Bank, Yes Bank, ...) so their slot is already reserved
@@ -42,6 +50,8 @@ export const BANK_ORDER = [
   "DCB Bank",
   "IDFC FIRST Bank",
   "DBS Bank India",
+  // Platforms get stable color slots after banks
+  "Skydo",
 ];
 
 // The categorical palette only validates CVD-safe adjacent pairs up to 8

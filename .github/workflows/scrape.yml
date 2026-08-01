@@ -26,7 +26,7 @@ jobs:
 
       - name: Scrape live rates
         env:
-          BANKS: axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi,bandhan,cityunion,hsbc,jkbank,kvb,citibank,ujjivan,dcb,idfcfirst,dbs,pnb,rbl,unionbank
+          BANKS: axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi,bandhan,cityunion,hsbc,jkbank,kvb,citibank,ujjivan,dcb,idfcfirst,dbs,pnb,rbl,unionbank,skydo
           MAX_SNAPSHOTS: "0"
           INCLUDE_LIVE: "1"
         run: python3 -m scraper.main

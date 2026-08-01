@@ -19,6 +19,7 @@ from . import (
     pnb,
     rbl,
     sbi,
+    skydo,
     ujjivan,
     unionbank,
 )
@@ -46,4 +47,5 @@ REGISTRY = {
     pnb.PLUGIN.slug: pnb.PLUGIN,
     rbl.PLUGIN.slug: rbl.PLUGIN,
     unionbank.PLUGIN.slug: unionbank.PLUGIN,
+    skydo.PLUGIN.slug: skydo.PLUGIN,
 }

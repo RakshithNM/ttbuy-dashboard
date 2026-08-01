@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import LineChart from "./components/LineChart.vue";
 import BestRateTable from "./components/BestRateTable.vue";
-import { isWrappedSlot, shortName, slotForBank, sortByBankOrder } from "./bankPalette";
+import { isPlatform, isWrappedSlot, shortName, slotForBank, sortByBankOrder } from "./bankPalette";
 import { currencyName, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency } from "./types";
 
@@ -146,6 +146,7 @@ const allSeries = computed<BankSeries[]>(() => {
     color: slotForBank(name),
     wrapped: isWrappedSlot(name),
     points: bankRates.value[name] ?? [],
+    category: isPlatform(name) ? "platform" : "bank",
   }));
 });
 

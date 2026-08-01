@@ -1,0 +1,5 @@
+Bank,Currency,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Buy,Source_URL,Raw_Data_Row
+Skydo,USD,live-20260801153149,2026-08-01,2026-08-01,2026-08-01,15:30,95.4035,https://www.skydo.com/convert-usd-to-inr?amount=1000,"{'fx_rate': 95.4035, 'api_timestamp': 'Aug 1, 2026, 3:30:00 PM', 'base': 'USD', 'target': 'INR'}"
+Skydo,EUR,live-20260801153149,2026-08-01,2026-08-01,2026-08-01,15:30,109.994,https://www.skydo.com/convert-usd-to-inr?amount=1000,"{'fx_rate': 109.994, 'api_timestamp': 'Aug 1, 2026, 3:30:00 PM', 'base': 'EUR', 'target': 'INR'}"
+Skydo,GBP,live-20260801153149,2026-08-01,2026-08-01,2026-08-01,15:30,128.5846,https://www.skydo.com/convert-usd-to-inr?amount=1000,"{'fx_rate': 128.5846, 'api_timestamp': 'Aug 1, 2026, 3:30:00 PM', 'base': 'GBP', 'target': 'INR'}"
+Skydo,AED,live-20260801153149,2026-08-01,2026-08-01,2026-08-01,15:30,25.9778,https://www.skydo.com/convert-usd-to-inr?amount=1000,"{'fx_rate': 25.9778, 'api_timestamp': 'Aug 1, 2026, 3:30:00 PM', 'base': 'AED', 'target': 'INR'}"

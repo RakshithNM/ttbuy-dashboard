@@ -20,6 +20,7 @@ interface DataRow {
   bank: string;
   color: string;
   wrapped: boolean;
+  category: "bank" | "platform";
   hasData: true;
   ttbuy: number;
   date: string;
@@ -48,6 +49,7 @@ interface EmptyRow {
   bank: string;
   color: string;
   wrapped: boolean;
+  category: "bank" | "platform";
   hasData: false;
 }
 
@@ -61,25 +63,33 @@ function isPreviousCalendarDay(earlierDate: string, laterDate: string): boolean 
 }
 
 const rows = computed<Row[]>(() => {
-  const dataRows: Omit<DataRow, "gapToBest">[] = [];
-  const emptyRows: EmptyRow[] = [];
+  const bankDataRows: Omit<DataRow, "gapToBest">[] = [];
+  const bankEmptyRows: EmptyRow[] = [];
+  const platformDataRows: Omit<DataRow, "gapToBest">[] = [];
+  const platformEmptyRows: EmptyRow[] = [];
 
   for (const s of props.series) {
+    const isPlatformRow = s.category === "platform";
     const last = s.points[s.points.length - 1];
     if (!last) {
-      emptyRows.push({ bank: s.name, color: s.color, wrapped: s.wrapped, hasData: false });
+      const emptyRow: EmptyRow = { bank: s.name, color: s.color, wrapped: s.wrapped, category: s.category, hasData: false };
+      if (isPlatformRow) platformEmptyRows.push(emptyRow);
+      else bankEmptyRows.push(emptyRow);
       continue;
     }
     const prev = s.points.length >= 2 ? s.points[s.points.length - 2] : null;
     const showDelta = prev !== null && isPreviousCalendarDay(prev.date, last.date);
-    const fee = props.fees[s.name];
-    const feeUnknown = fee?.fee_inr == null;
-    const feeInr = fee?.fee_inr ?? 0;
+    // Platforms credit the full converted amount to the recipient (sender pays
+    // the platform fee on their side), so feeInr=0 and feeUnknown=false.
+    const fee = isPlatformRow ? null : props.fees[s.name];
+    const feeUnknown = isPlatformRow ? false : fee?.fee_inr == null;
+    const feeInr = isPlatformRow ? 0 : (fee?.fee_inr ?? 0);
     const grossReceive = last.ttbuy * safeAmount.value;
-    dataRows.push({
+    const row: Omit<DataRow, "gapToBest"> = {
       bank: s.name,
       color: s.color,
       wrapped: s.wrapped,
+      category: s.category,
       hasData: true,
       ttbuy: last.ttbuy,
       date: last.date,
@@ -88,20 +98,27 @@ const rows = computed<Row[]>(() => {
       feeUnknown,
       netReceive: Math.max(0, grossReceive - feeInr),
       delta: showDelta ? last.ttbuy - prev!.ttbuy : null,
-    });
+    };
+    if (isPlatformRow) platformDataRows.push(row);
+    else bankDataRows.push(row);
   }
 
-  // Ranked by what you'd actually walk away with (rate minus fee), not the
-  // raw TT Buy rate — a better rate can lose here to a lower-fee bank. Banks
-  // with no data sort after every bank that has a rate to show.
-  dataRows.sort((a, b) => b.netReceive - a.netReceive);
-  const bestNet = dataRows[0]?.netReceive ?? 0;
-  const withGap = dataRows.map((r) => ({ ...r, gapToBest: bestNet - r.netReceive }));
+  // Banks: ranked by what you'd actually walk away with (rate minus fee).
+  // Banks with no data sort after every bank that has a rate to show.
+  bankDataRows.sort((a, b) => b.netReceive - a.netReceive);
+  const bestBankNet = bankDataRows[0]?.netReceive ?? 0;
+  const banksWithGap = bankDataRows.map((r) => ({ ...r, gapToBest: bestBankNet - r.netReceive }));
 
-  return [...withGap, ...emptyRows];
+  // Platforms: not sorted against each other (order from BANK_ORDER), gapToBest
+  // is vs the best bank so users can see how the platform compares.
+  const platformsWithGap = platformDataRows.map((r) => ({ ...r, gapToBest: bestBankNet - r.netReceive }));
+
+  return [...banksWithGap, ...bankEmptyRows, ...platformsWithGap, ...platformEmptyRows];
 });
 
-const bestBank = computed(() => rows.value.find((r) => r.hasData)?.bank ?? null);
+const bestBank = computed(() => rows.value.find((r) => r.hasData && r.category === "bank")?.bank ?? null);
+const hasPlatforms = computed(() => rows.value.some((r) => r.category === "platform"));
+const firstPlatformIndex = computed(() => rows.value.findIndex((r) => r.category === "platform"));
 
 function formatInr(value: number): string {
   return value.toLocaleString("en-IN", { maximumFractionDigits: 0 });
@@ -195,77 +212,86 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
           </tr>
         </thead>
         <tbody>
-          <tr v-for="row in rows" :key="row.bank" :class="{ best: row.bank === bestBank }">
-            <th scope="row">
-              <span class="row-header">
-                <span
-                  class="key"
-                  :class="{ wrapped: row.wrapped }"
-                  :style="{ background: `var(${row.color})` }"
-                  aria-hidden="true"
-                ></span>
-                <span class="bank-name">{{ shortName(row.bank) }}</span>
-                <button
-                  v-if="fees[row.bank]"
-                  type="button"
-                  class="fee-info"
-                  aria-label="Inward remittance fee info"
-                  @mouseenter="showFeeTooltip(row.bank, $event)"
-                  @mouseleave="scheduleHideFeeTooltip"
-                  @click="toggleFeeTooltip(row.bank, $event)"
-                  @blur="scheduleHideFeeTooltip"
-                >
-                  <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
-                    <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.3" />
-                    <line x1="8" y1="7" x2="8" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
-                    <circle cx="8" cy="4.6" r="0.9" fill="currentColor" />
-                  </svg>
-                </button>
-                <span v-if="row.bank === bestBank" class="badge">
-                  <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-                    <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                  <span class="badge-text">Best value</span>
-                </span>
-              </span>
-            </th>
-            <template v-if="row.hasData">
-              <td class="num">
-                <div class="ttbuy-inner">
-                  <span class="rate-val">{{ row.ttbuy.toFixed(2) }}</span>
-                  <span class="delta-slot">
-                    <span
-                      v-if="row.delta !== null"
-                      class="delta"
-                      :class="deltaDirection(row.delta)"
-                      :title="`${deltaDirection(row.delta) === 'flat' ? 'Unchanged' : deltaDirection(row.delta) === 'up' ? 'Up' : 'Down'} ${Math.abs(row.delta).toFixed(2)} vs previous rate`"
-                    >
-                      <template v-if="deltaDirection(row.delta) === 'up'">▲</template>
-                      <template v-else-if="deltaDirection(row.delta) === 'down'">▼</template>
-                      <template v-else>–</template>
-                      {{ Math.abs(row.delta).toFixed(2) }}
-                    </span>
+          <template v-for="(row, i) in rows" :key="row.bank">
+            <tr v-if="row.category === 'platform' && i === firstPlatformIndex" class="platform-divider">
+              <td colspan="5" class="platform-section-header">
+                Remittance platforms
+                <span class="platform-section-note">Rate credited to recipient — sender pays platform fee separately</span>
+              </td>
+            </tr>
+            <tr :class="{ best: row.bank === bestBank }">
+              <th scope="row">
+                <span class="row-header">
+                  <span
+                    class="key"
+                    :class="{ wrapped: row.wrapped }"
+                    :style="{ background: `var(${row.color})` }"
+                    aria-hidden="true"
+                  ></span>
+                  <span class="bank-name">{{ shortName(row.bank) }}</span>
+                  <button
+                    v-if="fees[row.bank]"
+                    type="button"
+                    class="fee-info"
+                    aria-label="Inward remittance fee info"
+                    @mouseenter="showFeeTooltip(row.bank, $event)"
+                    @mouseleave="scheduleHideFeeTooltip"
+                    @click="toggleFeeTooltip(row.bank, $event)"
+                    @blur="scheduleHideFeeTooltip"
+                  >
+                    <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                      <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.3" />
+                      <line x1="8" y1="7" x2="8" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                      <circle cx="8" cy="4.6" r="0.9" fill="currentColor" />
+                    </svg>
+                  </button>
+                  <span v-if="row.bank === bestBank" class="badge">
+                    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                      <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="badge-text">Best value</span>
                   </span>
-                </div>
-              </td>
-              <td class="num receive">
-                <span
-                  v-if="row.feeUnknown"
-                  :title="`Fee not confirmed for this bank — showing the gross conversion (rate × amount) with no fee deducted, so the real amount you get may be a little lower.`"
-                >
-                  ≈₹{{ formatInr(row.netReceive) }}
                 </span>
-                <template v-else>₹{{ formatInr(row.netReceive) }}</template>
-                <div v-if="row.feeInr > 0" class="fee-deducted">−₹{{ formatInr(row.feeInr) }} fee</div>
-              </td>
-              <td class="num gap" :class="{ muted: row.bank === bestBank }">
-                <template v-if="row.bank === bestBank">—</template>
-                <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
-              </td>
-              <td class="muted">{{ row.date }}</td>
-            </template>
-            <td v-else colspan="4" class="no-data">No data for this bank</td>
-          </tr>
+              </th>
+              <template v-if="row.hasData">
+                <td class="num">
+                  <div class="ttbuy-inner">
+                    <span class="rate-val">{{ row.ttbuy.toFixed(2) }}</span>
+                    <span class="delta-slot">
+                      <span
+                        v-if="row.delta !== null"
+                        class="delta"
+                        :class="deltaDirection(row.delta)"
+                        :title="`${deltaDirection(row.delta) === 'flat' ? 'Unchanged' : deltaDirection(row.delta) === 'up' ? 'Up' : 'Down'} ${Math.abs(row.delta).toFixed(2)} vs previous rate`"
+                      >
+                        <template v-if="deltaDirection(row.delta) === 'up'">▲</template>
+                        <template v-else-if="deltaDirection(row.delta) === 'down'">▼</template>
+                        <template v-else>–</template>
+                        {{ Math.abs(row.delta).toFixed(2) }}
+                      </span>
+                    </span>
+                  </div>
+                </td>
+                <td class="num receive">
+                  <span
+                    v-if="row.feeUnknown"
+                    :title="`Fee not confirmed for this bank — showing the gross conversion (rate × amount) with no fee deducted, so the real amount you get may be a little lower.`"
+                  >
+                    ≈₹{{ formatInr(row.netReceive) }}
+                  </span>
+                  <template v-else>₹{{ formatInr(row.netReceive) }}</template>
+                  <div v-if="row.feeInr > 0" class="fee-deducted">−₹{{ formatInr(row.feeInr) }} fee</div>
+                </td>
+                <td class="num gap" :class="{ muted: row.bank === bestBank || row.gapToBest === 0, ahead: row.gapToBest < 0 }">
+                  <template v-if="row.bank === bestBank || row.gapToBest === 0">—</template>
+                  <template v-else-if="row.gapToBest < 0">+₹{{ formatInr(Math.abs(row.gapToBest)) }}</template>
+                  <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
+                </td>
+                <td class="muted">{{ row.date }}</td>
+              </template>
+              <td v-else colspan="4" class="no-data">No data for this bank</td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -423,6 +449,10 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
 
   .gap {
     color: var(--text-secondary);
+
+    &.ahead {
+      color: var(--success-text);
+    }
   }
 
   .ttbuy-inner {
@@ -466,6 +496,31 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
     color: var(--text-muted);
     font-style: italic;
     text-align: center;
+  }
+
+  tr.platform-divider td {
+    padding: 6px 12px 4px;
+    border-bottom: none;
+    border-top: 2px solid var(--border);
+    background: var(--surface-0, var(--surface-1));
+  }
+
+  .platform-section-header {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .platform-section-note {
+    font-size: 11px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text-muted);
+    margin-left: 8px;
+    font-style: italic;
   }
 
   @media (max-width: 480px) {

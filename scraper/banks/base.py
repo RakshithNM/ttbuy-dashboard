@@ -20,3 +20,7 @@ class BankPlugin:
     # rotates (dated filename or opaque hash); resolve_url(html) extracts the
     # current PDF URL from that page so it can be fetched in a second step.
     resolve_url: Optional[Callable[[str], Optional[str]]] = None
+    # "bank" for traditional banks; "platform" for remittance services (Skydo,
+    # Wise, etc.) whose rate is what the recipient gets, with the sender paying
+    # the platform fee on their end rather than a deduction from the credited amount.
+    category: str = "bank"
