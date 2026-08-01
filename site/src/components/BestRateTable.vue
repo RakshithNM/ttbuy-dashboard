@@ -109,14 +109,16 @@ const rows = computed<Row[]>(() => {
   const bestBankNet = bankDataRows[0]?.netReceive ?? 0;
   const banksWithGap = bankDataRows.map((r) => ({ ...r, gapToBest: bestBankNet - r.netReceive }));
 
-  // Platforms: not sorted against each other (order from BANK_ORDER), gapToBest
-  // is vs the best bank so users can see how the platform compares.
+  // Platforms: sorted by netReceive just like banks; gapToBest is vs the best
+  // bank so users can see how each platform compares to the bank leader.
+  platformDataRows.sort((a, b) => b.netReceive - a.netReceive);
   const platformsWithGap = platformDataRows.map((r) => ({ ...r, gapToBest: bestBankNet - r.netReceive }));
 
   return [...banksWithGap, ...bankEmptyRows, ...platformsWithGap, ...platformEmptyRows];
 });
 
 const bestBank = computed(() => rows.value.find((r) => r.hasData && r.category === "bank")?.bank ?? null);
+const bestPlatform = computed(() => rows.value.find((r) => r.hasData && r.category === "platform")?.bank ?? null);
 const hasPlatforms = computed(() => rows.value.some((r) => r.category === "platform"));
 const firstPlatformIndex = computed(() => rows.value.findIndex((r) => r.category === "platform"));
 
@@ -249,7 +251,13 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                     <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
                       <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span class="badge-text">Best value</span>
+                    <span class="badge-text">Best value in banks</span>
+                  </span>
+                  <span v-if="row.bank === bestPlatform" class="badge">
+                    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                      <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="badge-text">Best value in platforms</span>
                   </span>
                 </span>
               </th>
