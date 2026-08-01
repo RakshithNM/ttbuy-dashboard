@@ -257,5 +257,64 @@
     "fee_inr": null,
     "source_url": "https://www.dcb.bank.in/fees-and-charges/non-resident-accounts",
     "checked_at": "2026-08-01"
+  },
+  "Punjab National Bank": {
+    "bank": "Punjab National Bank",
+    "rules": [
+      {
+        "label": "Up to ₹10 lakh (regular account)",
+        "charge": "₹100/- Flat"
+      },
+      {
+        "label": "Above ₹10 lakh (regular account)",
+        "charge": "₹250/- Flat"
+      },
+      {
+        "label": "NRE / NRO / FCNR / FCRA account",
+        "charge": "Free"
+      }
+    ],
+    "note": "Charges apply to regular (resident) accounts. NRE/NRO/FCNR/FCRA accounts are exempt.",
+    "fee_inr": null,
+    "source_url": "https://pnb.bank.in/downloadprocess.aspx?fid=ecry+oz2YLsK3sJllMjEAA%3D%3D",
+    "checked_at": "2026-08-01"
+  },
+  "RBL Bank": {
+    "bank": "RBL Bank",
+    "rules": [
+      {
+        "label": "Payment instructions to Nostro account (correspondent bank credit)",
+        "charge": "Free"
+      },
+      {
+        "label": "Clean SWIFT MT 103 inward credited to customer account",
+        "charge": "Rs. 250/-"
+      }
+    ],
+    "note": "If a single remittance carries multiple purpose codes, Rs. 250/- applies per purpose code.",
+    "fee_inr": 250.0,
+    "source_url": "https://webassets.rbl.bank.in/document/service-charges/trade-finance-schedule-of-charges.pdf",
+    "checked_at": "2026-08-01"
+  },
+  "Union Bank of India": {
+    "bank": "Union Bank of India",
+    "rules": [
+      {
+        "label": "Non-trade / personal remittance",
+        "charge": "Rs. 250/- Flat Per Remittance irrespective of amount"
+      },
+      {
+        "label": "Trade remittance",
+        "charge": "Upto USD 10,000 or equivalent = Rs 500/"
+      },
+      {
+        "label": "Trade remittance",
+        "charge": "More than USD 10,000 or equivalent = Rs 1500/"
+      }
+    ],
+    "note": "Trade tier applies to export/import-linked remittances. Personal remittance is the flat Rs. 250 figure.",
+    "fee_inr": 250.0,
+    "source_url": "https://www.unionbankofindia.bank.in/pdf/forex-service-charges.pdf",
+    "checked_at": "2026-08-01"
   }
 }
