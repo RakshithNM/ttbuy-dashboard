@@ -43,6 +43,8 @@ def parse(pdf_bytes, source_url):
             }
         ],
         "note": "Nil if credited to an NRE/NRO account.",
+        # fee_inr uses the "up to USD 2000" tier — the common case.
+        "fee_inr": float(match.group(1).replace(",", "")),
     }
 
 

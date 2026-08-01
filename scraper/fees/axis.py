@@ -47,7 +47,12 @@ def parse(pdf_bytes, source_url):
         )
 
     note = "Premium banking segments (Burgundy/Priority) get lower or nil charges than the standard tier shown here."
-    return {"rules": rules, "note": note}
+
+    # fee_inr uses the Resident standard tier (most site visitors receiving a
+    # personal remittance into India), GST-inclusive at 18% since the
+    # published figure is exclusive of GST.
+    fee_inr = round(float(resident.group(1).replace(",", "")) * 1.18, 2) if resident else None
+    return {"rules": rules, "note": note, "fee_inr": fee_inr}
 
 
 PLUGIN = FeePlugin(

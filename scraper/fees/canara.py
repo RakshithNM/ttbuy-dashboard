@@ -39,7 +39,12 @@ def parse(pdf_bytes, source_url):
     if "commission in lieu of exchange" in block.lower():
         note = "If the remittance is paid out in foreign currency, commission in lieu of exchange is charged in addition."
 
-    return {"rules": rules, "note": note}
+    fee_inr = None
+    if individual:
+        value = individual.group(1).strip()
+        fee_inr = 0.0 if value.lower() == "nil" else float(re.sub(r"[^\d.]", "", value))
+
+    return {"rules": rules, "note": note, "fee_inr": fee_inr}
 
 
 PLUGIN = FeePlugin(

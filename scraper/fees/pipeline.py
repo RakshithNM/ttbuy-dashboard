@@ -25,6 +25,7 @@ def scrape_fee(plugin):
         "bank": plugin.name,
         "rules": parsed["rules"],
         "note": parsed.get("note"),
+        "fee_inr": parsed.get("fee_inr"),
         "source_url": plugin.source_url,
         "checked_at": datetime.now().strftime("%Y-%m-%d"),
     }

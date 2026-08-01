@@ -26,6 +26,7 @@ def parse(pdf_bytes, source_url):
     return {
         "rules": [{"label": "Inward remittance", "charge": "No Charge"}],
         "note": f"FIRC certificate (if needed): Rs.{firc.group(1)} per FIRC" if firc else None,
+        "fee_inr": 0,
     }
 
 

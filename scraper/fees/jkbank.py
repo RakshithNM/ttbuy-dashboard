@@ -33,6 +33,9 @@ def parse(pdf_bytes, source_url):
             }
         ],
         "note": "No commission if proceeds are deposited to an NRE/NRO/FCNR(B)/RFC/EEFC account with J&K Bank.",
+        # fee_inr uses the "up to" tier — the amounts this site's calculator
+        # deals with are well under the lakh-scale threshold for the higher tier.
+        "fee_inr": float(other.group(2).replace(",", "")),
     }
 
 

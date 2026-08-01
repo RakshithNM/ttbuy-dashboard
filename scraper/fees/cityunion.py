@@ -46,7 +46,12 @@ def parse(html, source_url):
             }
         )
 
-    return {"rules": rules, "note": None}
+    fee_inr = None
+    if individual:
+        value = individual.group(1).strip()
+        fee_inr = 0.0 if value.lower() == "nil" else float(re.sub(r"[^\d.]", "", value))
+
+    return {"rules": rules, "note": None, "fee_inr": fee_inr}
 
 
 PLUGIN = FeePlugin(

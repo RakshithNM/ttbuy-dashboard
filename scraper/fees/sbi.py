@@ -37,6 +37,7 @@ def parse(pdf_bytes, source_url):
             "SBI's branded Express Remit corridors (UK/Canada/Worldwide) have a "
             "separate fee structure for specific remittance products."
         ),
+        "fee_inr": float(fee.replace(",", "")),
     }
 
 

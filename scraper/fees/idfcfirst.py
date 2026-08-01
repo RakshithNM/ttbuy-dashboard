@@ -19,6 +19,7 @@ def parse(html, source_url):
     return {
         "rules": [{"label": "Inward remittance", "charge": "Zero processing fees"}],
         "note": "Correspondent/intermediary banks may still levy their own charges before the funds reach IDFC FIRST.",
+        "fee_inr": 0,
     }
 
 

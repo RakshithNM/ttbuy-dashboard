@@ -18,6 +18,7 @@ def parse(html, source_url):
     return {
         "rules": [{"label": "Inward remittance (specific countries)", "charge": "Zero fees"}],
         "note": "Correspondent/intermediary banks may still levy their own charges before the funds reach DBS.",
+        "fee_inr": 0,
     }
 
 

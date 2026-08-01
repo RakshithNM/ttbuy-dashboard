@@ -23,14 +23,24 @@ interface DataRow {
   hasData: true;
   ttbuy: number;
   date: string;
-  youReceive: number;
+  // Straight rate × amount conversion, before any fee.
+  grossReceive: number;
+  // Approximate flat fee for the standard/individual case, in rupees — 0
+  // when confirmed free or when unknown (see feeUnknown).
+  feeInr: number;
+  // True when we don't have a confirmed fee for this bank — netReceive is
+  // then just grossReceive (best case, not a guarantee), and the UI marks
+  // it as approximate rather than silently treating "unknown" as "free".
+  feeUnknown: boolean;
+  netReceive: number;
   // Change vs the previous calendar day's rate; null when the previous
   // scraped point isn't from the day right before (a bank missed a day, or
   // this is the first point on record) — showing a delta across a gap would
   // misrepresent it as a single day's move.
   delta: number | null;
-  // Rupees you'd receive less than the best bank, at the chosen amount —
-  // 0 for the best bank itself.
+  // Rupees you'd net less than the best bank, at the chosen amount — 0 for
+  // the best bank itself. Based on netReceive, not the raw TT Buy rate, so
+  // a better rate can still lose to a lower-fee bank here.
   gapToBest: number;
 }
 
@@ -62,6 +72,10 @@ const rows = computed<Row[]>(() => {
     }
     const prev = s.points.length >= 2 ? s.points[s.points.length - 2] : null;
     const showDelta = prev !== null && isPreviousCalendarDay(prev.date, last.date);
+    const fee = props.fees[s.name];
+    const feeUnknown = fee?.fee_inr == null;
+    const feeInr = fee?.fee_inr ?? 0;
+    const grossReceive = last.ttbuy * safeAmount.value;
     dataRows.push({
       bank: s.name,
       color: s.color,
@@ -69,17 +83,20 @@ const rows = computed<Row[]>(() => {
       hasData: true,
       ttbuy: last.ttbuy,
       date: last.date,
-      youReceive: last.ttbuy * safeAmount.value,
+      grossReceive,
+      feeInr,
+      feeUnknown,
+      netReceive: Math.max(0, grossReceive - feeInr),
       delta: showDelta ? last.ttbuy - prev!.ttbuy : null,
     });
   }
 
-  // Sorting by TT Buy is equivalent to sorting by amount received (a
-  // positive linear scale of it), so one sort serves both columns. Banks
+  // Ranked by what you'd actually walk away with (rate minus fee), not the
+  // raw TT Buy rate — a better rate can lose here to a lower-fee bank. Banks
   // with no data sort after every bank that has a rate to show.
-  dataRows.sort((a, b) => b.ttbuy - a.ttbuy);
-  const bestTtbuy = dataRows[0]?.ttbuy ?? 0;
-  const withGap = dataRows.map((r) => ({ ...r, gapToBest: (bestTtbuy - r.ttbuy) * safeAmount.value }));
+  dataRows.sort((a, b) => b.netReceive - a.netReceive);
+  const bestNet = dataRows[0]?.netReceive ?? 0;
+  const withGap = dataRows.map((r) => ({ ...r, gapToBest: bestNet - r.netReceive }));
 
   return [...withGap, ...emptyRows];
 });
@@ -159,12 +176,15 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
         <span class="prefix">{{ currencySymbol(currency) }}</span>
         <input id="remit-amount" v-model.number="amount" type="number" min="0" step="1" inputmode="decimal" class="amount-input" />
       </div>
-      <span class="suffix">{{ currency }}, here's what each bank credits you</span>
+      <span class="suffix">{{ currency }}, here's what each bank credits you after fees (where known)</span>
     </div>
 
     <div class="table-wrap">
       <table class="best-rate-table">
-        <caption>{{ currency }} TT Buy rate by bank — most recent published rate per bank</caption>
+        <caption>
+          {{ currency }} TT Buy rate by bank — ranked by what you'd actually receive after each bank's own
+          inward remittance fee, not just the raw rate
+        </caption>
         <thead>
           <tr>
             <th scope="col">Bank</th>
@@ -177,34 +197,36 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
         <tbody>
           <tr v-for="row in rows" :key="row.bank" :class="{ best: row.bank === bestBank }">
             <th scope="row">
-              <span
-                class="key"
-                :class="{ wrapped: row.wrapped }"
-                :style="{ background: `var(${row.color})` }"
-                aria-hidden="true"
-              ></span>
-              <span class="bank-name">{{ shortName(row.bank) }}</span>
-              <button
-                v-if="fees[row.bank]"
-                type="button"
-                class="fee-info"
-                aria-label="Inward remittance fee info"
-                @mouseenter="showFeeTooltip(row.bank, $event)"
-                @mouseleave="scheduleHideFeeTooltip"
-                @click="toggleFeeTooltip(row.bank, $event)"
-                @blur="scheduleHideFeeTooltip"
-              >
-                <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
-                  <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.3" />
-                  <line x1="8" y1="7" x2="8" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
-                  <circle cx="8" cy="4.6" r="0.9" fill="currentColor" />
-                </svg>
-              </button>
-              <span v-if="row.bank === bestBank" class="badge">
-                <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-                  <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <span class="badge-text">Best rate</span>
+              <span class="row-header">
+                <span
+                  class="key"
+                  :class="{ wrapped: row.wrapped }"
+                  :style="{ background: `var(${row.color})` }"
+                  aria-hidden="true"
+                ></span>
+                <span class="bank-name">{{ shortName(row.bank) }}</span>
+                <button
+                  v-if="fees[row.bank]"
+                  type="button"
+                  class="fee-info"
+                  aria-label="Inward remittance fee info"
+                  @mouseenter="showFeeTooltip(row.bank, $event)"
+                  @mouseleave="scheduleHideFeeTooltip"
+                  @click="toggleFeeTooltip(row.bank, $event)"
+                  @blur="scheduleHideFeeTooltip"
+                >
+                  <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                    <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.3" />
+                    <line x1="8" y1="7" x2="8" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                    <circle cx="8" cy="4.6" r="0.9" fill="currentColor" />
+                  </svg>
+                </button>
+                <span v-if="row.bank === bestBank" class="badge">
+                  <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                    <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <span class="badge-text">Best value</span>
+                </span>
               </span>
             </th>
             <template v-if="row.hasData">
@@ -222,7 +244,16 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                   {{ Math.abs(row.delta).toFixed(2) }}
                 </span>
               </td>
-              <td class="num receive">₹{{ formatInr(row.youReceive) }}</td>
+              <td class="num receive">
+                <span
+                  v-if="row.feeUnknown"
+                  :title="`Fee not confirmed for this bank — showing the gross conversion (rate × amount) with no fee deducted, so the real amount you get may be a little lower.`"
+                >
+                  ≈₹{{ formatInr(row.netReceive) }}
+                </span>
+                <template v-else>₹{{ formatInr(row.netReceive) }}</template>
+                <div v-if="row.feeInr > 0" class="fee-deducted">−₹{{ formatInr(row.feeInr) }} fee</div>
+              </td>
               <td class="num gap" :class="{ muted: row.bank === bestBank }">
                 <template v-if="row.bank === bestBank">—</template>
                 <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
@@ -349,6 +380,14 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
 
   tbody th {
     font-weight: 500;
+    // Deliberately not display:flex on the <th> itself — that breaks its
+    // table-cell box, so its border-bottom stops stretching to match the
+    // row height when a sibling <td> (e.g. a fee subtext line) is taller.
+    // The flex layout lives on .row-header inside it instead.
+    vertical-align: middle;
+  }
+
+  .row-header {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -369,6 +408,13 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
   .receive {
     color: var(--text-primary);
     font-weight: 600;
+  }
+
+  .fee-deducted {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text-muted);
+    white-space: nowrap;
   }
 
   .gap {

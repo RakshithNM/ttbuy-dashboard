@@ -176,7 +176,7 @@ const lastUpdated = computed(() => {
     <p v-if="bankQuery && searchedSeries.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
 
     <section class="panel">
-      <h2>Best rate today</h2>
+      <h2>Best value today</h2>
       <BestRateTable :series="searchedSeries" :currency="currency" :fees="fees" />
     </section>
 

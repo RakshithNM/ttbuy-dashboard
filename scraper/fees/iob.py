@@ -50,7 +50,10 @@ def parse(pdf_bytes, source_url):
     if fc_payout:
         note = f"If paid out in foreign currency (DD/MT/PO/TT): Rs.{fc_payout.group(1)} + SWIFT charges"
 
-    return {"rules": rules, "note": note}
+    # fee_inr uses the individual/non-trade figure — the case that applies to
+    # someone receiving a personal remittance, not the trade tier.
+    fee_inr = float(individual.group(1).replace(",", "")) if individual else None
+    return {"rules": rules, "note": note, "fee_inr": fee_inr}
 
 
 PLUGIN = FeePlugin(

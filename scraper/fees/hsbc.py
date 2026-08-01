@@ -21,12 +21,16 @@ def parse(html, source_url):
     if not match:
         return None
 
+    # fee_inr uses the standard tier, GST-inclusive at 18% since the
+    # published figure is exclusive of tax.
+    fee_inr = round(float(match.group(1).replace(",", "")) * 1.18, 2)
     return {
         "rules": [
             {"label": "Standard", "charge": f"Rs.{match.group(1)} + taxes"},
             {"label": "HSBC NR / Premier customers", "charge": "Free"},
         ],
         "note": None,
+        "fee_inr": fee_inr,
     }
 
 

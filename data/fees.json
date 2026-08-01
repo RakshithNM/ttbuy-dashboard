@@ -16,8 +16,9 @@
       }
     ],
     "note": "Premium banking segments (Burgundy/Priority) get lower or nil charges than the standard tier shown here.",
+    "fee_inr": 295.0,
     "source_url": "https://www.axis.bank.in/docs/default-source/default-document-library/inward-wire-schedule-of-charges.pdf",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "Indian Overseas Bank": {
     "bank": "Indian Overseas Bank",
@@ -32,8 +33,9 @@
       }
     ],
     "note": "If paid out in foreign currency (DD/MT/PO/TT): Rs.575 + SWIFT charges",
+    "fee_inr": 150.0,
     "source_url": "https://www.iob.bank.in/documents/d/guest/schedule-forex-service-charges-01092015",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "Bank of Baroda": {
     "bank": "Bank of Baroda",
@@ -48,8 +50,9 @@
       }
     ],
     "note": null,
+    "fee_inr": 0,
     "source_url": "https://bankofbaroda.bank.in/interest-rate-and-service-charges/service-charges",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "Canara Bank": {
     "bank": "Canara Bank",
@@ -64,8 +67,9 @@
       }
     ],
     "note": null,
+    "fee_inr": 0.0,
     "source_url": "https://www.canarabank.bank.in/documents/d/guest/forex-20service-20charges-20annex-20wef-2002022026",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "State Bank of India": {
     "bank": "State Bank of India",
@@ -76,8 +80,9 @@
       }
     ],
     "note": "SBI's branded Express Remit corridors (UK/Canada/Worldwide) have a separate fee structure for specific remittance products.",
+    "fee_inr": 25.0,
     "source_url": "https://sbi.bank.in/webfiles/uploads/nri/NRI_SERVICE%20CHARGES.pdf",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "HDFC Bank": {
     "bank": "HDFC Bank",
@@ -88,8 +93,9 @@
       }
     ],
     "note": "FIRC certificate (if needed): Rs.200 per FIRC",
+    "fee_inr": 0,
     "source_url": "https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/pdf/notice-board/rates-and-charges/feesandchargesforforexservicesenglish.pdf",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "Kotak Mahindra Bank": {
     "bank": "Kotak Mahindra Bank",
@@ -100,8 +106,9 @@
       }
     ],
     "note": "No separate charge for the inward remittance credit itself was found in Kotak's published schedule.",
+    "fee_inr": null,
     "source_url": "https://images.kotak.bank.in/bank/mailers/2026/files/811_GSFC_Apr_26.pdf",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "IDBI Bank": {
     "bank": "IDBI Bank",
@@ -116,8 +123,9 @@
       }
     ],
     "note": null,
+    "fee_inr": 0.0,
     "source_url": "https://www.idbi.bank.in/pdf/soc/RevisedTradeFinanceScheduleofCharges2019.pdf",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "City Union Bank": {
     "bank": "City Union Bank",
@@ -132,8 +140,9 @@
       }
     ],
     "note": null,
+    "fee_inr": 0.0,
     "source_url": "https://cityunionbank.bank.in/service-charges",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "HSBC": {
     "bank": "HSBC",
@@ -148,8 +157,9 @@
       }
     ],
     "note": null,
+    "fee_inr": 354.0,
     "source_url": "https://www.hsbc.co.in/international/remittance-fees-and-charges/",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "Jammu & Kashmir Bank": {
     "bank": "Jammu & Kashmir Bank",
@@ -160,8 +170,9 @@
       }
     ],
     "note": "No commission if proceeds are deposited to an NRE/NRO/FCNR(B)/RFC/EEFC account with J&K Bank.",
+    "fee_inr": 250.0,
     "source_url": "https://www.jkbank.com/pdfs/servicecharge/forex.pdf",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "Karur Vysya Bank": {
     "bank": "Karur Vysya Bank",
@@ -172,8 +183,9 @@
       }
     ],
     "note": "Nil if credited to an NRE/NRO account.",
+    "fee_inr": 200.0,
     "source_url": "https://www.kvb.bank.in/docs/forex-charges.pdf",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "Ujjivan Small Finance Bank": {
     "bank": "Ujjivan Small Finance Bank",
@@ -184,8 +196,9 @@
       }
     ],
     "note": "Currency conversion also attracts GST on a separate slab based on the transaction amount.",
+    "fee_inr": 295.0,
     "source_url": "https://www.ujjivansfb.bank.in/assets/Schedule_of_charges_Fx_Services_Outward_and_Inward_Remittances_374aaed10c.pdf",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "IDFC FIRST Bank": {
     "bank": "IDFC FIRST Bank",
@@ -196,8 +209,9 @@
       }
     ],
     "note": "Correspondent/intermediary banks may still levy their own charges before the funds reach IDFC FIRST.",
+    "fee_inr": 0,
     "source_url": "https://www.idfcfirst.bank.in/personal-banking/forex/inward-remittance",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "DBS Bank India": {
     "bank": "DBS Bank India",
@@ -208,35 +222,40 @@
       }
     ],
     "note": "Correspondent/intermediary banks may still levy their own charges before the funds reach DBS.",
+    "fee_inr": 0,
     "source_url": "https://www.dbs.bank.in/digibank/in/banking/remittance/remittance-fees-and-charges",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "Citibank": {
     "bank": "Citibank",
     "rules": [],
     "note": "Citi's retail banking business in India (savings accounts, cards, loans) was fully migrated to Axis Bank by July 2024 — individuals can no longer open a new Citibank account here. The TT Buy rate shown is still published by Citi's separate institutional/corporate banking arm, so it doesn't reflect a personal account you can open.",
+    "fee_inr": null,
     "source_url": "https://www.axis.bank.in/forward-together",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "ICICI Bank": {
     "bank": "ICICI Bank",
     "rules": [],
     "note": "ICICI doesn't publish an inward remittance fee on any public page or PDF we could find (checked their service charges pages and 8+ NRI account-tier documents) — it may only be disclosed via net banking/app or at a branch.",
+    "fee_inr": null,
     "source_url": "https://www.icici.bank.in/nri-banking/service-charges",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "Bandhan Bank": {
     "bank": "Bandhan Bank",
     "rules": [],
     "note": "Bandhan publishes a fee brochure for this, but it's built from vector graphics rather than extractable text, so we can't parse the actual numbers automatically. Open the PDF below to read it directly.",
+    "fee_inr": null,
     "source_url": "https://bandhan.bank.in/sites/default/files/2026-01/Non-Trade-Inward-Remittances-Brochure-28012026.pdf",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   },
   "DCB Bank": {
     "bank": "DCB Bank",
     "rules": [],
     "note": "DCB doesn't state an inward remittance fee on any page we could find — their published fee schedules only cover domestic transfers (NEFT/RTGS/DD), and pages describing inward remittance as a service never give a figure.",
+    "fee_inr": null,
     "source_url": "https://www.dcb.bank.in/fees-and-charges/non-resident-accounts",
-    "checked_at": "2026-07-31"
+    "checked_at": "2026-08-01"
   }
 }

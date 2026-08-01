@@ -22,9 +22,11 @@ def parse(pdf_bytes, source_url):
     if not match:
         return None
 
+    fee_inr = round(float(match.group(1).replace(",", "")) * (1 + float(match.group(2)) / 100), 2)
     return {
         "rules": [{"label": "Inward remittance transfer fee", "charge": f"Rs.{match.group(1)} + {match.group(2)}% GST"}],
         "note": "Currency conversion also attracts GST on a separate slab based on the transaction amount.",
+        "fee_inr": fee_inr,
     }
 
 

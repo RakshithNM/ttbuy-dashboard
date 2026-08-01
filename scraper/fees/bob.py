@@ -36,6 +36,10 @@ def parse(html, source_url):
                         {"label": "Otherwise (e.g. paid out elsewhere)", "charge": f"Rs.{match.group(1)}"},
                     ],
                     "note": None,
+                    # fee_inr uses the "credited to a BOB account" case — the
+                    # relevant one for someone deciding whether to receive
+                    # money at BOB.
+                    "fee_inr": 0,
                 }
     return None
 

@@ -22,11 +22,12 @@ and over time.
 
 - **Compares TT Buy rates across ~19 Indian banks** side by side, for four
   currencies: USD, GBP, EUR, and AED.
-- **"Best rate today" table** — banks ranked best rate first, so the top row
-  is always who pays you the most right now.
+- **"Best value today" table** — banks ranked by what you'd actually receive
+  after each bank's own inward remittance fee (where known), not just the raw
+  rate, so a higher TT Buy rate can still lose to a lower-fee bank here.
 - **Amount calculator** — enter how much you're receiving and see exactly how
-  many rupees each bank would credit you, plus how much less you'd get from
-  every other bank vs. the best one.
+  many net rupees each bank would credit you, plus how much less you'd get
+  from every other bank vs. the best one.
 - **Day-over-day change** (▲/▼) on each bank's rate, shown only when there's
   an actual previous-day rate to compare against (no misleading comparisons
   across a gap in the data).
@@ -39,9 +40,9 @@ and over time.
   anything manually for the site to stay current.
 - **Inward remittance fee info** — a small ⓘ next to a bank's name shows what
   it actually charges to receive the money (or, for a few banks whose fee
-  schedules aren't publicly reachable, a note explaining why), since a
-  better TT Buy rate can still net you less once the bank's own fee is
-  taken out.
+  schedules aren't publicly reachable, a note explaining why). Banks with an
+  unconfirmed fee are marked with "≈" in the amount column — that number is
+  the gross conversion only, not a guarantee.
 
 ## Layout
 

@@ -23,6 +23,10 @@ def parse(pdf_bytes, source_url):
     return {
         "rules": [{"label": "FIRC certificate (if requested)", "charge": f"Rs.{match.group(1)}"}],
         "note": "No separate charge for the inward remittance credit itself was found in Kotak's published schedule.",
+        # Absence of a stated fee isn't the same as a confirmed "Nil" (unlike
+        # banks that explicitly say Free/No Charge/Nil) — leave unknown
+        # rather than assume free.
+        "fee_inr": None,
     }
 
 
