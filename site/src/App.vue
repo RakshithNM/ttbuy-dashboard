@@ -277,6 +277,8 @@ const lastUpdated = computed(() => {
 
   <footer class="site-footer">
     Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a>
+    <span class="footer-sep">·</span>
+    <a href="https://bellare.gumroad.com/l/tiffp" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
   </footer>
 </template>
 
@@ -533,6 +535,10 @@ const lastUpdated = computed(() => {
     height: 1px;
     background: var(--border);
     transform: translateX(-50%);
+  }
+
+  .footer-sep {
+    margin: 0 6px;
   }
 
   a {
