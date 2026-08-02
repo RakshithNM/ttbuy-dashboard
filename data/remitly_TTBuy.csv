@@ -2,3 +2,6 @@ Bank,Currency,Snapshot_Timestamp,Snapshot_Date,Date,Rate_Date,Published_At,TT_Bu
 Remitly,USD,live-20260801154558,2026-08-01,2026-08-01,2026-08-01,15:45,95.66,https://www.remitly.com/us/en/india,"{'currency': 'USD', 'effectiveRateAsLowAs': '95.66'}"
 Remitly,GBP,live-20260801154558,2026-08-01,2026-08-01,2026-08-01,15:45,129.07,https://www.remitly.com/us/en/india,"{'currency': 'GBP', 'effectiveRateAsLowAs': '129.07'}"
 Remitly,EUR,live-20260801154558,2026-08-01,2026-08-01,2026-08-01,15:45,110.50,https://www.remitly.com/us/en/india,"{'currency': 'EUR', 'effectiveRateAsLowAs': '110.50'}"
+Remitly,USD,live-20260802062324,2026-08-02,2026-08-02,2026-08-02,06:23,95.66,https://www.remitly.com/us/en/india,"{'currency': 'USD', 'effectiveRateAsLowAs': '95.66'}"
+Remitly,GBP,live-20260802062324,2026-08-02,2026-08-02,2026-08-02,06:23,129.07,https://www.remitly.com/us/en/india,"{'currency': 'GBP', 'effectiveRateAsLowAs': '129.07'}"
+Remitly,EUR,live-20260802062324,2026-08-02,2026-08-02,2026-08-02,06:23,110.50,https://www.remitly.com/us/en/india,"{'currency': 'EUR', 'effectiveRateAsLowAs': '110.50'}"
