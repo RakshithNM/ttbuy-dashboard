@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { BankSeries, FeesByBank } from "../types";
-import { shortName } from "../bankPalette";
+import { shortName, sourceUrl } from "../bankPalette";
 import { currencySymbol } from "../currencies";
 
 const props = defineProps<{
@@ -230,7 +230,14 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                     :style="{ background: `var(${row.color})` }"
                     aria-hidden="true"
                   ></span>
-                  <span class="bank-name">{{ shortName(row.bank) }}</span>
+                  <a
+                  v-if="sourceUrl(row.bank)"
+                  :href="sourceUrl(row.bank)!"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="bank-name bank-link"
+                >{{ shortName(row.bank) }}</a>
+                <span v-else class="bank-name">{{ shortName(row.bank) }}</span>
                   <button
                     v-if="fees[row.bank]"
                     type="button"
@@ -436,6 +443,16 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .bank-link {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
   }
 
   .num {

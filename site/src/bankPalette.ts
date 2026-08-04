@@ -13,6 +13,38 @@ export const CATEGORICAL_SLOTS = [
   "--series-8", // red
 ] as const;
 
+// Source URLs for each bank/platform's published forex rate card or page.
+export const SOURCE_URLS: Record<string, string> = {
+  "Axis Bank": "https://application.axis.bank.in/webforms/corporatecardrate/index.aspx",
+  "Bandhan Bank": "https://bandhan.bank.in/rates-charges",
+  "Bank of Baroda": "https://bankofbaroda.bank.in/business-banking/treasury/forex-card-rates",
+  "Canara Bank": "https://www.canarabank.bank.in/pages/forex-card-rates",
+  "Citibank": "https://www.citigroup.com/rcs/citigpa/storage/public/India/forex-rates.pdf", // no general web page (retail ops transferred to Axis Bank)
+  "City Union Bank": "https://cityunionbank.bank.in/foreign-exchange-rates",
+  "DBS Bank India": "https://www.dbs.bank.in/in/treasures/rates-online/foreign-currency-foreign-exchange.page",
+  "DCB Bank": "https://www.dcb.bank.in/rates/forex-rates",
+  "HDFC Bank": "https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/interest-rates/hdfc-bank-treasury-forex-card-rates.pdf",
+  "HSBC": "https://www.hsbc.co.in/nri/foreign-exchange-rates/",
+  "ICICI Bank": "https://www.icici.bank.in/corporate/global-markets/forex/forex-card-rate",
+  "IDBI Bank": "https://idbi.bank.in/merchantrates.aspx",
+  "IDFC FIRST Bank": "https://www.idfcfirst.bank.in/forex-rates.html",
+  "Indian Overseas Bank": "https://www.iob.bank.in/en/forex-rates",
+  "Jammu & Kashmir Bank": "https://eapp.jkb.bank.in/eintraweb/forex-rates",
+  "Karur Vysya Bank": "https://www.kvb.bank.in/interest-rates/",
+  "Kotak Mahindra Bank": "https://www.kotak.bank.in/en/rates/forex-rates.html",
+  "Punjab National Bank": "https://pnb.bank.in/PNB-helpdesk-forexservices.html",
+  "RBL Bank": "https://www.rbl.bank.in/fxadmin_getfx",
+  "Remitly": "https://www.remitly.com/us/en/india",
+  "Skydo": "https://www.skydo.com/convert-usd-to-inr?amount=1000",
+  "State Bank of India": "https://sbi.bank.in/web/personal-banking/forex-cards",
+  "Ujjivan Small Finance Bank": "https://www.ujjivansfb.bank.in/forex-rates",
+  "Union Bank of India": "https://www.unionbankofindia.co.in/english/ibd-other-exchangerate.aspx",
+};
+
+export function sourceUrl(name: string): string | null {
+  return SOURCE_URLS[name] ?? null;
+}
+
 // Remittance platform names. These appear in rates.json alongside banks but
 // are displayed in a separate section in the UI.
 export const PLATFORM_NAMES = new Set(["Skydo", "Remitly"]);
