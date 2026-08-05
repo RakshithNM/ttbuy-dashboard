@@ -1,7 +1,41 @@
-// Fixed categorical hue order (dataviz skill palette, validated for CVD-safe
-// adjacent pairs). Slot assignment follows a fixed bank order, not alphabetical
-// or data-driven sort, so a bank's color never shifts as other banks are
-// filtered in/out or as new banks are added at the end of the list.
+// Official brand colors for each bank/platform, used for indicators and chart
+// lines. Colors are sourced from published brand guidelines and logo palettes.
+// Where a bank uses multiple brand colors, the single most recognizable one is
+// used. Add new banks at the end of BANK_ORDER, then add a color here.
+export const BRAND_COLORS: Record<string, string> = {
+  "Axis Bank":                  "#97144D", // Axis magenta-maroon
+  "Indian Overseas Bank":       "#013CC8", // IOB deep blue
+  "State Bank of India":        "#22409A", // SBI navy
+  "Punjab National Bank":       "#FBBC09", // PNB yellow/gold
+  "Bank of Baroda":             "#F15A29", // BoB orange
+  "Canara Bank":                "#019EEC", // Canara sky blue
+  "HDFC Bank":                  "#ED232A", // HDFC red
+  "ICICI Bank":                 "#F99D27", // ICICI orange
+  "Kotak Mahindra Bank":        "#ED1C24", // Kotak red
+  "IDBI Bank":                  "#F58220", // IDBI orange
+  "Bandhan Bank":               "#0A3152", // Bandhan dark blue
+  "City Union Bank":            "#C8102E", // CUB red
+  "HSBC":                       "#DB0011", // HSBC red
+  "Jammu & Kashmir Bank":       "#0084C4", // J&K blue
+  "Karur Vysya Bank":           "#00854A", // KVB green
+  "Citibank":                   "#003B70", // Citi navy
+  "Ujjivan Small Finance Bank": "#249D82", // Ujjivan teal
+  "DCB Bank":                   "#26358F", // DCB indigo
+  "IDFC FIRST Bank":            "#9C1D26", // IDFC FIRST dark red
+  "DBS Bank India":             "#DA291C", // DBS red
+  "RBL Bank":                   "#21317D", // RBL dark blue
+  "Union Bank of India":        "#00579C", // Union Bank blue
+  "Skydo":                      "#1B4FD8", // Skydo blue
+  "Remitly":                    "#1D3557", // Remitly dark navy
+};
+
+const BRAND_COLOR_FALLBACK = "#6b7280";
+
+export function brandColor(name: string): string {
+  return BRAND_COLORS[name] ?? BRAND_COLOR_FALLBACK;
+}
+
+// Legacy slot system — kept for reference but no longer used for rendering.
 export const CATEGORICAL_SLOTS = [
   "--series-1", // blue
   "--series-2", // orange

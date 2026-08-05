@@ -255,7 +255,7 @@ const tableRows = computed(() =>
         <span
           class="key"
           :class="{ wrapped: s.wrapped }"
-          :style="{ background: s.wrapped ? undefined : `var(${s.color})`, borderColor: `var(${s.color})` }"
+          :style="{ background: s.color, borderColor: s.color }"
           aria-hidden="true"
         ></span>
         {{ s.name }}
@@ -301,7 +301,7 @@ const tableRows = computed(() =>
         <path
           :d="linePath(s.points)"
           fill="none"
-          :stroke="`var(${s.color})`"
+          :stroke="s.color"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -313,14 +313,14 @@ const tableRows = computed(() =>
           :cx="xScale(p.date)"
           :cy="yScale(p.ttbuy)"
           r="2.5"
-          :fill="`var(${s.color})`"
+          :fill="s.color"
         />
         <template v-if="lastPoint(s)">
           <circle
             :cx="xScale(lastPoint(s)!.date)"
             :cy="yScale(lastPoint(s)!.ttbuy)"
             r="4"
-            :fill="`var(${s.color})`"
+            :fill="s.color"
             stroke="var(--surface-1)"
             stroke-width="2"
           />
@@ -356,7 +356,7 @@ const tableRows = computed(() =>
     >
       <div class="tooltip-date">{{ formatShortDate(hoverDate) }}</div>
       <div v-for="row in tooltipRows" :key="row.name" class="tooltip-row">
-        <span class="line-key" :style="{ background: `var(${row.color})` }" aria-hidden="true"></span>
+        <span class="line-key" :style="{ background: row.color }" aria-hidden="true"></span>
         <span class="tooltip-name">{{ row.name }}</span>
         <span class="tooltip-value">{{ row.value.toFixed(2) }}</span>
       </div>
@@ -371,7 +371,7 @@ const tableRows = computed(() =>
               <span
                 class="key"
                 :class="{ wrapped: s.wrapped }"
-                :style="{ background: s.wrapped ? undefined : `var(${s.color})`, borderColor: `var(${s.color})` }"
+                :style="{ background: s.color, borderColor: s.color }"
                 aria-hidden="true"
               ></span>
               {{ shortName(s.name) }}

@@ -236,7 +236,7 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                   <span
                     class="key"
                     :class="{ wrapped: row.wrapped }"
-                    :style="{ background: `var(${row.color})` }"
+                    :style="{ background: row.color }"
                     aria-hidden="true"
                   ></span>
                   <a
