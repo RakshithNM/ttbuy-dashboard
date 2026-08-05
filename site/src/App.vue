@@ -344,7 +344,7 @@ const lastUpdatedFormatted = computed(() => {
   }
 
   h1 {
-    font-size: 28px;
+    font-size: 32px;
     margin: 0 0 12px;
   }
 
@@ -386,6 +386,12 @@ const lastUpdatedFormatted = computed(() => {
   color: var(--text-secondary);
   white-space: nowrap;
   cursor: pointer;
+  transition: background 80ms ease, border-color 80ms ease, color 80ms ease;
+
+  &:hover:not(.active) {
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
 
   &:focus-visible {
     outline: 2px solid var(--accent);
@@ -469,8 +475,10 @@ const lastUpdatedFormatted = computed(() => {
   color: var(--text-secondary);
   white-space: nowrap;
   cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
 
-  &:hover {
+  &:hover:not(.copied) {
+    background: var(--page-plane);
     color: var(--text-primary);
   }
 
@@ -499,7 +507,7 @@ const lastUpdatedFormatted = computed(() => {
   margin-bottom: 24px;
 
   h2 {
-    font-size: 16px;
+    font-size: 18px;
     margin: 0 0 16px;
   }
 
@@ -537,8 +545,10 @@ const lastUpdatedFormatted = computed(() => {
   color: var(--text-secondary);
   white-space: nowrap;
   cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
 
   &:hover {
+    background: var(--page-plane);
     color: var(--text-primary);
   }
 
@@ -563,6 +573,12 @@ const lastUpdatedFormatted = computed(() => {
   color: var(--text-secondary);
   white-space: nowrap;
   cursor: pointer;
+  transition: background 80ms ease, border-color 80ms ease, color 80ms ease;
+
+  &:hover:not(.active) {
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
 
   &:focus-visible {
     outline: 2px solid var(--accent);
@@ -588,8 +604,10 @@ const lastUpdatedFormatted = computed(() => {
   border-radius: 6px;
   color: var(--text-secondary);
   cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
 
   &:hover {
+    background: var(--page-plane);
     color: var(--text-primary);
   }
 

@@ -437,6 +437,17 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
     text-align: left;
     border-bottom: 1px solid var(--gridline);
     white-space: nowrap;
+    transition: background 80ms ease;
+  }
+
+  tbody tr:not(.platform-divider):not(.best):hover th,
+  tbody tr:not(.platform-divider):not(.best):hover td {
+    background: var(--page-plane);
+  }
+
+  tbody tr:last-child th,
+  tbody tr:last-child td {
+    border-bottom: none;
   }
 
   thead th {
