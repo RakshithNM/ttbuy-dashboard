@@ -26,6 +26,24 @@ const RANGE_OPTIONS: { key: RangeKey; label: string; days: number | null }[] = [
 // can throw (private browsing, disabled storage) — this is a nice-to-have,
 // never worth breaking the page over, so every access is best-effort.
 const VIEW_STORAGE_KEY = "ttbuy-dashboard:view";
+const THEME_STORAGE_KEY = "ttbuy-dashboard:theme";
+
+// Apply stored theme before first paint so there's no flash of wrong theme.
+const _storedTheme = (() => {
+  try { return localStorage.getItem(THEME_STORAGE_KEY) as "light" | "dark" | null; } catch { return null; }
+})();
+if (_storedTheme) document.documentElement.setAttribute("data-theme", _storedTheme);
+const isDark = ref(
+  _storedTheme !== null
+    ? _storedTheme === "dark"
+    : window.matchMedia("(prefers-color-scheme: dark)").matches
+);
+function toggleTheme() {
+  isDark.value = !isDark.value;
+  const t = isDark.value ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", t);
+  try { localStorage.setItem(THEME_STORAGE_KEY, t); } catch {}
+}
 
 interface StoredView {
   range?: RangeKey;
@@ -79,6 +97,7 @@ const currency = ref<string>(queryView.currency ?? storedView.currency ?? "USD")
 const amount = ref<number>(queryView.amount ?? storedView.amount ?? 1000);
 
 watch([range, showTable, currency, amount], ([r, t, c, a]) => {
+  document.title = `${c} TT Buy Rate | TTBuy Rates`;
   try {
     localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ range: r, showTable: t, currency: c, amount: a }));
   } catch {
@@ -186,6 +205,13 @@ const lastUpdated = computed(() => {
   if (dates.length === 0) return null;
   return dates.sort().at(-1) ?? null;
 });
+
+const lastUpdatedFormatted = computed(() => {
+  if (!lastUpdated.value) return null;
+  const [year, month, day] = lastUpdated.value.split("-").map(Number);
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return `${MONTHS[month - 1]} ${day}, ${year}`;
+});
 </script>
 
 <template>
@@ -194,12 +220,12 @@ const lastUpdated = computed(() => {
     <h1>{{ currency }} TT Buy rate by Indian banks</h1>
     <p class="lede">
       TT Buy is the rate a bank credits you at when you receive a foreign inward
-      (telegraphic transfer) remittance — a higher TT Buy means more rupees for the
+      (telegraphic transfer) remittance. A higher TT Buy means more rupees for the
       same {{ currencyName(currency) }} amount. Rates below are scraped directly from
       each bank's public forex rate page.
     </p>
     <p v-if="lastUpdated" class="updated">
-      Data last updated {{ lastUpdated }}. Collected daily once at 11 AM IST, starting 28 July 2026.
+      Data last updated {{ lastUpdatedFormatted }}. Updated daily at 11 AM IST.
     </p>
   </header>
 
@@ -237,6 +263,29 @@ const lastUpdated = computed(() => {
           />
         </svg>
         {{ copied ? "Copied!" : "Copy link" }}
+      </button>
+      <button
+        type="button"
+        class="theme-toggle"
+        :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+        @click="toggleTheme"
+      >
+        <svg v-if="isDark" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <line x1="8" y1="1.5" x2="8" y2="3"/>
+            <line x1="8" y1="13" x2="8" y2="14.5"/>
+            <line x1="1.5" y1="8" x2="3" y2="8"/>
+            <line x1="13" y1="8" x2="14.5" y2="8"/>
+            <line x1="3.4" y1="3.4" x2="4.4" y2="4.4"/>
+            <line x1="11.6" y1="11.6" x2="12.6" y2="12.6"/>
+            <line x1="12.6" y1="3.4" x2="11.6" y2="4.4"/>
+            <line x1="4.4" y1="11.6" x2="3.4" y2="12.6"/>
+          </g>
+        </svg>
+        <svg v-else viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <path d="M13 10.5a6 6 0 0 1-7.5-7.5A5.5 5.5 0 1 0 13 10.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
       </button>
     </div>
     <p v-if="bankQuery && searchedSeries.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
@@ -338,9 +387,14 @@ const lastUpdated = computed(() => {
   white-space: nowrap;
   cursor: pointer;
 
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   &.active {
-    background: var(--series-1);
-    border-color: var(--series-1);
+    background: var(--accent);
+    border-color: var(--accent);
     color: #fff;
   }
 }
@@ -420,6 +474,11 @@ const lastUpdated = computed(() => {
     color: var(--text-primary);
   }
 
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   &.copied {
     color: var(--success-text);
     border-color: var(--success-text);
@@ -482,6 +541,11 @@ const lastUpdated = computed(() => {
   &:hover {
     color: var(--text-primary);
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
 
 .range-filter {
@@ -500,10 +564,38 @@ const lastUpdated = computed(() => {
   white-space: nowrap;
   cursor: pointer;
 
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   &.active {
-    background: var(--series-1);
-    border-color: var(--series-1);
+    background: var(--accent);
+    border-color: var(--accent);
     color: #fff;
+  }
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 }
 

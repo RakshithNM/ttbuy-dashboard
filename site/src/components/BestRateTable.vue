@@ -55,6 +55,17 @@ interface EmptyRow {
 
 type Row = DataRow | EmptyRow;
 
+function formatDate(iso: string): string {
+  const [, month, day] = iso.split("-").map(Number);
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${MONTHS[month - 1]} ${day}`;
+}
+
+const hasInvalidAmount = computed(() => {
+  const n = Number(amount.value);
+  return !Number.isFinite(n) || n <= 0;
+});
+
 function feeFromSlabs(slabs: FeeSlab[], grossInr: number): number {
   for (const s of slabs) {
     if (s.up_to === null || grossInr <= s.up_to) return s.fee_inr;
@@ -200,9 +211,9 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
   <div class="best-rate">
     <div class="amount-control">
       <label for="remit-amount">If you receive</label>
-      <div class="amount-field">
+      <div class="amount-field" :class="{ invalid: hasInvalidAmount }">
         <span class="prefix">{{ currencySymbol(currency) }}</span>
-        <input id="remit-amount" v-model.number="amount" type="number" min="0" step="1" inputmode="decimal" class="amount-input" />
+        <input id="remit-amount" v-model.number="amount" type="number" min="1" step="1" inputmode="decimal" class="amount-input" :aria-invalid="hasInvalidAmount ? 'true' : undefined" />
       </div>
       <span class="suffix">{{ currency }}, here's what each bank credits you after fees (where known)</span>
     </div>
@@ -311,7 +322,7 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                   <template v-else-if="row.gapToBest < 0">+₹{{ formatInr(Math.abs(row.gapToBest)) }}</template>
                   <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
                 </td>
-                <td class="muted">{{ row.date }}</td>
+                <td class="muted">{{ formatDate(row.date) }}</td>
               </template>
               <td v-else colspan="4" class="no-data">No data for this bank</td>
             </tr>
@@ -328,7 +339,7 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
       @mouseleave="scheduleHideFeeTooltip"
     >
       <div class="fee-tooltip-title">
-        {{ shortName(activeFee.bank) }} — {{ activeFee.rules.length ? "inward remittance fee" : "note" }}
+        {{ shortName(activeFee.bank) }}: {{ activeFee.rules.length ? "Inward remittance fee" : "Note" }}
       </div>
       <div v-for="rule in activeFee.rules" :key="rule.label" class="fee-rule">
         <div class="fee-label">{{ rule.label }}</div>
@@ -368,6 +379,10 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
   border-radius: 6px;
   padding: 0 8px;
   background: var(--surface-1);
+
+  &.invalid {
+    border-color: var(--status-critical);
+  }
 
   .prefix {
     color: var(--text-muted);
@@ -670,7 +685,7 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
 .fee-source {
   display: inline-block;
   margin-top: 8px;
-  color: var(--series-1);
+  color: var(--accent);
   font-size: 11px;
 
   &:hover {
