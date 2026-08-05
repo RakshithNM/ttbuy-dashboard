@@ -225,6 +225,27 @@ def add_live_row(plugin):
             print(f"Live {plugin.name} {currency} row for {rate_date} already exists.")
             continue
 
+        # Skip weekend carry-forwards: if the rate date is Saturday or Sunday
+        # and the rate is identical to the most recently stored rate for this
+        # currency, the bank is just republishing Friday's data — skip it so
+        # the chart shows a clean gap rather than a misleading flat stub.
+        try:
+            rate_date_dt = datetime.strptime(rate_date, "%Y-%m-%d")
+        except ValueError:
+            rate_date_dt = None
+        if rate_date_dt and rate_date_dt.weekday() in (5, 6) and not existing_df.empty:
+            prev = existing_df[existing_df["Currency"] == currency].sort_values("Date")
+            if not prev.empty:
+                try:
+                    if abs(float(prev.iloc[-1]["TT_Buy"]) - float(parsed_row["TT_Buy"])) < 0.001:
+                        print(
+                            f"Skipping {plugin.name} {currency} weekend carry-forward "
+                            f"for {rate_date} (rate {parsed_row['TT_Buy']} unchanged from previous)"
+                        )
+                        continue
+                except (ValueError, TypeError):
+                    pass
+
         historical_data.append({
             "Bank": plugin.name,
             "Currency": currency,
