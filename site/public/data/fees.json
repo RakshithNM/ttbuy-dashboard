@@ -277,7 +277,17 @@
     "note": "Charges apply to regular (resident) accounts. NRE/NRO/FCNR/FCRA accounts are exempt.",
     "fee_inr": null,
     "source_url": "https://pnb.bank.in/downloadprocess.aspx?fid=ecry+oz2YLsK3sJllMjEAA%3D%3D",
-    "checked_at": "2026-08-01"
+    "checked_at": "2026-08-01",
+    "fee_slabs": [
+      {
+        "up_to": 1000000,
+        "fee_inr": 100
+      },
+      {
+        "up_to": null,
+        "fee_inr": 250
+      }
+    ]
   },
   "RBL Bank": {
     "bank": "RBL Bank",

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import type { BankSeries, FeesByBank } from "../types";
+import type { BankSeries, FeesByBank, FeeSlab } from "../types";
 import { shortName, sourceUrl } from "../bankPalette";
 import { currencySymbol } from "../currencies";
 
@@ -55,6 +55,13 @@ interface EmptyRow {
 
 type Row = DataRow | EmptyRow;
 
+function feeFromSlabs(slabs: FeeSlab[], grossInr: number): number {
+  for (const s of slabs) {
+    if (s.up_to === null || grossInr <= s.up_to) return s.fee_inr;
+  }
+  return 0;
+}
+
 function isPreviousCalendarDay(earlierDate: string, laterDate: string): boolean {
   const earlier = new Date(`${earlierDate}T00:00:00Z`);
   const later = new Date(`${laterDate}T00:00:00Z`);
@@ -82,9 +89,11 @@ const rows = computed<Row[]>(() => {
     // Platforms credit the full converted amount to the recipient (sender pays
     // the platform fee on their side), so feeInr=0 and feeUnknown=false.
     const fee = isPlatformRow ? null : props.fees[s.name];
-    const feeUnknown = isPlatformRow ? false : fee?.fee_inr == null;
-    const feeInr = isPlatformRow ? 0 : (fee?.fee_inr ?? 0);
     const grossReceive = last.ttbuy * safeAmount.value;
+    const feeUnknown = isPlatformRow ? false : (!fee?.fee_slabs && fee?.fee_inr == null);
+    const feeInr = isPlatformRow ? 0 : (
+      fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, grossReceive) : (fee?.fee_inr ?? 0)
+    );
     const row: Omit<DataRow, "gapToBest"> = {
       bank: s.name,
       color: s.color,

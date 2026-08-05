@@ -21,6 +21,11 @@ export interface FeeRule {
   charge: string;
 }
 
+export interface FeeSlab {
+  up_to: number | null; // upper bound inclusive in INR; null = all amounts above previous slab
+  fee_inr: number;
+}
+
 export interface BankFee {
   bank: string;
   rules: FeeRule[];
@@ -30,6 +35,9 @@ export interface BankFee {
   // don't know (see BankFee.note for why). Deliberately separate from
   // `rules`, which stays free text and isn't meant to be parsed for math.
   fee_inr: number | null;
+  // Present when the fee varies by receive amount — takes precedence over
+  // fee_inr for the net-receive calculation.
+  fee_slabs?: FeeSlab[];
   source_url: string;
   checked_at: string;
 }

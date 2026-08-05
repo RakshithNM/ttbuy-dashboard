@@ -45,7 +45,11 @@ def parse(pdf_bytes, source_url):
     return {
         "rules": rules,
         "note": "Charges apply to regular (resident) accounts. NRE/NRO/FCNR/FCRA accounts are exempt.",
-        "fee_inr": None,  # depends on account type — can't collapse to a single number
+        "fee_inr": None,
+        "fee_slabs": [
+            {"up_to": 1_000_000, "fee_inr": 100},
+            {"up_to": None, "fee_inr": 250},
+        ],
     }
 
 

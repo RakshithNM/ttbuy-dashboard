@@ -21,7 +21,7 @@ def scrape_fee(plugin):
     if not parsed:
         return None
 
-    return {
+    result = {
         "bank": plugin.name,
         "rules": parsed["rules"],
         "note": parsed.get("note"),
@@ -29,6 +29,9 @@ def scrape_fee(plugin):
         "source_url": plugin.source_url,
         "checked_at": datetime.now().strftime("%Y-%m-%d"),
     }
+    if parsed.get("fee_slabs") is not None:
+        result["fee_slabs"] = parsed["fee_slabs"]
+    return result
 
 
 def scrape_all_fees(registry):
