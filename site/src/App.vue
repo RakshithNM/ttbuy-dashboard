@@ -241,24 +241,33 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
     ? (() => { const d = new Date(); d.setDate(d.getDate() - opt.days!); return d.toISOString().slice(0, 10); })()
     : null;
 
-  // Per-date winner by raw TT Buy rate across all banks (not affected by
-  // the search filter). Fees are fixed over time so raw rate ordering gives
-  // the same relative ranking as net-receive for the purpose of this badge.
-  const dateWinner = new Map<string, { bank: string; rate: number }>();
-  for (const s of allSeries.value) {
-    if (s.category === "platform") continue;
+  // Collect all entries per date across all banks (ignoring search filter).
+  const bankSeries = allSeries.value.filter(s => s.category === "bank");
+  const dateEntries = new Map<string, { bank: string; rate: number }[]>();
+  for (const s of bankSeries) {
     for (const pt of s.points) {
       if (cutoffStr && pt.date < cutoffStr) continue;
-      const prev = dateWinner.get(pt.date);
-      if (!prev || pt.ttbuy > prev.rate) dateWinner.set(pt.date, { bank: s.name, rate: pt.ttbuy });
+      const list = dateEntries.get(pt.date) ?? [];
+      list.push({ bank: s.name, rate: pt.ttbuy });
+      dateEntries.set(pt.date, list);
     }
   }
 
-  const totalDays = dateWinner.size;
-  if (totalDays === 0) return null;
-
+  // Only count days where a majority of banks have data — days with only a
+  // handful of scraped entries (Wayback backfill gaps, scrapers failing) would
+  // make any "winner" trivially whoever showed up, not who was actually best.
+  const majorityThreshold = Math.floor(bankSeries.length / 2) + 1;
   const wins: Record<string, number> = {};
-  for (const { bank } of dateWinner.values()) wins[bank] = (wins[bank] ?? 0) + 1;
+  let qualifyingDays = 0;
+
+  for (const entries of dateEntries.values()) {
+    if (entries.length < majorityThreshold) continue;
+    qualifyingDays++;
+    const best = entries.reduce((a, b) => a.rate >= b.rate ? a : b);
+    wins[best.bank] = (wins[best.bank] ?? 0) + 1;
+  }
+
+  if (qualifyingDays === 0) return null;
 
   let topBank: string | null = null;
   let topCount = 0;
@@ -266,7 +275,7 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
     if (count > topCount) { topCount = count; topBank = bank; }
   }
 
-  return topBank ? { bank: topBank, count: topCount, total: totalDays } : null;
+  return topBank ? { bank: topBank, count: topCount, total: qualifyingDays } : null;
 });
 </script>
 
