@@ -16,14 +16,22 @@ const viewMonth = ref(today.getMonth());
 interface BestEntry { bank: string; color: string; rate: number; }
 
 const bestByDate = computed(() => {
-  const map = new Map<string, BestEntry>();
+  const dateEntries = new Map<string, BestEntry[]>();
   for (const s of props.series) {
     if (s.category !== "bank") continue;
     for (const p of s.points) {
-      const curr = map.get(p.date);
-      if (!curr || p.ttbuy > curr.rate) {
-        map.set(p.date, { bank: s.name, color: s.color, rate: p.ttbuy });
+      if (!dateEntries.has(p.date)) {
+        dateEntries.set(p.date, []);
       }
+      dateEntries.get(p.date)!.push({ bank: s.name, color: s.color, rate: p.ttbuy });
+    }
+  }
+
+  const map = new Map<string, BestEntry>();
+  for (const [date, entries] of dateEntries.entries()) {
+    if (entries.length >= 11) {
+      const best = entries.reduce((prev, current) => (prev.rate > current.rate) ? prev : current);
+      map.set(date, best);
     }
   }
   return map;

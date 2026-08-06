@@ -289,15 +289,30 @@ const dowInsight = computed<DowInsight | null>(() => {
   const bankSeries = allSeries.value.filter(s => s.category === "bank");
   if (!bankSeries.length) return null;
 
-  // For each date find the peak rate across all banks — DOW analysis should
-  // reflect the best achievable rate, not an average pulled down by slow banks.
+  // Track both the peak rate and the number of reporting banks per date.
+  // We want to ignore early sparse data (e.g. before July 28) when calculating trends.
+  const dateEntries = new Map<string, number>();
   const dateMax = new Map<string, number>();
   for (const s of bankSeries) {
     for (const p of s.points) {
+      dateEntries.set(p.date, (dateEntries.get(p.date) ?? 0) + 1);
       const curr = dateMax.get(p.date) ?? 0;
       if (p.ttbuy > curr) dateMax.set(p.date, p.ttbuy);
     }
   }
+
+  const majorityThreshold = Math.floor(bankSeries.length / 2) + 1;
+  const sortedDates = [...dateEntries.keys()].sort();
+  const firstValidDate = sortedDates.find(d => dateEntries.get(d)! >= majorityThreshold);
+
+  if (!firstValidDate) return null;
+
+  for (const date of dateMax.keys()) {
+    if (date < firstValidDate) {
+      dateMax.delete(date);
+    }
+  }
+
   if (dateMax.size < 14) return null;
 
   const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
