@@ -11,6 +11,13 @@ const props = defineProps<{
   consistency: { bank: string; count: number; total: number; since: string | null } | null;
   dowInsight: { day: string; diffPaise: number } | null;
   range: string;
+  todaySignal: {
+    todayBest: number;
+    avgBest: number;
+    daysCount: number;
+    direction: "above" | "below" | "near";
+    trend: "up" | "down" | "flat";
+  } | null;
 }>();
 
 const statPrefix = computed(() => {
@@ -316,6 +323,21 @@ const bankStats = computed(() => {
           — <span class="spread-amount">₹{{ formatInr(rateSpread.receiveGap) }} more</span>
           on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}
         </template>
+      </span>
+    </div>
+
+    <div v-if="todaySignal" class="today-callout" :class="todaySignal.direction" role="note">
+      <svg class="today-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <polyline v-if="todaySignal.direction === 'above'" points="1,12 5,7 9,9 15,3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline v-else-if="todaySignal.direction === 'below'" points="1,4 5,9 9,7 15,13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline v-else points="1,8 5,6 9,10 15,8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>
+        Today's best {{ currency }} rate
+        <strong>₹{{ todaySignal.todayBest.toFixed(2) }}</strong>
+        is {{ todaySignal.direction === 'above' ? 'above' : todaySignal.direction === 'below' ? 'below' : 'near' }}
+        the {{ todaySignal.daysCount }}-day average
+        <strong>₹{{ todaySignal.avgBest.toFixed(2) }}</strong><template v-if="todaySignal.trend === 'up'"> — rates have been rising</template><template v-else-if="todaySignal.trend === 'down'"> — rates have been declining</template>
       </span>
     </div>
 
@@ -649,6 +671,47 @@ const bankStats = computed(() => {
   .spread-amount {
     font-weight: 700;
     color: var(--success-text);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.today-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+
+  &.above {
+    background: color-mix(in srgb, var(--status-good) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--status-good) 22%, transparent);
+    .today-icon { color: var(--status-good); }
+  }
+
+  &.below {
+    background: color-mix(in srgb, var(--status-warning) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--status-warning) 28%, transparent);
+    .today-icon { color: var(--status-warning); }
+  }
+
+  &.near {
+    background: var(--page-plane);
+    border: 1px solid var(--border);
+    .today-icon { color: var(--text-muted); }
+  }
+
+  .today-icon {
+    flex: none;
+    margin-top: 2px;
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--text-primary);
     font-variant-numeric: tabular-nums;
   }
 }

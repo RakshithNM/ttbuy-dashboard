@@ -445,6 +445,50 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
 
   return topBank ? { bank: topBank, count: topCount, total: qualifyingDays, since: firstQualifyingDate } : null;
 });
+
+interface TodaySignal {
+  todayBest: number;
+  avgBest: number;
+  daysCount: number;
+  direction: "above" | "below" | "near";
+  trend: "up" | "down" | "flat";
+}
+
+const todaySignal = computed<TodaySignal | null>(() => {
+  const bankSeries = allSeries.value.filter(s => s.category === "bank");
+  if (!bankSeries.length) return null;
+
+  const majorityThreshold = Math.floor(bankSeries.length / 2) + 1;
+
+  const dateEntries = new Map<string, number[]>();
+  for (const s of bankSeries) {
+    for (const pt of s.points) {
+      const arr = dateEntries.get(pt.date) ?? [];
+      arr.push(pt.ttbuy);
+      dateEntries.set(pt.date, arr);
+    }
+  }
+
+  const qualifyingDates = [...dateEntries.entries()]
+    .filter(([, rates]) => rates.length >= majorityThreshold)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-7);
+
+  if (qualifyingDates.length < 2) return null;
+
+  const dailyBests = qualifyingDates.map(([, rates]) => Math.max(...rates));
+  const todayBest = dailyBests[dailyBests.length - 1];
+  const avgBest = dailyBests.reduce((s, v) => s + v, 0) / dailyBests.length;
+
+  const diff = todayBest - avgBest;
+  const threshold = 0.05;
+  const direction: TodaySignal["direction"] = diff > threshold ? "above" : diff < -threshold ? "below" : "near";
+
+  const trendDiff = dailyBests[dailyBests.length - 1] - dailyBests[0];
+  const trend: TodaySignal["trend"] = trendDiff > threshold ? "up" : trendDiff < -threshold ? "down" : "flat";
+
+  return { todayBest, avgBest, daysCount: dailyBests.length, direction, trend };
+});
 </script>
 
 <template>
@@ -551,7 +595,7 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
 
     <section class="panel">
       <h2>Best value today</h2>
-      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" :range="range" />
+      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" :range="range" :today-signal="todaySignal" />
     </section>
 
     <section class="panel">
