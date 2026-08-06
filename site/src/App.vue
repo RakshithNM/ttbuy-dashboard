@@ -116,8 +116,20 @@ watch([range, showTable, currency, amount], ([r, t, c, a]) => {
 
 const copied = ref(false);
 let copiedTimer: ReturnType<typeof setTimeout> | null = null;
+const canNativeShare = typeof navigator.share === "function";
 
 async function copyShareLink() {
+  if (canNativeShare) {
+    try {
+      await navigator.share({ title: document.title, url: window.location.href });
+    } catch (e) {
+      // AbortError = user cancelled the sheet — not an error worth handling.
+      // Any other failure falls through to the clipboard path below.
+      if (e instanceof Error && e.name === "AbortError") return;
+      try { await navigator.clipboard.writeText(window.location.href); } catch {}
+    }
+    return;
+  }
   try {
     await navigator.clipboard.writeText(window.location.href);
     copied.value = true;
@@ -253,7 +265,11 @@ const lastUpdatedFormatted = computed(() => {
         <button v-if="bankQuery" type="button" class="clear-search" aria-label="Clear search" @click="bankQuery = ''">✕</button>
       </div>
       <button type="button" class="share-btn" :class="{ copied }" @click="copyShareLink">
-        <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+        <svg v-if="canNativeShare" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+          <path d="M8 1v9M5 4l3-3 3 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 10v4h10v-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg v-else viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
           <path
             d="M6.5 9.5l3-3M6.8 5.3l.9-.9a2.2 2.2 0 013.1 3.1l-.9.9M9.2 10.7l-.9.9a2.2 2.2 0 01-3.1-3.1l.9-.9"
             fill="none"
@@ -262,7 +278,7 @@ const lastUpdatedFormatted = computed(() => {
             stroke-linecap="round"
           />
         </svg>
-        {{ copied ? "Copied!" : "Copy link" }}
+        {{ canNativeShare ? "Share" : (copied ? "Copied!" : "Copy link") }}
       </button>
       <button
         type="button"
