@@ -239,6 +239,46 @@ const tableRows = computed(() =>
     }))
     .reverse()
 );
+
+function isWeekend(dateStr: string): boolean {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return [0, 6].includes(new Date(y, m - 1, d).getDay());
+}
+
+function datesBetween(older: string, newer: string): string[] {
+  const result: string[] = [];
+  const cur = new Date(older + "T00:00:00Z");
+  const end = new Date(newer + "T00:00:00Z");
+  cur.setUTCDate(cur.getUTCDate() + 1);
+  while (cur < end) {
+    result.push(cur.toISOString().slice(0, 10));
+    cur.setUTCDate(cur.getUTCDate() + 1);
+  }
+  return result;
+}
+
+interface AugmentedRow {
+  date: string;
+  isWeekend: boolean;
+  values: { name: string; value: number | null }[] | null;
+}
+
+// Extends tableRows (newest-first) by inserting synthetic weekend rows into
+// gaps where banks were closed so the user can see why data is missing.
+const augmentedTableRows = computed<AugmentedRow[]>(() => {
+  const result: AugmentedRow[] = [];
+  const rows = tableRows.value;
+  for (let i = 0; i < rows.length; i++) {
+    result.push({ ...rows[i], isWeekend: isWeekend(rows[i].date) });
+    const next = rows[i + 1];
+    if (next) {
+      for (const d of datesBetween(next.date, rows[i].date).reverse()) {
+        if (isWeekend(d)) result.push({ date: d, isWeekend: true, values: null });
+      }
+    }
+  }
+  return result;
+});
 </script>
 
 <template>
@@ -380,10 +420,15 @@ const tableRows = computed(() =>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="row in tableRows" :key="row.date">
-            <th scope="row">{{ row.date }}</th>
-            <td v-for="cell in row.values" :key="cell.name" class="num">
-              {{ cell.value !== null ? cell.value.toFixed(2) : "—" }}
+          <tr v-for="row in augmentedTableRows" :key="row.date" :class="{ weekend: row.isWeekend }">
+            <th scope="row">{{ formatShortDate(row.date) }}</th>
+            <template v-if="row.values !== null">
+              <td v-for="cell in row.values" :key="cell.name" class="num">
+                {{ cell.value !== null ? cell.value.toFixed(2) : "—" }}
+              </td>
+            </template>
+            <td v-else :colspan="tableSeries.length" class="weekend-note">
+              Banks closed — no rates published
             </td>
           </tr>
           <tr v-if="noDataSeries.length">
@@ -393,6 +438,10 @@ const tableRows = computed(() =>
           </tr>
         </tbody>
       </table>
+      <p class="weekend-legend">
+        <span class="weekend-swatch" aria-hidden="true"></span>
+        Saturdays &amp; Sundays — banks don't publish forex rates
+      </p>
     </div>
   </div>
 </template>
@@ -592,6 +641,17 @@ const tableRows = computed(() =>
     white-space: normal;
   }
 
+  tr.weekend th,
+  tr.weekend td {
+    background: color-mix(in srgb, var(--status-critical) 7%, transparent);
+    color: var(--text-muted);
+  }
+
+  .weekend-note {
+    font-style: italic;
+    font-size: 12px;
+  }
+
   thead .key {
     display: inline-block;
     width: 14px;
@@ -606,5 +666,24 @@ const tableRows = computed(() =>
       border-radius: 0;
     }
   }
+}
+
+.weekend-legend {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.weekend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: none;
+  background: color-mix(in srgb, var(--status-critical) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-critical) 25%, transparent);
 }
 </style>
