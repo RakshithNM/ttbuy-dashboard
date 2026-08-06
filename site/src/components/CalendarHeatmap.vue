@@ -132,17 +132,18 @@ function formatCalDate(iso: string): string {
           <path d="M6 3l4 5-4 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <div class="cal-info-bar">
-        <template v-if="hoveredCell?.best">
-          <span class="info-date">{{ formatCalDate(hoveredCell.date) }}</span>
-          <span class="info-sep">·</span>
-          <span class="info-best">
-            Best: <strong :style="{ color: hoveredCell.best.color }">{{ shortName(hoveredCell.best.bank) }}</strong>
-            at ₹{{ hoveredCell.best.rate.toFixed(2) }}
-          </span>
-        </template>
-        <span v-else class="info-hint">Hover a day to see details</span>
-      </div>
+    </div>
+
+    <div class="cal-info-bar">
+      <template v-if="hoveredCell?.best">
+        <span class="info-date">{{ formatCalDate(hoveredCell.date) }}</span>
+        <span class="info-sep">·</span>
+        <span class="info-best">
+          Best: <strong :style="{ color: hoveredCell.best.color }">{{ shortName(hoveredCell.best.bank) }}</strong>
+          at ₹{{ hoveredCell.best.rate.toFixed(2) }}
+        </span>
+      </template>
+      <span v-else class="info-hint">Tap or hover a day to see details</span>
     </div>
 
     <div class="cal-dow-row" aria-hidden="true">
@@ -166,6 +167,7 @@ function formatCalDate(iso: string): string {
         :aria-label="cell?.best ? `${formatCalDate(cell.date)}: ${shortName(cell.best.bank)} ${cell.best.rate.toFixed(2)}` : cell ? formatCalDate(cell.date) : undefined"
         @mouseenter="cell && !cell.isFuture && (hoveredCell = cell)"
         @mouseleave="hoveredCell = null"
+        @click="cell && !cell.isFuture && (hoveredCell = hoveredCell?.date === cell.date ? null : cell)"
       >
         <span v-if="cell" class="cal-day-num" aria-hidden="true">{{ cell.day }}</span>
       </div>
@@ -239,10 +241,10 @@ function formatCalDate(iso: string): string {
 }
 
 .cal-info-bar {
-  margin-left: auto;
+  min-height: 20px;
+  margin-bottom: 8px;
   font-size: 13px;
   color: var(--text-secondary);
-  white-space: nowrap;
 
   .info-date {
     font-weight: 500;
