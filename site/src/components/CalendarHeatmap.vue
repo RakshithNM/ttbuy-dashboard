@@ -35,6 +35,7 @@ interface CalCell {
   best: BestEntry | null;
   isToday: boolean;
   isFuture: boolean;
+  isBeforeData: boolean;
 }
 
 const calendarCells = computed<(CalCell | null)[]>(() => {
@@ -48,6 +49,7 @@ const calendarCells = computed<(CalCell | null)[]>(() => {
   const cells: (CalCell | null)[] = [];
   for (let i = 0; i < padding; i++) cells.push(null);
 
+  const firstDate = firstDataDate.value ?? todayStr;
   for (let d = 1; d <= daysInMonth; d++) {
     const date = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     cells.push({
@@ -56,6 +58,7 @@ const calendarCells = computed<(CalCell | null)[]>(() => {
       best: bestByDate.value.get(date) ?? null,
       isToday: date === todayStr,
       isFuture: date > todayStr,
+      isBeforeData: date < firstDate,
     });
   }
   return cells;
@@ -80,16 +83,14 @@ const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct
 const monthLabel = computed(() => `${MONTHS[viewMonth.value]} ${viewYear.value}`);
 
 const firstDataDate = computed(() => {
-  const dates: string[] = [];
-  for (const s of props.series) {
-    if (s.points[0]) dates.push(s.points[0].date);
-  }
-  return dates.length ? [...dates].sort()[0] : null;
+  const dates = [...bestByDate.value.keys()].sort();
+  return dates[0] ?? null;
 });
 
 const canGoPrev = computed(() => {
   if (!firstDataDate.value) return false;
   const [fy, fm] = firstDataDate.value.split("-").map(Number);
+  // Allow navigating to the month that contains the first data date.
   return viewYear.value > fy || (viewYear.value === fy && viewMonth.value > fm - 1);
 });
 
@@ -158,16 +159,17 @@ function formatCalDate(iso: string): string {
         :class="{
           empty: !cell,
           'has-best': !!cell?.best,
-          'no-data': cell && !cell.best && !cell.isFuture,
+          'no-data': cell && !cell.best && !cell.isFuture && !cell.isBeforeData,
           today: cell?.isToday,
           future: cell?.isFuture,
+          'before-data': cell?.isBeforeData,
         }"
         :style="cell?.best ? { '--cell-color': cell.best.color } : {}"
         role="gridcell"
         :aria-label="cell?.best ? `${formatCalDate(cell.date)}: ${shortName(cell.best.bank)} ${cell.best.rate.toFixed(2)}` : cell ? formatCalDate(cell.date) : undefined"
-        @mouseenter="cell && !cell.isFuture && (hoveredCell = cell)"
+        @mouseenter="cell && !cell.isFuture && !cell.isBeforeData && (hoveredCell = cell)"
         @mouseleave="hoveredCell = null"
-        @click="cell && !cell.isFuture && (hoveredCell = hoveredCell?.date === cell.date ? null : cell)"
+        @click="cell && !cell.isFuture && !cell.isBeforeData && (hoveredCell = cell)"
       >
         <span v-if="cell" class="cal-day-num" aria-hidden="true">{{ cell.day }}</span>
       </div>
@@ -310,6 +312,12 @@ function formatCalDate(iso: string): string {
 
   &.future {
     background: color-mix(in srgb, var(--text-muted) 5%, transparent);
+  }
+
+  &.before-data {
+    background: color-mix(in srgb, var(--text-muted) 5%, transparent);
+    opacity: 0.35;
+    cursor: not-allowed;
   }
 
   &.today {
