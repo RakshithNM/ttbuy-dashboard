@@ -219,6 +219,11 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
       <span class="suffix">{{ currency }}, here's what each bank credits you after fees (where known)</span>
     </div>
 
+    <p v-if="consistency" class="consistency-summary">
+      <span class="consistency-bank">{{ shortName(consistency.bank) }}</span>
+      had the best {{ currency }} rate most often in this period — {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}
+    </p>
+
     <div class="table-wrap">
       <table class="best-rate-table">
         <caption>
@@ -417,6 +422,17 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
     margin: 0;
   }
   -moz-appearance: textfield;
+}
+
+.consistency-summary {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+
+  .consistency-bank {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
 }
 
 .table-wrap {
