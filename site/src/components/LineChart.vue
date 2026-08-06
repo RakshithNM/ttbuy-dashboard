@@ -137,6 +137,30 @@ function lastPoint(s: BankSeries) {
 
 const showEndLabels = computed(() => visibleSeries.value.length <= 4);
 
+const weekendBands = computed<{ x: number; width: number }[]>(() => {
+  const [d0, d1] = xDomain.value;
+  if (d0 === d1 || !allDates.value.length) return [];
+  const msPerDay = 86400000;
+  const dayWidth = (plotW * msPerDay) / (d1 - d0);
+  const bands: { x: number; width: number }[] = [];
+  const cur = new Date(d0);
+  cur.setUTCHours(0, 0, 0, 0);
+  const end = new Date(d1);
+  end.setUTCHours(0, 0, 0, 0);
+  while (cur.getTime() <= end.getTime()) {
+    const dow = cur.getUTCDay();
+    if (dow === 0 || dow === 6) {
+      const t = cur.getTime();
+      const rawX = MARGIN.left + ((t - d0) / (d1 - d0)) * plotW;
+      const x1 = Math.max(MARGIN.left, rawX);
+      const x2 = Math.min(MARGIN.left + plotW, rawX + dayWidth);
+      if (x2 > x1) bands.push({ x: x1, width: x2 - x1 });
+    }
+    cur.setUTCDate(cur.getUTCDate() + 1);
+  }
+  return bands;
+});
+
 // End labels default to the right of the point, but the last point is often
 // at (or near) the right edge of the plot — flip to the left, right-anchored,
 // when there isn't enough room, so the label never gets clipped by the viewBox.
@@ -313,6 +337,19 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
       @pointermove="onPointerMove"
       @pointerleave="onPointerLeave"
     >
+      <!-- weekend bands -->
+      <g aria-hidden="true">
+        <rect
+          v-for="(band, i) in weekendBands"
+          :key="`wknd-${i}`"
+          :x="band.x"
+          :y="MARGIN.top"
+          :width="band.width"
+          :height="plotH"
+          class="weekend-band"
+        />
+      </g>
+
       <!-- gridlines + y ticks -->
       <g>
         <line
@@ -506,6 +543,11 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
   height: auto;
   display: block;
   touch-action: pan-x;
+}
+
+.weekend-band {
+  fill: color-mix(in srgb, var(--status-critical) 7%, transparent);
+  pointer-events: none;
 }
 
 .gridline {
