@@ -219,10 +219,18 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
       <span class="suffix">{{ currency }}, here's what each bank credits you after fees (where known)</span>
     </div>
 
-    <p v-if="consistency" class="consistency-summary">
-      <span class="consistency-bank">{{ shortName(consistency.bank) }}</span>
-      had the best {{ currency }} rate most often in this period — {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}
-    </p>
+    <div v-if="consistency" class="consistency-summary" role="note">
+      <svg class="consistency-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <path d="M4.5 2h7v5.5a3.5 3.5 0 01-7 0V2z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M1.5 3h3M11.5 3h3" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+        <path d="M8 9.5V12" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+        <path d="M5 14h6" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+      </svg>
+      <span>
+        <span class="consistency-bank">{{ shortName(consistency.bank) }}</span>
+        had the best {{ currency }} rate most often in this period, {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}
+      </span>
+    </div>
 
     <div class="table-wrap">
       <table class="best-rate-table">
@@ -425,9 +433,23 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
 }
 
 .consistency-summary {
-  margin: 0 0 10px;
-  font-size: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border-left: 2px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
   color: var(--text-secondary);
+  line-height: 1.4;
+
+  .consistency-icon {
+    flex: none;
+    color: var(--accent);
+    margin-top: 1px;
+  }
 
   .consistency-bank {
     font-weight: 600;
@@ -510,10 +532,16 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
   }
 
   .consistency-label {
+    display: inline-flex;
+    align-items: center;
     font-size: 10px;
-    font-weight: 400;
-    color: var(--text-muted);
+    font-weight: 500;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    padding: 1px 5px;
+    border-radius: 3px;
     white-space: nowrap;
+    letter-spacing: 0.01em;
   }
 
   .bank-link {
