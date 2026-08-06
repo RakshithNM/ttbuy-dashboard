@@ -379,6 +379,22 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
         <input v-model="bankQuery" type="search" placeholder="Search banks…" aria-label="Search banks" class="bank-search-input" />
         <button v-if="bankQuery" type="button" class="clear-search" aria-label="Clear search" @click="bankQuery = ''">✕</button>
       </div>
+      <button
+        v-if="!showTable || compareMode"
+        type="button"
+        class="compare-btn"
+        :class="{ active: compareMode }"
+        @click="compareMode ? exitCompareMode() : enterCompareMode()"
+      >
+        <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+          <path d="M2 12l3-5 3 3 4-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 14l3-3 3 2 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+        </svg>
+        {{ compareMode ? "Exit compare" : "Compare" }}
+      </button>
+      <button type="button" class="table-toggle" @click="showTable = !showTable">
+        {{ showTable ? "Show chart" : "View as table" }}
+      </button>
       <button type="button" class="share-btn" :class="{ copied }" @click="copyShareLink">
         <svg v-if="canNativeShare" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
           <path d="M8 1v9M5 4l3-3 3 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -429,36 +445,18 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
     <section class="panel">
       <div class="panel-header">
         <h2>Historical TT Buy rate</h2>
-        <div class="header-controls">
+        <div class="range-filter" role="group" aria-label="Date range">
           <button
-            v-if="!showTable || compareMode"
+            v-for="opt in RANGE_OPTIONS"
+            :key="opt.key"
             type="button"
-            class="compare-btn"
-            :class="{ active: compareMode }"
-            @click="compareMode ? exitCompareMode() : enterCompareMode()"
+            class="range-btn"
+            :class="{ active: range === opt.key }"
+            :aria-pressed="range === opt.key"
+            @click="range = opt.key"
           >
-            <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
-              <path d="M2 12l3-5 3 3 4-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M2 14l3-3 3 2 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-            </svg>
-            {{ compareMode ? "Exit compare" : "Compare" }}
+            {{ opt.label }}
           </button>
-          <button type="button" class="table-toggle" @click="showTable = !showTable">
-            {{ showTable ? "Show chart" : "View as table" }}
-          </button>
-          <div class="range-filter" role="group" aria-label="Date range">
-            <button
-              v-for="opt in RANGE_OPTIONS"
-              :key="opt.key"
-              type="button"
-              class="range-btn"
-              :class="{ active: range === opt.key }"
-              :aria-pressed="range === opt.key"
-              @click="range = opt.key"
-            >
-              {{ opt.label }}
-            </button>
-          </div>
         </div>
       </div>
       <div v-if="compareMode && !showTable" class="compare-picker">
@@ -692,18 +690,11 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px 16px;
+  margin-bottom: 16px;
 
   h2 {
     margin: 0;
   }
-}
-
-.header-controls {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
 }
 
 .table-toggle {
