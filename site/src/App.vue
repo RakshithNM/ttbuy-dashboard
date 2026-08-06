@@ -38,10 +38,18 @@ const isDark = ref(
     ? _storedTheme === "dark"
     : window.matchMedia("(prefers-color-scheme: dark)").matches
 );
+
+function setThemeColor(dark: boolean) {
+  document.querySelector('meta[name="theme-color"]')
+    ?.setAttribute("content", dark ? "#0d0d0d" : "#f9f9f7");
+}
+setThemeColor(isDark.value);
+
 function toggleTheme() {
   isDark.value = !isDark.value;
   const t = isDark.value ? "dark" : "light";
   document.documentElement.setAttribute("data-theme", t);
+  setThemeColor(isDark.value);
   try { localStorage.setItem(THEME_STORAGE_KEY, t); } catch {}
 }
 
