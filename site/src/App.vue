@@ -220,6 +220,68 @@ function toggleBank(name: string) {
   hidden.value = next;
 }
 
+const MAX_COMPARE = 4;
+const compareMode = ref(false);
+const compareSelected = ref<Set<string>>(new Set());
+
+// Date-range filtered (no search filter) — chart base for compare mode so
+// users can pick any bank regardless of what's in the search box.
+const dateFilteredSeries = computed<BankSeries[]>(() => {
+  const opt = RANGE_OPTIONS.find(o => o.key === range.value);
+  if (!opt || opt.days === null) return allSeries.value;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - opt.days);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+  return allSeries.value.map(s => ({
+    ...s,
+    points: s.points.filter(p => p.date >= cutoffStr),
+  }));
+});
+
+// All series sorted by most recent rate for the compare picker chip list.
+const comparableSeriesSorted = computed(() =>
+  allSeries.value.slice().sort((a, b) => {
+    const aRate = a.points.at(-1)?.ttbuy ?? 0;
+    const bRate = b.points.at(-1)?.ttbuy ?? 0;
+    return bRate - aRate;
+  })
+);
+
+// Series fed to the chart — normal mode uses the search+date filtered set;
+// compare mode uses date-filtered only, restricted to the selected banks.
+const chartSeries = computed<BankSeries[]>(() => {
+  if (!compareMode.value || compareSelected.value.size === 0) return filteredSeries.value;
+  return dateFilteredSeries.value.filter(s => compareSelected.value.has(s.name));
+});
+
+// In compare mode the hidden set is irrelevant — the picker is the selector.
+const chartHidden = computed(() => compareMode.value ? new Set<string>() : hidden.value);
+
+function enterCompareMode() {
+  const top3 = dateFilteredSeries.value
+    .filter(s => s.category === "bank" && s.points.length > 0)
+    .sort((a, b) => (b.points.at(-1)?.ttbuy ?? 0) - (a.points.at(-1)?.ttbuy ?? 0))
+    .slice(0, 3)
+    .map(s => s.name);
+  compareSelected.value = new Set(top3);
+  compareMode.value = true;
+}
+
+function exitCompareMode() {
+  compareMode.value = false;
+  compareSelected.value = new Set();
+}
+
+function toggleCompareBank(name: string) {
+  const next = new Set(compareSelected.value);
+  if (next.has(name)) next.delete(name);
+  else if (next.size < MAX_COMPARE) next.add(name);
+  compareSelected.value = next;
+}
+
+// Reset compare state when currency changes — selected banks are currency-specific.
+watch(currency, () => { if (compareMode.value) exitCompareMode(); });
+
 const lastUpdated = computed(() => {
   const dates = allSeries.value.flatMap((s) => s.points.map((p) => p.date));
   if (dates.length === 0) return null;
@@ -368,6 +430,19 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
       <div class="panel-header">
         <h2>Historical TT Buy rate</h2>
         <div class="header-controls">
+          <button
+            v-if="!showTable"
+            type="button"
+            class="compare-btn"
+            :class="{ active: compareMode }"
+            @click="compareMode ? exitCompareMode() : enterCompareMode()"
+          >
+            <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+              <path d="M2 12l3-5 3 3 4-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 14l3-3 3 2 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+            </svg>
+            {{ compareMode ? "Exit compare" : "Compare" }}
+          </button>
           <button type="button" class="table-toggle" @click="showTable = !showTable">
             {{ showTable ? "Show chart" : "View as table" }}
           </button>
@@ -386,7 +461,33 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
           </div>
         </div>
       </div>
-      <LineChart v-model:show-table="showTable" :series="filteredSeries" :hidden="hidden" :currency="currency" @toggle="toggleBank" />
+      <div v-if="compareMode && !showTable" class="compare-picker">
+        <p class="compare-meta">
+          <strong>{{ compareSelected.size }}</strong> of {{ MAX_COMPARE }} selected
+          <span v-if="compareSelected.size >= MAX_COMPARE" class="compare-full-hint">— deselect one to swap</span>
+        </p>
+        <div class="compare-chips" role="group" aria-label="Select banks to compare">
+          <button
+            v-for="s in comparableSeriesSorted"
+            :key="s.name"
+            type="button"
+            class="compare-chip"
+            :class="{
+              selected: compareSelected.has(s.name),
+              maxed: !compareSelected.has(s.name) && compareSelected.size >= MAX_COMPARE,
+            }"
+            :style="compareSelected.has(s.name) ? { '--chip-color': s.color } : {}"
+            :disabled="!compareSelected.has(s.name) && compareSelected.size >= MAX_COMPARE"
+            :aria-pressed="compareSelected.has(s.name)"
+            @click="toggleCompareBank(s.name)"
+          >
+            <span class="chip-dot" :style="{ background: s.color }" aria-hidden="true"></span>
+            {{ shortName(s.name) }}
+          </button>
+        </div>
+      </div>
+
+      <LineChart v-model:show-table="showTable" :series="chartSeries" :hidden="chartHidden" :currency="currency" :compare-mode="compareMode" @toggle="toggleBank" />
     </section>
   </main>
 
@@ -624,6 +725,110 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
   &:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
+  }
+}
+
+.compare-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 80ms ease, border-color 80ms ease, color 80ms ease;
+
+  &:hover:not(.active) {
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  &.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+}
+
+.compare-picker {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  border-radius: 8px;
+}
+
+.compare-meta {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+  }
+
+  .compare-full-hint {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+}
+
+.compare-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.compare-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: none;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 60ms ease, border-color 60ms ease, color 60ms ease, opacity 60ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  &.selected {
+    border-color: var(--chip-color, var(--accent));
+    background: color-mix(in srgb, var(--chip-color, var(--accent)) 14%, transparent);
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  &.maxed {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .chip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex: none;
   }
 }
 

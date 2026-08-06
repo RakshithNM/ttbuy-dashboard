@@ -7,6 +7,7 @@ const props = defineProps<{
   series: BankSeries[];
   hidden: Set<string>;
   currency: string;
+  compareMode?: boolean;
 }>();
 const emit = defineEmits<{ (e: "toggle", bank: string): void }>();
 
@@ -242,7 +243,7 @@ const tableRows = computed(() =>
 
 <template>
   <div class="line-chart">
-    <div v-if="!showTable" class="legend" role="group" aria-label="Toggle banks">
+    <div v-if="!showTable && !compareMode" class="legend" role="group" aria-label="Toggle banks">
       <button
         v-for="s in series"
         :key="s.name"

@@ -141,6 +141,17 @@ const rows = computed<Row[]>(() => {
 const bestBank = computed(() => rows.value.find((r) => r.hasData && r.category === "bank")?.bank ?? null);
 const bestPlatform = computed(() => rows.value.find((r) => r.hasData && r.category === "platform")?.bank ?? null);
 
+const rateSpread = computed(() => {
+  const bankDataRows = rows.value.filter((r): r is DataRow => r.hasData && r.category === "bank");
+  if (bankDataRows.length < 2) return null;
+  const best = bankDataRows[0];
+  const worst = bankDataRows[bankDataRows.length - 1];
+  const rateGap = best.ttbuy - worst.ttbuy;
+  if (rateGap <= 0.004) return null;
+  const receiveGap = safeAmount.value > 0 ? best.netReceive - worst.netReceive : null;
+  return { rateGap, receiveGap };
+});
+
 const firstPlatformIndex = computed(() => rows.value.findIndex((r) => r.category === "platform"));
 
 function formatInr(value: number): string {
@@ -217,6 +228,20 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
         <input id="remit-amount" v-model.number="amount" type="number" min="1" step="1" inputmode="decimal" class="amount-input" :aria-invalid="hasInvalidAmount ? 'true' : undefined" />
       </div>
       <span class="suffix">{{ currency }}, here's what each bank credits you after fees (where known)</span>
+    </div>
+
+    <div v-if="rateSpread" class="spread-callout" role="note">
+      <svg class="spread-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <path d="M8 2v12M5 5l3-3 3 3M5 11l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>
+        Best bank beats worst by
+        <span class="spread-rate">₹{{ rateSpread.rateGap.toFixed(2) }}/{{ currency }}</span>
+        <template v-if="rateSpread.receiveGap !== null">
+          — <span class="spread-amount">₹{{ formatInr(rateSpread.receiveGap) }} more</span>
+          on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}
+        </template>
+      </span>
     </div>
 
     <div v-if="consistency" class="consistency-summary" role="note">
@@ -430,6 +455,38 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
     margin: 0;
   }
   -moz-appearance: textfield;
+}
+
+.spread-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--status-good) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-good) 22%, transparent);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+
+  .spread-icon {
+    flex: none;
+    color: var(--success-text);
+    margin-top: 1px;
+  }
+
+  .spread-rate {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .spread-amount {
+    font-weight: 700;
+    color: var(--success-text);
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 .consistency-summary {
