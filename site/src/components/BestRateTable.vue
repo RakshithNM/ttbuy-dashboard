@@ -8,7 +8,7 @@ const props = defineProps<{
   series: BankSeries[];
   currency: string;
   fees: FeesByBank;
-  consistency: { bank: string; count: number; total: number } | null;
+  consistency: { bank: string; count: number; total: number; since: string | null } | null;
   dowInsight: { day: string; diffPaise: number } | null;
   range: string;
 }>();
@@ -18,6 +18,14 @@ const statPrefix = computed(() => {
     "7d": "7D", "30d": "30D", "90d": "90D", "1y": "1Y", "all": "All-time",
   };
   return map[props.range] ?? "Period";
+});
+
+const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const sinceLabel = computed(() => {
+  const since = props.consistency?.since;
+  if (!since) return null;
+  const [, m, d] = since.split("-").map(Number);
+  return `${MONTHS_SHORT[m - 1]} ${d}`;
 });
 
 const amount = defineModel<number>("amount", { default: 1000 });
@@ -347,7 +355,7 @@ const bankStats = computed(() => {
       </svg>
       <span>
         <span class="consistency-bank">{{ shortName(consistency.bank) }}</span>
-        had the best {{ currency }} rate most often in this period, {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}
+        had the best {{ currency }} rate most often — {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}<template v-if="sinceLabel"> since {{ sinceLabel }}</template>
       </span>
     </div>
 

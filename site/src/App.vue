@@ -399,7 +399,7 @@ const lastUpdatedFormatted = computed(() => {
   return `${MONTHS[month - 1]} ${day}, ${year}`;
 });
 
-interface ConsistencyResult { bank: string; count: number; total: number }
+interface ConsistencyResult { bank: string; count: number; total: number; since: string | null }
 
 const consistencyBadge = computed<ConsistencyResult | null>(() => {
   const opt = RANGE_OPTIONS.find(o => o.key === range.value);
@@ -425,10 +425,12 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
   const majorityThreshold = Math.floor(bankSeries.length / 2) + 1;
   const wins: Record<string, number> = {};
   let qualifyingDays = 0;
+  let firstQualifyingDate: string | null = null;
 
-  for (const entries of dateEntries.values()) {
+  for (const [date, entries] of [...dateEntries.entries()].sort(([a], [b]) => a.localeCompare(b))) {
     if (entries.length < majorityThreshold) continue;
     qualifyingDays++;
+    if (!firstQualifyingDate) firstQualifyingDate = date;
     const best = entries.reduce((a, b) => a.rate >= b.rate ? a : b);
     wins[best.bank] = (wins[best.bank] ?? 0) + 1;
   }
@@ -441,7 +443,7 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
     if (count > topCount) { topCount = count; topBank = bank; }
   }
 
-  return topBank ? { bank: topBank, count: topCount, total: qualifyingDays } : null;
+  return topBank ? { bank: topBank, count: topCount, total: qualifyingDays, since: firstQualifyingDate } : null;
 });
 </script>
 
