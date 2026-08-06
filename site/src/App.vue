@@ -181,12 +181,31 @@ const bankRates = computed(() => rawRates.value[currency.value] ?? {});
 
 const allSeries = computed<BankSeries[]>(() => {
   const banks = sortByBankOrder(Object.keys(bankRates.value));
-  return banks.map((name) => ({
+  const raw = banks.map((name) => ({
     name,
     color: brandColor(name),
     wrapped: false,
     points: bankRates.value[name] ?? [],
     category: isPlatform(name) ? "platform" : "bank",
+  }));
+
+  // Find the first date where ≥11 banks reported — everything before that is
+  // sparse Wayback backfill and is trimmed so all series start from the same
+  // epoch and cross-bank comparisons are apples-to-apples.
+  const dateCount = new Map<string, number>();
+  for (const s of raw) {
+    if (s.category !== "bank") continue;
+    for (const p of s.points) dateCount.set(p.date, (dateCount.get(p.date) ?? 0) + 1);
+  }
+  const fullDataStart = [...dateCount.entries()]
+    .filter(([, n]) => n >= 11)
+    .map(([d]) => d)
+    .sort()[0] ?? null;
+
+  if (!fullDataStart) return raw;
+  return raw.map((s) => ({
+    ...s,
+    points: s.points.filter((p) => p.date >= fullDataStart),
   }));
 });
 
@@ -530,7 +549,7 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
 
     <section class="panel">
       <h2>Best value today</h2>
-      <BestRateTable v-model:amount="amount" :series="searchedSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" />
+      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" :range="range" />
     </section>
 
     <section class="panel">

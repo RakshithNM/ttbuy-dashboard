@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, type Ref } from "vue";
 import type { BankSeries, FeesByBank, FeeSlab } from "../types";
 import { shortName, sourceUrl } from "../bankPalette";
 import { currencySymbol } from "../currencies";
@@ -10,7 +10,15 @@ const props = defineProps<{
   fees: FeesByBank;
   consistency: { bank: string; count: number; total: number } | null;
   dowInsight: { day: string; diffPaise: number } | null;
+  range: string;
 }>();
+
+const statPrefix = computed(() => {
+  const map: Record<string, string> = {
+    "7d": "7D", "30d": "30D", "90d": "90D", "1y": "1Y", "all": "All-time",
+  };
+  return map[props.range] ?? "Period";
+});
 
 const amount = defineModel<number>("amount", { default: 1000 });
 const safeAmount = computed(() => {
@@ -231,6 +239,51 @@ const feeTooltipStyle = computed(() => ({
 }));
 
 const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank.value] ?? null : null));
+
+const expandedBank = ref<string | null>(null);
+
+function toggleExpand(bank: string, evt: Event) {
+  // Don't toggle if clicking the fee-info button itself (it has its own hover/click logic)
+  const target = evt.target as HTMLElement;
+  if (target.closest('.fee-info') || target.closest('a')) return;
+  expandedBank.value = expandedBank.value === bank ? null : bank;
+}
+
+interface BankStats {
+  avg: number | null;
+  best: number | null;
+  worst: number | null;
+  sparkline: string;
+}
+
+const bankStats = computed(() => {
+  const map = new Map<string, BankStats>();
+  for (const s of props.series) {
+    if (s.points.length === 0) continue;
+    let sum = 0, min = Infinity, max = -Infinity;
+    for (const p of s.points) {
+      sum += p.ttbuy;
+      if (p.ttbuy < min) min = p.ttbuy;
+      if (p.ttbuy > max) max = p.ttbuy;
+    }
+    const avg = sum / s.points.length;
+
+    const w = 120, h = 44, pad = 2;
+    let sparkline = "";
+    if (s.points.length > 1) {
+      const yRange = max > min ? (max - min) : 1;
+      const pts = s.points.map((p, i) => {
+        const x = pad + (i / (s.points.length - 1)) * (w - pad * 2);
+        const y = pad + (1 - (p.ttbuy - min) / yRange) * (h - pad * 2);
+        return `${x},${y}`;
+      });
+      sparkline = `M ${pts.join(" L ")}`;
+    }
+
+    map.set(s.name, { avg, best: max, worst: min, sparkline });
+  }
+  return map;
+});
 </script>
 
 <template>
@@ -321,7 +374,7 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                 <span class="platform-section-note">Rate applied to your transfer, no deduction on recipient side</span>
               </td>
             </tr>
-            <tr :class="{ best: row.bank === bestBank }">
+            <tr :class="{ best: row.bank === bestBank, expanded: expandedBank === row.bank, clickable: true }" @click="toggleExpand(row.bank, $event)">
               <th scope="row">
                 <span class="row-header">
                   <span
@@ -372,6 +425,16 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                     </svg>
                     <span class="badge-text">Best value in platforms</span>
                   </span>
+                  <svg
+                    class="expand-chevron"
+                    :class="{ open: expandedBank === row.bank }"
+                    viewBox="0 0 16 16"
+                    width="12"
+                    height="12"
+                    aria-hidden="true"
+                  >
+                    <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
                 </span>
               </th>
               <template v-if="row.hasData">
@@ -418,6 +481,51 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                 </td>
               </template>
               <td v-else colspan="4" class="no-data">No data for this bank</td>
+            </tr>
+            <tr v-if="expandedBank === row.bank" class="detail-row">
+              <td colspan="5">
+                <div class="detail-panel">
+                  <div v-if="bankStats.has(row.bank)" class="detail-stats">
+                    <div class="stat-group">
+                      <div class="stat-item">
+                        <span class="stat-label">{{ statPrefix }} avg</span>
+                        <span class="stat-val">{{ bankStats.get(row.bank)!.avg?.toFixed(2) }}</span>
+                      </div>
+                      <div class="stat-item">
+                        <span class="stat-label">{{ statPrefix }} best</span>
+                        <span class="stat-val good">{{ bankStats.get(row.bank)!.best?.toFixed(2) }}</span>
+                      </div>
+                      <div class="stat-item">
+                        <span class="stat-label">{{ statPrefix }} worst</span>
+                        <span class="stat-val bad">{{ bankStats.get(row.bank)!.worst?.toFixed(2) }}</span>
+                      </div>
+                    </div>
+                    <div class="sparkline-wrap">
+                      <svg v-if="bankStats.get(row.bank)!.sparkline" viewBox="0 0 120 44" class="sparkline-svg">
+                        <path :d="bankStats.get(row.bank)!.sparkline" fill="none" :stroke="row.color" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <span v-else class="sparkline-empty">Not enough data</span>
+                    </div>
+                  </div>
+                  <div v-else class="detail-stats empty">
+                    No historical data available for this period.
+                  </div>
+
+                  <div v-if="fees[row.bank]" class="detail-fees">
+                    <p class="detail-fee-title">{{ fees[row.bank].rules.length ? "Inward remittance fee" : "Fee note" }}</p>
+                    <div class="detail-fee-rules">
+                      <div v-for="rule in fees[row.bank].rules" :key="rule.label" class="detail-fee-rule">
+                        <span class="fee-label">{{ rule.label }}</span>
+                        <span class="fee-charge">{{ rule.charge }}</span>
+                      </div>
+                    </div>
+                    <p v-if="fees[row.bank].note" class="fee-note">{{ fees[row.bank].note }}</p>
+                    <a :href="fees[row.bank].source_url" target="_blank" rel="noopener noreferrer" class="fee-source">
+                      {{ fees[row.bank].rules.length ? "Bank's published schedule ↗" : "Learn more ↗" }}
+                    </a>
+                  </div>
+                </div>
+              </td>
             </tr>
           </template>
         </tbody>
@@ -599,6 +707,142 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
   tbody tr:last-child td {
     border-bottom: none;
   }
+  
+  tbody tr.clickable {
+    cursor: pointer;
+
+    &:not(.best):not(.platform-divider):hover .expand-chevron {
+      color: var(--text-secondary);
+    }
+  }
+  
+  tbody tr.expanded th,
+  tbody tr.expanded td {
+    border-bottom: none;
+  }
+  
+  tbody tr.detail-row th,
+  tbody tr.detail-row td {
+    padding: 0;
+    border-bottom: 1px solid var(--gridline);
+    background: color-mix(in srgb, var(--surface-1) 30%, var(--page-plane));
+    white-space: normal;
+  }
+
+  tbody tr.detail-row:hover th,
+  tbody tr.detail-row:hover td {
+    background: color-mix(in srgb, var(--surface-1) 30%, var(--page-plane));
+    cursor: default;
+  }
+
+  .detail-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 14px 16px 18px 32px;
+    box-shadow: inset 0 2px 8px -4px rgba(0,0,0,0.08);
+  }
+
+  .detail-stats {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    flex: 1;
+    min-width: 200px;
+    padding-right: 20px;
+
+    &.empty {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 13px;
+    }
+  }
+
+  .stat-group {
+    display: flex;
+    gap: 20px;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  .stat-val {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+
+    &.good { color: var(--success-text); }
+    &.bad { color: var(--status-critical); }
+  }
+
+  .sparkline-wrap {
+    flex: none;
+    width: 120px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .sparkline-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .sparkline-empty {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .detail-fees {
+    flex: 1;
+    min-width: 180px;
+    border-left: 1px solid var(--gridline);
+    padding: 0 0 0 20px;
+  }
+
+  .detail-fee-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    margin: 0 0 8px;
+  }
+
+  .detail-fee-rules {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .detail-fee-rule {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    border-bottom: 1px solid var(--gridline);
+    padding-bottom: 6px;
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
 
   thead th {
     color: var(--text-muted);
@@ -763,6 +1007,22 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
     .badge-text {
       display: none;
     }
+    
+    .detail-panel {
+      padding: 12px 8px 16px;
+      flex-direction: column;
+    }
+
+    .detail-stats {
+      gap: 16px;
+      padding-right: 0;
+    }
+
+    .detail-fees {
+      border-left: none;
+      border-top: 1px solid var(--gridline);
+      padding: 12px 0 0;
+    }
   }
 
   .key {
@@ -775,6 +1035,18 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
     &.wrapped {
       outline: 1px dashed var(--text-muted);
       outline-offset: 2px;
+    }
+  }
+
+  .expand-chevron {
+    flex: none;
+    margin-left: auto;
+    color: var(--text-muted);
+    transition: transform 200ms ease, color 100ms ease;
+
+    &.open {
+      transform: rotate(180deg);
+      color: var(--text-secondary);
     }
   }
 

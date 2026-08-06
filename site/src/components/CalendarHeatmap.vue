@@ -29,10 +29,8 @@ const bestByDate = computed(() => {
 
   const map = new Map<string, BestEntry>();
   for (const [date, entries] of dateEntries.entries()) {
-    if (entries.length >= 11) {
-      const best = entries.reduce((prev, current) => (prev.rate > current.rate) ? prev : current);
-      map.set(date, best);
-    }
+    const best = entries.reduce((prev, current) => (prev.rate > current.rate) ? prev : current);
+    map.set(date, best);
   }
   return map;
 });
