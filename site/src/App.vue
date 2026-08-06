@@ -380,7 +380,6 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
         <button v-if="bankQuery" type="button" class="clear-search" aria-label="Clear search" @click="bankQuery = ''">✕</button>
       </div>
       <button
-        v-if="!showTable || compareMode"
         type="button"
         class="compare-btn"
         :class="{ active: compareMode }"
@@ -459,7 +458,7 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
           </button>
         </div>
       </div>
-      <div v-if="compareMode && !showTable" class="compare-picker">
+      <div v-if="compareMode" class="compare-picker">
         <p class="compare-meta">
           <strong>{{ compareSelected.size }}</strong> of {{ MAX_COMPARE }} selected
           <span v-if="compareSelected.size >= MAX_COMPARE" class="compare-full-hint">— deselect one to swap</span>
