@@ -9,6 +9,7 @@ const props = defineProps<{
   currency: string;
   fees: FeesByBank;
   consistency: { bank: string; count: number; total: number } | null;
+  dowInsight: { day: string; diffPaise: number } | null;
 }>();
 
 const amount = defineModel<number>("amount", { default: 1000 });
@@ -141,6 +142,19 @@ const rows = computed<Row[]>(() => {
 const bestBank = computed(() => rows.value.find((r) => r.hasData && r.category === "bank")?.bank ?? null);
 const bestPlatform = computed(() => rows.value.find((r) => r.hasData && r.category === "platform")?.bank ?? null);
 
+// Stale = bank's last date is behind the freshest date seen across all banks.
+// This fires only when some banks are behind others, not when the whole
+// scraper hasn't run yet (in which case every bank shows the same old date).
+const latestDate = computed(() => {
+  const dates = rows.value.filter(r => r.hasData && r.category === "bank").map(r => (r as DataRow).date);
+  return dates.length ? [...dates].sort().at(-1)! : null;
+});
+
+const staleBanks = computed<DataRow[]>(() => {
+  if (!latestDate.value) return [];
+  return rows.value.filter((r): r is DataRow => r.hasData && r.category === "bank" && r.date < latestDate.value!);
+});
+
 const rateSpread = computed(() => {
   const bankDataRows = rows.value.filter((r): r is DataRow => r.hasData && r.category === "bank");
   if (bankDataRows.length < 2) return null;
@@ -241,6 +255,33 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
           — <span class="spread-amount">₹{{ formatInr(rateSpread.receiveGap) }} more</span>
           on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}
         </template>
+      </span>
+    </div>
+
+    <div v-if="staleBanks.length" class="stale-callout" role="alert">
+      <svg class="stale-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <path d="M8 1.5L1.5 13h13L8 1.5z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+        <line x1="8" y1="6.5" x2="8" y2="9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="8" cy="11.5" r="0.7" fill="currentColor"/>
+      </svg>
+      <span>
+        Rate data for
+        <strong>{{ staleBanks.slice(0, 3).map(r => shortName(r.bank)).join(', ') }}<template v-if="staleBanks.length > 3"> +{{ staleBanks.length - 3 }} more</template></strong>
+        is from {{ formatDate(staleBanks[0].date) }} — may not reflect today's rate
+      </span>
+    </div>
+
+    <div v-if="dowInsight" class="dow-callout" role="note">
+      <svg class="dow-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <rect x="1.5" y="2.5" width="13" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <line x1="5" y1="1" x2="5" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="11" y1="1" x2="11" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="1.5" y1="6.5" x2="14.5" y2="6.5" stroke="currentColor" stroke-width="1.3"/>
+        <circle cx="8" cy="10.5" r="1.2" fill="currentColor"/>
+      </svg>
+      <span>
+        Based on history, <strong>{{ currency }} rates tend to peak on {{ dowInsight.day }}s</strong>
+        — avg ₹{{ (dowInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the weekly mean
       </span>
     </div>
 
@@ -367,7 +408,14 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                   <template v-else-if="row.gapToBest < 0">+₹{{ formatInr(Math.abs(row.gapToBest)) }}</template>
                   <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
                 </td>
-                <td class="muted">{{ formatDate(row.date) }}</td>
+                <td :class="{ 'stale-date': latestDate && row.date < latestDate }">
+                  {{ formatDate(row.date) }}
+                  <svg v-if="latestDate && row.date < latestDate" class="stale-cell-icon" viewBox="0 0 16 16" width="10" height="10" aria-label="Stale data">
+                    <path d="M8 1.5L1.5 13h13L8 1.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    <line x1="8" y1="6.5" x2="8" y2="9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="8" cy="11.5" r="0.8" fill="currentColor"/>
+                  </svg>
+                </td>
               </template>
               <td v-else colspan="4" class="no-data">No data for this bank</td>
             </tr>
@@ -822,6 +870,66 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+.stale-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  background: color-mix(in srgb, #f59e0b 8%, transparent);
+  border: 1px solid color-mix(in srgb, #f59e0b 28%, transparent);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+
+  .stale-icon {
+    flex: none;
+    color: #d97706;
+    margin-top: 1px;
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+}
+
+.stale-date {
+  color: #d97706;
+
+  .stale-cell-icon {
+    color: #d97706;
+    vertical-align: middle;
+    margin-left: 3px;
+  }
+}
+
+.dow-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+
+  .dow-icon {
+    flex: none;
+    color: var(--accent);
+    margin-top: 1px;
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-weight: 600;
   }
 }
 </style>

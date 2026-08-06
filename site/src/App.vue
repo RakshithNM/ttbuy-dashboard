@@ -282,6 +282,46 @@ function toggleCompareBank(name: string) {
 // Reset compare state when currency changes — selected banks are currency-specific.
 watch(currency, () => { if (compareMode.value) exitCompareMode(); });
 
+interface DowInsight { day: string; diffPaise: number; }
+
+const dowInsight = computed<DowInsight | null>(() => {
+  const bankSeries = allSeries.value.filter(s => s.category === "bank");
+  if (!bankSeries.length) return null;
+
+  // For each date find the peak rate across all banks — DOW analysis should
+  // reflect the best achievable rate, not an average pulled down by slow banks.
+  const dateMax = new Map<string, number>();
+  for (const s of bankSeries) {
+    for (const p of s.points) {
+      const curr = dateMax.get(p.date) ?? 0;
+      if (p.ttbuy > curr) dateMax.set(p.date, p.ttbuy);
+    }
+  }
+  if (dateMax.size < 14) return null;
+
+  const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const totals = new Array(7).fill(0);
+  const counts = new Array(7).fill(0);
+  for (const [date, rate] of dateMax) {
+    const [y, m, d] = date.split("-").map(Number);
+    totals[new Date(y, m - 1, d).getDay()] += rate;
+    counts[new Date(y, m - 1, d).getDay()]++;
+  }
+
+  const avgs = totals.map((t, i) => counts[i] >= 4 ? t / counts[i] : null);
+  const valid = avgs.filter((a): a is number => a !== null);
+  if (valid.length < 4) return null;
+
+  const overallAvg = valid.reduce((a, b) => a + b) / valid.length;
+  let bestDay = -1, bestAvg = -Infinity;
+  avgs.forEach((a, i) => { if (a !== null && a > bestAvg) { bestAvg = a; bestDay = i; } });
+  if (bestDay === -1) return null;
+
+  const diff = bestAvg - overallAvg;
+  if (diff < 0.02) return null;
+  return { day: DAY_NAMES[bestDay], diffPaise: Math.round(diff * 100) };
+});
+
 function exportCsv() {
   const base = dateFilteredSeries.value.filter(s => s.category === "bank");
   const series = compareMode.value && compareSelected.value.size > 0
@@ -474,7 +514,7 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
 
     <section class="panel">
       <h2>Best value today</h2>
-      <BestRateTable v-model:amount="amount" :series="searchedSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" />
+      <BestRateTable v-model:amount="amount" :series="searchedSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" />
     </section>
 
     <section class="panel">
