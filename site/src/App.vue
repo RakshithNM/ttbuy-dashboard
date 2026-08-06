@@ -421,7 +421,7 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
         {{ compareMode ? "Exit compare" : "Compare" }}
       </button>
       <button type="button" class="table-toggle" @click="showTable = !showTable">
-        {{ showTable ? "Show chart" : "View as table" }}
+        {{ showTable ? "Chart view" : "Table view" }}
       </button>
       <button type="button" class="export-btn" :title="`Download ${currency} rates as CSV`" @click="exportCsv">
         <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
