@@ -282,6 +282,35 @@ function toggleCompareBank(name: string) {
 // Reset compare state when currency changes — selected banks are currency-specific.
 watch(currency, () => { if (compareMode.value) exitCompareMode(); });
 
+function exportCsv() {
+  const base = dateFilteredSeries.value.filter(s => s.category === "bank");
+  const series = compareMode.value && compareSelected.value.size > 0
+    ? base.filter(s => compareSelected.value.has(s.name))
+    : base;
+  if (!series.length) return;
+
+  const dates = [...new Set(series.flatMap(s => s.points.map(p => p.date)))].sort();
+  const lookup: Record<string, Record<string, number | undefined>> = {};
+  for (const s of series) {
+    lookup[s.name] = {};
+    for (const p of s.points) lookup[s.name][p.date] = p.ttbuy;
+  }
+
+  const header = ["Date", ...series.map(s => s.name)].join(",");
+  const rows = dates.map(d => [d, ...series.map(s => lookup[s.name][d] ?? "")].join(","));
+  const csv = [header, ...rows].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ttbuy-${currency.value}-${range.value}-rates.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 const lastUpdated = computed(() => {
   const dates = allSeries.value.flatMap((s) => s.points.map((p) => p.date));
   if (dates.length === 0) return null;
@@ -393,6 +422,13 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
       </button>
       <button type="button" class="table-toggle" @click="showTable = !showTable">
         {{ showTable ? "Show chart" : "View as table" }}
+      </button>
+      <button type="button" class="export-btn" :title="`Download ${currency} rates as CSV`" @click="exportCsv">
+        <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+          <path d="M8 2v8M5 7l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 12h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        CSV
       </button>
       <button type="button" class="share-btn" :class="{ copied }" @click="copyShareLink">
         <svg v-if="canNativeShare" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
@@ -696,7 +732,11 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
   }
 }
 
-.table-toggle {
+.table-toggle,
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   background: none;
   border: 1px solid var(--border);
   border-radius: 6px;
