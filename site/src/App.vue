@@ -232,6 +232,42 @@ const lastUpdatedFormatted = computed(() => {
   const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   return `${MONTHS[month - 1]} ${day}, ${year}`;
 });
+
+interface ConsistencyResult { bank: string; count: number; total: number }
+
+const consistencyBadge = computed<ConsistencyResult | null>(() => {
+  const opt = RANGE_OPTIONS.find(o => o.key === range.value);
+  const cutoffStr = opt?.days != null
+    ? (() => { const d = new Date(); d.setDate(d.getDate() - opt.days!); return d.toISOString().slice(0, 10); })()
+    : null;
+
+  // Per-date winner by raw TT Buy rate across all banks (not affected by
+  // the search filter). Fees are fixed over time so raw rate ordering gives
+  // the same relative ranking as net-receive for the purpose of this badge.
+  const dateWinner = new Map<string, { bank: string; rate: number }>();
+  for (const s of allSeries.value) {
+    if (s.category === "platform") continue;
+    for (const pt of s.points) {
+      if (cutoffStr && pt.date < cutoffStr) continue;
+      const prev = dateWinner.get(pt.date);
+      if (!prev || pt.ttbuy > prev.rate) dateWinner.set(pt.date, { bank: s.name, rate: pt.ttbuy });
+    }
+  }
+
+  const totalDays = dateWinner.size;
+  if (totalDays === 0) return null;
+
+  const wins: Record<string, number> = {};
+  for (const { bank } of dateWinner.values()) wins[bank] = (wins[bank] ?? 0) + 1;
+
+  let topBank: string | null = null;
+  let topCount = 0;
+  for (const [bank, count] of Object.entries(wins)) {
+    if (count > topCount) { topCount = count; topBank = bank; }
+  }
+
+  return topBank ? { bank: topBank, count: topCount, total: totalDays } : null;
+});
 </script>
 
 <template>
@@ -316,7 +352,7 @@ const lastUpdatedFormatted = computed(() => {
 
     <section class="panel">
       <h2>Best value today</h2>
-      <BestRateTable v-model:amount="amount" :series="searchedSeries" :currency="currency" :fees="fees" />
+      <BestRateTable v-model:amount="amount" :series="searchedSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" />
     </section>
 
     <section class="panel">

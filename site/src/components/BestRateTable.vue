@@ -8,6 +8,7 @@ const props = defineProps<{
   series: BankSeries[];
   currency: string;
   fees: FeesByBank;
+  consistency: { bank: string; count: number; total: number } | null;
 }>();
 
 const amount = defineModel<number>("amount", { default: 1000 });
@@ -250,14 +251,20 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
                     :style="{ background: row.color }"
                     aria-hidden="true"
                   ></span>
-                  <a
-                  v-if="sourceUrl(row.bank)"
-                  :href="sourceUrl(row.bank)!"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="bank-name bank-link"
-                >{{ shortName(row.bank) }}</a>
-                <span v-else class="bank-name">{{ shortName(row.bank) }}</span>
+                  <span class="bank-info">
+                    <a
+                      v-if="sourceUrl(row.bank)"
+                      :href="sourceUrl(row.bank)!"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="bank-name bank-link"
+                    >{{ shortName(row.bank) }}</a>
+                    <span v-else class="bank-name">{{ shortName(row.bank) }}</span>
+                    <span
+                      v-if="consistency && row.bank === consistency.bank"
+                      class="consistency-label"
+                    >Best rate {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}</span>
+                  </span>
                   <button
                     v-if="fees[row.bank]"
                     type="button"
@@ -473,11 +480,24 @@ const activeFee = computed(() => (activeFeeBank.value ? props.fees[activeFeeBank
     gap: 8px;
   }
 
-  .bank-name {
+  .bank-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
     flex: 0 1 auto;
     min-width: 0;
+  }
+
+  .bank-name {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .consistency-label {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text-muted);
+    white-space: nowrap;
   }
 
   .bank-link {
