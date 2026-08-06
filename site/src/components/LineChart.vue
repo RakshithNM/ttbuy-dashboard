@@ -421,6 +421,11 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
     </svg>
     </div>
 
+    <p v-if="weekendBands.length" class="weekend-legend">
+      <span class="weekend-swatch" aria-hidden="true"></span>
+      Saturdays &amp; Sundays — banks don't publish forex rates
+    </p>
+
     <!-- tooltip: deliberately outside .chart-frame (which scrolls horizontally
          and must clip vertically for that to look right) so a tall tooltip —
          one row per bank, and there can be many — is never cut off -->
