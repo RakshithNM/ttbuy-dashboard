@@ -186,7 +186,7 @@ const allSeries = computed<BankSeries[]>(() => {
     color: brandColor(name),
     wrapped: false,
     points: bankRates.value[name] ?? [],
-    category: isPlatform(name) ? "platform" : "bank",
+    category: (isPlatform(name) ? "platform" : "bank") as "bank" | "platform",
   }));
 
   // Find the first date where ≥11 banks reported — everything before that is
