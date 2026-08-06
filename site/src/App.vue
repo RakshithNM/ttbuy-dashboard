@@ -431,7 +431,7 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
         <h2>Historical TT Buy rate</h2>
         <div class="header-controls">
           <button
-            v-if="!showTable"
+            v-if="!showTable || compareMode"
             type="button"
             class="compare-btn"
             :class="{ active: compareMode }"
