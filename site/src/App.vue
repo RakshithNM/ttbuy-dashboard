@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import LineChart from "./components/LineChart.vue";
 import BestRateTable from "./components/BestRateTable.vue";
+import CalendarHeatmap from "./components/CalendarHeatmap.vue";
 import { brandColor, isPlatform, shortName, sortByBankOrder } from "./bankPalette";
 import { currencyName, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency } from "./types";
@@ -562,6 +563,12 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
 
       <LineChart v-model:show-table="showTable" :series="chartSeries" :hidden="chartHidden" :currency="currency" :compare-mode="compareMode" @toggle="toggleBank" />
     </section>
+
+    <section class="panel">
+      <h2>Best bank per day</h2>
+      <p class="panel-sub">Which bank had the highest {{ currency }} TT Buy rate each day</p>
+      <CalendarHeatmap :series="allSeries" :currency="currency" />
+    </section>
   </main>
 
   <p v-else-if="loadError" class="error">Couldn't load rate data: {{ loadError }}</p>
@@ -751,12 +758,18 @@ const consistencyBadge = computed<ConsistencyResult | null>(() => {
 
   h2 {
     font-size: 18px;
-    margin: 0 0 16px;
+    margin: 0 0 4px;
   }
 
   @media (max-width: 480px) {
     padding: 14px;
   }
+}
+
+.panel-sub {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
 .panel-header {
