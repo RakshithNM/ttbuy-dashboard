@@ -199,7 +199,7 @@ function daysAgo(dateStr: string): string {
           <span class="sum-diff" :class="diffInr >= 0 ? 'diff-pos' : 'diff-neg'">
             {{ diffInr >= 0
               ? `+₹${formatInr(diffInr)} more today`
-              : `-₹${formatInr(-diffInr)} more then` }}
+              : `₹${formatInr(-diffInr)} more then` }}
           </span>
         </div>
       </div>
