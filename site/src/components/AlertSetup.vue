@@ -7,7 +7,7 @@ const props = defineProps<{
   currentRate: number;
 }>();
 
-const VAPID_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY as string;
+const VAPID_KEY = "BEFtQ5_k0qteRW-1Udl62eHhyNwBvg43EXp61vkl1yDveOFRqqJq4JOyMLDzT_C-cC0XlppDC5oF_OkaAqIUIQo";
 
 function vapidKeyBuffer(b64: string): ArrayBuffer {
   const padding = "=".repeat((4 - (b64.length % 4)) % 4);
