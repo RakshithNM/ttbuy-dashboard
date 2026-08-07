@@ -165,7 +165,7 @@ async function disable() {
 
     <div v-if="open" class="as-panel">
       <div class="as-row">
-        <span class="as-label">Notify me when rate goes</span>
+        <span class="as-label">Notify me when {{ props.bank.toUpperCase() }} rate goes</span>
         <select v-model="direction" class="as-dir">
           <option value="above">above</option>
           <option value="below">below</option>
@@ -186,7 +186,7 @@ async function disable() {
           :disabled="status === 'loading'"
           @click="enable"
         >
-          {{ status === "loading" ? "Enabling..." : status === "subscribed" ? "Update" : "Enable" }}
+          {{ status === "loading" ? "Enabling..." : (status === "subscribed" && alertedBank === props.bank && alertedCurrency === props.currency) ? "Update" : "Enable" }}
         </button>
         <span v-if="status === 'error'" class="as-err">{{ errorMsg }}</span>
       </div>
