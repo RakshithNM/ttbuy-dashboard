@@ -119,6 +119,10 @@ function nextMonth() {
 
 const hoveredCell = ref<CalCell | null>(null);
 
+const hasNoData = computed(() => {
+  return calendarCells.value.some(c => c && !c.best && !c.isFuture);
+});
+
 function formatCalDate(iso: string): string {
   const [, m, d] = iso.split("-").map(Number);
   return `${MONTHS_SHORT[m - 1]} ${d}`;
@@ -181,7 +185,7 @@ function formatCalDate(iso: string): string {
       </div>
     </div>
 
-    <div v-if="monthBanks.length" class="cal-legend" aria-label="Legend">
+    <div v-if="monthBanks.length || hasNoData" class="cal-legend" aria-label="Legend">
       <div
         v-for="b in monthBanks"
         :key="b.bank"
@@ -191,6 +195,10 @@ function formatCalDate(iso: string): string {
         <span class="legend-swatch" :style="{ background: b.color }" aria-hidden="true"></span>
         <span class="legend-name">{{ shortName(b.bank) }}</span>
         <span class="legend-count">{{ b.count }}d</span>
+      </div>
+      <div v-if="hasNoData" class="legend-item" title="No rate data available">
+        <span class="legend-swatch" style="background: color-mix(in srgb, var(--text-muted) 11%, transparent)" aria-hidden="true"></span>
+        <span class="legend-name">No data</span>
       </div>
     </div>
 
