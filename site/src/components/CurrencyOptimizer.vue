@@ -97,19 +97,73 @@ const perCurrencyBest = computed<CurrencyBest[]>(() => {
 });
 
 
+const mode = ref<"forward" | "reverse">("forward");
+const targetInr = ref("150000");
+
+interface ReverseResult {
+  currency: string;
+  symbol: string;
+  bank: string;
+  color: string;
+  ttbuy: number;
+  feeInr: number;
+  feeUnknown: boolean;
+  foreignAmount: number;
+}
+
+const reverseResults = computed<ReverseResult[]>(() => {
+  const target = parseFloat(targetInr.value);
+  if (!Number.isFinite(target) || target <= 0) return [];
+
+  const results: ReverseResult[] = [];
+  for (const currency of props.currencies) {
+    const bankRates = props.rawRates[currency] ?? {};
+    let best: { bank: string; color: string; ttbuy: number; feeInr: number; feeUnknown: boolean; foreignAmount: number } | null = null;
+
+    for (const [bank, points] of Object.entries(bankRates)) {
+      if (!points.length || isPlatform(bank)) continue;
+      const latest = points[points.length - 1];
+      const fee = props.fees[bank];
+      const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
+      const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, target) : (fee?.fee_inr ?? 0);
+      const foreignAmount = (target + feeInr) / latest.ttbuy;
+
+      if (!best || foreignAmount < best.foreignAmount) {
+        best = { bank, color: brandColor(bank), ttbuy: latest.ttbuy, feeInr, feeUnknown, foreignAmount };
+      }
+    }
+
+    if (best) results.push({ currency, symbol: currencySymbol(currency), ...best });
+  }
+  return results;
+});
+
 function formatInr(n: number): string {
   return "₹" + Math.round(n).toLocaleString("en-IN");
+}
+
+function formatForeign(amount: number, symbol: string): string {
+  return symbol + amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 </script>
 
 <template>
   <div class="optimizer">
     <div class="optimizer-header">
-      <h2 class="optimizer-title">Currency optimizer</h2>
-      <p class="optimizer-sub">Enter the amount for each currency to see which bank gives you the most rupees.</p>
+      <div class="optimizer-header-top">
+        <h2 class="optimizer-title">Currency optimizer</h2>
+        <div class="mode-toggle" role="group" aria-label="Calculator direction">
+          <button type="button" :class="{ active: mode === 'forward' }" @click="mode = 'forward'">Foreign → ₹</button>
+          <button type="button" :class="{ active: mode === 'reverse' }" @click="mode = 'reverse'">₹ → Foreign</button>
+        </div>
+      </div>
+      <p class="optimizer-sub">
+        <template v-if="mode === 'forward'">Enter the amount for each currency to see which bank gives you the most rupees.</template>
+        <template v-else>Enter your INR target to see the minimum your sender needs to wire in each currency.</template>
+      </p>
     </div>
 
-    <div class="amount-row">
+    <div v-if="mode === 'forward'" class="amount-row">
       <label v-for="c in currencies" :key="c" class="amount-field">
         <span class="currency-label">{{ c }}</span>
         <div class="input-wrap">
@@ -126,48 +180,99 @@ function formatInr(n: number): string {
       </label>
     </div>
 
-    <div v-if="activeCurrencies.length === 0" class="empty-state">
-      Enter at least one amount above to see results.
+    <div v-else class="amount-row">
+      <label class="amount-field reverse-target-field">
+        <span class="currency-label">You need to receive</span>
+        <div class="input-wrap">
+          <span class="currency-symbol">₹</span>
+          <input
+            v-model="targetInr"
+            type="number"
+            min="1"
+            class="amount-input reverse-amount-input"
+            aria-label="Target INR amount"
+            @focus="($event.target as HTMLInputElement).select()"
+          />
+        </div>
+      </label>
     </div>
 
+    <template v-if="mode === 'forward'">
+      <div v-if="activeCurrencies.length === 0" class="empty-state">
+        Enter at least one amount above to see results.
+      </div>
+      <template v-else>
+        <div class="results-wrap summary-wrap">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th class="col-ccy">Currency</th>
+                <th>Best bank</th>
+                <th class="col-num">TT Buy</th>
+                <th class="col-num">You receive</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="best in perCurrencyBest" :key="best.currency">
+                <td class="col-ccy">
+                  <span class="ccy-pill">{{ best.currency }}</span>
+                  <span class="rate-detail">{{ best.symbol }}{{ best.inputAmount.toLocaleString("en-IN") }}</span>
+                </td>
+                <td class="col-bank">
+                  <span class="bank-dot" :style="{ background: best.color }" aria-hidden="true"></span>
+                  <span class="bank-name-text">{{ shortName(best.bank) }}</span>
+                  <span v-if="best.alsoWins.length" class="also-wins">also best for {{ best.alsoWins.join(', ') }}</span>
+                </td>
+                <td class="col-num">₹{{ best.ttbuy.toFixed(2) }}</td>
+                <td class="col-num col-receive">
+                  {{ formatInr(best.netInr) }}
+                  <span v-if="best.feeUnknown" class="approx-mark" title="Fee unknown, shown without deduction">≈</span>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="3" class="total-label">Total</td>
+                <td class="col-num total-value">{{ formatInr(perCurrencyBest.reduce((s, b) => s + b.netInr, 0)) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </template>
+    </template>
+
     <template v-else>
-      <div class="results-wrap summary-wrap">
+      <div v-if="reverseResults.length === 0" class="empty-state">
+        Enter a target amount above to see results.
+      </div>
+      <div v-else class="results-wrap summary-wrap">
         <table class="results-table">
           <thead>
             <tr>
               <th class="col-ccy">Currency</th>
               <th>Best bank</th>
               <th class="col-num">TT Buy</th>
-              <th class="col-num">You receive</th>
+              <th class="col-num col-send">Send</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="best in perCurrencyBest" :key="best.currency">
+            <tr v-for="r in reverseResults" :key="r.currency">
               <td class="col-ccy">
-                <span class="ccy-pill">{{ best.currency }}</span>
-                <span class="rate-detail">{{ best.symbol }}{{ best.inputAmount.toLocaleString("en-IN") }}</span>
+                <span class="ccy-pill">{{ r.currency }}</span>
               </td>
               <td class="col-bank">
-                <span class="bank-dot" :style="{ background: best.color }" aria-hidden="true"></span>
-                <span class="bank-name-text">{{ shortName(best.bank) }}</span>
-                <span v-if="best.alsoWins.length" class="also-wins">also best for {{ best.alsoWins.join(', ') }}</span>
+                <span class="bank-dot" :style="{ background: r.color }" aria-hidden="true"></span>
+                <span class="bank-name-text">{{ shortName(r.bank) }}</span>
               </td>
-              <td class="col-num">₹{{ best.ttbuy.toFixed(2) }}</td>
-              <td class="col-num col-receive">
-                {{ formatInr(best.netInr) }}
-                <span v-if="best.feeUnknown" class="approx-mark" title="Fee unknown, shown without deduction">≈</span>
+              <td class="col-num">₹{{ r.ttbuy.toFixed(2) }}</td>
+              <td class="col-num col-send">
+                {{ formatForeign(r.foreignAmount, r.symbol) }}
+                <span v-if="r.feeUnknown" class="approx-mark" title="Fee unknown, shown without deduction">≈</span>
               </td>
             </tr>
           </tbody>
-          <tfoot>
-            <tr class="total-row">
-              <td colspan="3" class="total-label">Total</td>
-              <td class="col-num total-value">{{ formatInr(perCurrencyBest.reduce((s, b) => s + b.netInr, 0)) }}</td>
-            </tr>
-          </tfoot>
         </table>
       </div>
-
     </template>
   </div>
 </template>
@@ -181,11 +286,54 @@ function formatInr(n: number): string {
   margin-bottom: 16px;
 }
 
+.optimizer-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
 .optimizer-title {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 4px;
+  margin: 0;
+}
+
+.mode-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  button {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 100ms, color 100ms;
+    white-space: nowrap;
+
+    &:not(:last-child) {
+      border-right: 1px solid var(--border);
+    }
+
+    &.active {
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: var(--accent);
+    }
+
+    &:hover:not(.active) {
+      background: var(--page-plane);
+      color: var(--text-secondary);
+    }
+  }
 }
 
 .optimizer-sub {
@@ -208,6 +356,21 @@ function formatInr(n: number): string {
   gap: 5px;
   cursor: default;
   flex: 1;
+}
+
+.reverse-target-field {
+  flex: 0 0 auto;
+  min-width: 200px;
+}
+
+.reverse-amount-input {
+  width: 140px;
+}
+
+.col-send {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
 }
 
 .currency-label {
