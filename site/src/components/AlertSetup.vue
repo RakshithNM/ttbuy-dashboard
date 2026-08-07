@@ -9,11 +9,13 @@ const props = defineProps<{
 
 const VAPID_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY as string;
 
-function urlBase64ToUint8Array(b64: string): Uint8Array {
+function vapidKeyBuffer(b64: string): ArrayBuffer {
   const padding = "=".repeat((4 - (b64.length % 4)) % 4);
   const base64 = (b64 + padding).replace(/-/g, "+").replace(/_/g, "/");
   const raw = atob(base64);
-  return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
+  const arr = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr.buffer;
 }
 
 const supported = ref(false);
@@ -67,7 +69,7 @@ async function enable() {
 
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_KEY),
+      applicationServerKey: vapidKeyBuffer(VAPID_KEY),
     });
 
     const res = await fetch("/.netlify/functions/subscribe", {
@@ -128,7 +130,7 @@ async function disable() {
         </svg>
       </button>
 
-      <button v-if="status === 'subscribed'" class="as-off" @click="disable" :disabled="status === 'loading'" aria-label="Disable alert">
+      <button v-if="status === 'subscribed'" class="as-off" @click="disable" aria-label="Disable alert">
         Disable
       </button>
     </div>
