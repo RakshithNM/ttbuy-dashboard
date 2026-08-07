@@ -37,8 +37,12 @@ const bankB = ref("");
 watch(
   allBanks,
   (banks) => {
-    if (!bankA.value && banks[0]) bankA.value = banks[0];
-    if (!bankB.value && banks[1]) bankB.value = banks[1];
+    if (!bankA.value) {
+      bankA.value = banks.includes("Punjab National Bank") ? "Punjab National Bank" : (banks[0] ?? "");
+    }
+    if (!bankB.value) {
+      bankB.value = banks.includes("Indian Overseas Bank") ? "Indian Overseas Bank" : (banks[1] ?? "");
+    }
   },
   { immediate: true }
 );
