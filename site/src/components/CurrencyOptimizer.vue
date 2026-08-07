@@ -39,20 +39,6 @@ interface CurrencyBest {
   alsoWins: string[];
 }
 
-interface Combo {
-  rank: number;
-  currency: string;
-  bank: string;
-  color: string;
-  category: "bank" | "platform";
-  ttbuy: number;
-  feeInr: number;
-  feeUnknown: boolean;
-  netInr: number;
-  inputAmount: number;
-  gapToTop: number;
-}
-
 const activeCurrencies = computed(() =>
   props.currencies.filter(c => {
     const v = parseFloat(amounts.value[c] ?? "");
@@ -110,38 +96,6 @@ const perCurrencyBest = computed<CurrencyBest[]>(() => {
   }));
 });
 
-const showAllCombos = ref(false);
-
-const sortedCombos = computed<Combo[]>(() => {
-  if (!showAllCombos.value) return [];
-  const raw: Omit<Combo, "rank" | "gapToTop">[] = [];
-
-  for (const currency of props.currencies) {
-    const amt = parseFloat(amounts.value[currency] ?? "");
-    if (!Number.isFinite(amt) || amt <= 0) continue;
-
-    const bankRates = props.rawRates[currency] ?? {};
-    for (const [bank, points] of Object.entries(bankRates)) {
-      if (!points.length || isPlatform(bank)) continue;
-      const latest = points[points.length - 1];
-      const grossInr = latest.ttbuy * amt;
-      const fee = props.fees[bank];
-      const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
-      const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, grossInr) : (fee?.fee_inr ?? 0);
-      raw.push({
-        currency, bank,
-        color: brandColor(bank),
-        category: "bank",
-        ttbuy: latest.ttbuy, feeInr, feeUnknown,
-        netInr: grossInr - feeInr, inputAmount: amt,
-      });
-    }
-  }
-
-  raw.sort((a, b) => b.netInr - a.netInr);
-  const topNet = raw[0]?.netInr ?? 0;
-  return raw.map((r, i) => ({ ...r, rank: i + 1, gapToTop: topNet - r.netInr }));
-});
 
 function formatInr(n: number): string {
   return "₹" + Math.round(n).toLocaleString("en-IN");
@@ -214,60 +168,6 @@ function formatInr(n: number): string {
         </table>
       </div>
 
-      <button type="button" class="show-all-btn" @click="showAllCombos = !showAllCombos">
-        {{ showAllCombos ? "Hide all combinations" : "Compare all combinations" }}
-      </button>
-
-      <div v-if="showAllCombos" class="all-combos-wrap">
-        <div class="results-wrap">
-          <table class="results-table">
-            <thead>
-              <tr>
-                <th class="col-rank">#</th>
-                <th>Bank</th>
-                <th class="col-ccy">Currency</th>
-                <th class="col-num">Rate</th>
-                <th class="col-num">You receive</th>
-                <th class="col-num">vs best</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="row in sortedCombos"
-                :key="`${row.currency}-${row.bank}`"
-                :class="{ winner: row.rank === 1 }"
-              >
-                <td class="col-rank">
-                  <span v-if="row.rank === 1" class="winner-badge" aria-label="Best combination">
-                    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-                      <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </span>
-                  <span v-else class="rank-num">{{ row.rank }}</span>
-                </td>
-                <td class="col-bank">
-                  <span class="bank-dot" :style="{ background: row.color }" aria-hidden="true"></span>
-                  {{ shortName(row.bank) }}
-                  <span v-if="row.category === 'platform'" class="platform-tag">platform</span>
-                </td>
-                <td class="col-ccy">
-                  <span class="ccy-pill">{{ row.currency }}</span>
-                  <span class="rate-detail">{{ currencySymbol(row.currency) }}{{ row.inputAmount.toLocaleString("en-IN") }}</span>
-                </td>
-                <td class="col-num">₹{{ row.ttbuy.toFixed(2) }}</td>
-                <td class="col-num col-receive">
-                  {{ formatInr(row.netInr) }}
-                  <span v-if="row.feeUnknown" class="approx-mark" title="Fee unknown — shown without deduction">≈</span>
-                </td>
-                <td class="col-num col-gap">
-                  <span v-if="row.rank === 1" class="dash">—</span>
-                  <span v-else class="gap-value">−{{ formatInr(row.gapToTop) }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </template>
   </div>
 </template>
@@ -374,10 +274,6 @@ function formatInr(n: number): string {
   border-radius: 8px;
 }
 
-.all-combos-wrap {
-  margin-top: 12px;
-}
-
 .results-table {
   width: 100%;
   border-collapse: collapse;
@@ -415,11 +311,6 @@ function formatInr(n: number): string {
   }
 }
 
-.col-rank {
-  width: 36px;
-  text-align: center;
-}
-
 .col-num {
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -450,16 +341,6 @@ function formatInr(n: number): string {
   font-weight: 400;
 }
 
-.platform-tag {
-  font-size: 10px;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 1px 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
 .col-ccy {
   display: flex;
   align-items: center;
@@ -487,31 +368,11 @@ function formatInr(n: number): string {
   color: var(--text-primary);
 }
 
-.winner-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--status-good);
-}
-
-.rank-num {
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
 .approx-mark {
   color: var(--text-muted);
   font-size: 11px;
   margin-left: 2px;
   cursor: help;
-}
-
-.dash {
-  color: var(--text-muted);
-}
-
-.gap-value {
-  color: var(--text-muted);
 }
 
 .summary-wrap .results-table {
@@ -544,15 +405,4 @@ function formatInr(n: number): string {
   font-variant-numeric: tabular-nums;
 }
 
-.show-all-btn {
-  margin-top: 10px;
-  background: none;
-  border: none;
-  color: var(--accent);
-  font-size: 13px;
-  cursor: pointer;
-  padding: 4px 0;
-
-  &:hover { text-decoration: underline; }
-}
 </style>
