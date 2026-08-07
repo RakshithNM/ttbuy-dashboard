@@ -1,5 +1,5 @@
-const { getStore } = require("@netlify/blobs");
-const webpush = require("web-push");
+import { getStore } from "@netlify/blobs";
+import webpush from "web-push";
 
 webpush.setVapidDetails(
   process.env.VAPID_SUBJECT,
@@ -10,13 +10,13 @@ webpush.setVapidDetails(
 const RATES_URL =
   "https://raw.githubusercontent.com/RakshithNM/ttbuy-dashboard/refs/heads/main/data/rates.json";
 
-exports.handler = async (event) => {
-  if (event.headers["x-alerts-secret"] !== process.env.ALERTS_SECRET) {
-    return { statusCode: 401, body: "Unauthorized" };
+export default async (req) => {
+  if (req.headers.get("x-alerts-secret") !== process.env.ALERTS_SECRET) {
+    return new Response("Unauthorized", { status: 401 });
   }
 
   const ratesRes = await fetch(RATES_URL);
-  if (!ratesRes.ok) return { statusCode: 502, body: "Failed to fetch rates" };
+  if (!ratesRes.ok) return new Response("Failed to fetch rates", { status: 502 });
   const rates = await ratesRes.json();
 
   const today = new Date().toISOString().split("T")[0];
@@ -34,7 +34,6 @@ exports.handler = async (event) => {
 
     const { subscription, alerts = [], last_alerted_date } = data;
 
-    // One push per subscription per day
     if (last_alerted_date === today) { skipped++; continue; }
 
     const triggered = [];
@@ -61,14 +60,10 @@ exports.handler = async (event) => {
       await store.set(key, JSON.stringify({ ...data, last_alerted_date: today }));
       sent++;
     } catch (err) {
-      // 410 = subscription expired, 404 = endpoint gone
       if (err.statusCode === 410 || err.statusCode === 404) await store.delete(key);
       errors++;
     }
   }
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ sent, skipped, errors, date: today }),
-  };
+  return new Response(JSON.stringify({ sent, skipped, errors, date: today }), { status: 200 });
 };
