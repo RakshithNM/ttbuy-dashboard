@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { BankSeries, FeesByBank, FeeSlab } from "../types";
-import { shortName, sourceUrl } from "../bankPalette";
+import { brandColor, shortName, sourceUrl } from "../bankPalette";
 import { currencySymbol } from "../currencies";
 
 const props = defineProps<{
@@ -399,7 +399,7 @@ const bankStats = computed(() => {
         <path d="M5 14h6" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
       </svg>
       <span>
-        <span class="consistency-bank">{{ shortName(consistency.bank) }}</span>
+        <span class="consistency-bank" :style="{ color: brandColor(consistency.bank) }">{{ shortName(consistency.bank) }}</span>
         had the best {{ currency }} rate most often: {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}<template v-if="sinceLabel"> since {{ sinceLabel }}</template>
       </span>
     </div>
