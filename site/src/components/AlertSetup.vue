@@ -24,6 +24,8 @@ const threshold = ref(0);
 const direction = ref<"above" | "below">("above");
 const status = ref<"idle" | "loading" | "subscribed" | "error">("idle");
 const errorMsg = ref("");
+const alertedBank = ref("");
+const alertedCurrency = ref("");
 
 // Set threshold default once when rate becomes available
 watch(
@@ -45,18 +47,26 @@ async function checkExisting() {
   try {
     const reg = await navigator.serviceWorker.getRegistration("/sw.js");
     const sub = reg ? await reg.pushManager.getSubscription() : null;
-    if (!sub) { status.value = "idle"; return; }
-    status.value = "subscribed";
+    if (!sub) { status.value = "idle"; alertedBank.value = ""; return; }
     const res = await fetch(`/.netlify/functions/subscribe?endpoint=${encodeURIComponent(sub.endpoint)}`);
     if (res.ok) {
       const { alerts } = await res.json();
-      const match = alerts.find((a: { bank: string; currency: string; threshold: number; direction: string }) =>
-        a.bank === props.bank && a.currency === props.currency
-      );
-      if (match) {
-        threshold.value = match.threshold;
-        direction.value = match.direction;
+      const active = alerts[0] as { bank: string; currency: string; threshold: number; direction: string } | undefined;
+      if (active) {
+        alertedBank.value = active.bank;
+        alertedCurrency.value = active.currency;
+        status.value = "subscribed";
+        if (active.bank === props.bank && active.currency === props.currency) {
+          threshold.value = active.threshold;
+          direction.value = active.direction as "above" | "below";
+        }
+      } else {
+        status.value = "idle";
+        alertedBank.value = "";
       }
+    } else {
+      status.value = "subscribed";
+      alertedBank.value = "";
     }
   } catch {
     status.value = "idle";
@@ -96,6 +106,8 @@ async function enable() {
     if (!res.ok) throw new Error("Server error saving subscription");
 
     status.value = "subscribed";
+    alertedBank.value = props.bank;
+    alertedCurrency.value = props.currency;
     open.value = false;
   } catch (err: unknown) {
     errorMsg.value = err instanceof Error ? err.message : "Something went wrong";
@@ -118,6 +130,8 @@ async function disable() {
       await sub.unsubscribe();
     }
     status.value = "idle";
+    alertedBank.value = "";
+    alertedCurrency.value = "";
     open.value = false;
   } catch (err: unknown) {
     errorMsg.value = err instanceof Error ? err.message : "Failed to disable";
@@ -136,7 +150,8 @@ async function disable() {
       </svg>
 
       <button class="as-toggle" @click="open = !open" :aria-expanded="open">
-        <span v-if="status === 'subscribed'">Alert on</span>
+        <span v-if="status === 'subscribed' && alertedBank === props.bank && alertedCurrency === props.currency">Alert on</span>
+        <span v-else-if="status === 'subscribed'">Alert for {{ alertedBank.toUpperCase() }}</span>
         <span v-else>Set alert</span>
         <svg class="as-chevron" :class="{ rotated: open }" viewBox="0 0 10 6" width="9" height="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
           <path d="M1 1l4 4 4-4"/>
