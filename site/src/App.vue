@@ -5,6 +5,7 @@ import BestRateTable from "./components/BestRateTable.vue";
 import CalendarHeatmap from "./components/CalendarHeatmap.vue";
 import CurrencyOptimizer from "./components/CurrencyOptimizer.vue";
 import BankHeadToHead from "./components/BankHeadToHead.vue";
+import WhatIfMachine from "./components/WhatIfMachine.vue";
 import { brandColor, isPlatform, shortName, sortByBankOrder } from "./bankPalette";
 import { currencyName, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency } from "./types";
@@ -703,6 +704,12 @@ const stableBank = computed<StableBankResult | null>(() => {
       <h2>Bank head-to-head</h2>
       <p class="panel-sub">Pick two banks and see which one gives you more across all currencies</p>
       <BankHeadToHead :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
+    </section>
+
+    <section class="panel">
+      <h2>What if?</h2>
+      <p class="panel-sub">Pick any past date to replay the rates and see what you'd have received</p>
+      <WhatIfMachine :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
     </section>
 
     <section class="panel">
