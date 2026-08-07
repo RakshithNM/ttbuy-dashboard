@@ -36,6 +36,7 @@ watch(
 watch(() => props.bank, async () => {
   open.value = false;
   status.value = "idle";
+  threshold.value = 0; // allow rate watch to repopulate if no stored alert
   await checkExisting();
 });
 
@@ -44,7 +45,19 @@ async function checkExisting() {
   try {
     const reg = await navigator.serviceWorker.getRegistration("/sw.js");
     const sub = reg ? await reg.pushManager.getSubscription() : null;
-    status.value = sub ? "subscribed" : "idle";
+    if (!sub) { status.value = "idle"; return; }
+    status.value = "subscribed";
+    const res = await fetch(`/.netlify/functions/subscribe?endpoint=${encodeURIComponent(sub.endpoint)}`);
+    if (res.ok) {
+      const { alerts } = await res.json();
+      const match = alerts.find((a: { bank: string; currency: string; threshold: number; direction: string }) =>
+        a.bank === props.bank && a.currency === props.currency
+      );
+      if (match) {
+        threshold.value = match.threshold;
+        direction.value = match.direction;
+      }
+    }
   } catch {
     status.value = "idle";
   }

@@ -16,13 +16,21 @@ async function handle(req) {
       status: 204,
       headers: {
         ...CORS,
-        "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
+        "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
       },
     });
   }
 
   const store = getStore("push-subscriptions");
+
+  if (req.method === "GET") {
+    const endpoint = new URL(req.url).searchParams.get("endpoint");
+    if (!endpoint) return new Response(JSON.stringify({ error: "Missing endpoint" }), { status: 400, headers: CORS });
+    const raw = await store.get(subKey(endpoint));
+    const alerts = raw ? (JSON.parse(raw).alerts ?? []) : [];
+    return new Response(JSON.stringify({ alerts }), { status: 200, headers: CORS });
+  }
 
   if (req.method === "POST") {
     let body;
