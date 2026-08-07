@@ -214,9 +214,9 @@ function formatForeign(amount: number, symbol: string): string {
             </thead>
             <tbody>
               <tr v-for="best in perCurrencyBest" :key="best.currency">
-                <td class="col-ccy">
-                  <span class="ccy-pill">{{ best.currency }}</span>
-                  <span class="rate-detail">{{ best.symbol }}{{ best.inputAmount.toLocaleString("en-IN") }}</span>
+                <td>
+                  <span class="ccy-pill">{{ best.symbol }}</span>
+                  <span class="rate-detail"> {{ best.inputAmount.toLocaleString("en-IN") }}</span>
                 </td>
                 <td class="col-bank">
                   <span class="bank-dot" :style="{ background: best.color }" aria-hidden="true"></span>
@@ -252,12 +252,12 @@ function formatForeign(amount: number, symbol: string): string {
               <th class="col-ccy">Currency</th>
               <th>Best bank</th>
               <th class="col-num">TT Buy</th>
-              <th class="col-num col-send">Send</th>
+              <th>To send</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="r in reverseResults" :key="r.currency">
-              <td class="col-ccy">
+              <td>
                 <span class="ccy-pill">{{ r.currency }}</span>
               </td>
               <td class="col-bank">
