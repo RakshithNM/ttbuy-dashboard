@@ -395,8 +395,8 @@ const bankStats = computed(() => {
       </svg>
       <span>
         <strong :style="{ color: stableBank.color }">{{ shortName(stableBank.bank) }}</strong>
-        was the most consistent among the top {{ stableBank.topN }} banks —
-        rate varied by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
+        had the most stable rate among the top {{ stableBank.topN }} banks —
+        varied by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
           vs {{ shortName(stableBank.runner.bank) }}'s ₹{{ stableBank.runner.variation.toFixed(2) }}</template>
       </span>
     </div>
