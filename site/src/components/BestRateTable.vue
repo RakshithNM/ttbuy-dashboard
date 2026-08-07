@@ -307,6 +307,81 @@ const bankStats = computed(() => {
   }
   return map;
 });
+
+interface SplitSuggestion {
+  bankA: string;
+  bankB: string;
+  amtA: number;
+  amtB: number;
+  savings: number;
+}
+
+// Try every ordered pair of different banks and every fee-slab boundary as
+// a candidate split point. The only splits worth surfacing are those where
+// gross INR to one bank sits just under a slab threshold — that's where
+// the fee drops enough to beat the best single-bank option.
+const splitSuggestion = computed<SplitSuggestion | null>(() => {
+  if (!safeAmount.value) return null;
+  const bankRows = rows.value.filter((r): r is DataRow => r.hasData && r.category === "bank");
+  if (bankRows.length < 2) return null;
+
+  const bestSingleNet = bankRows[0].netReceive;
+
+  function netInr(rate: number, bank: string, fxAmt: number): number {
+    const gross = rate * fxAmt;
+    const fee = props.fees[bank];
+    const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, gross) : (fee?.fee_inr ?? 0);
+    return gross - feeInr;
+  }
+
+  let bestNet = bestSingleNet;
+  let best: Omit<SplitSuggestion, "savings"> | null = null;
+
+  for (let i = 0; i < bankRows.length; i++) {
+    for (let j = 0; j < bankRows.length; j++) {
+      if (i === j) continue;
+      const rowA = bankRows[i];
+      const rowB = bankRows[j];
+      const feeA = props.fees[rowA.bank];
+      const feeB = props.fees[rowB.bank];
+
+      const candidates: number[] = [];
+
+      if (feeA?.fee_slabs) {
+        for (const slab of feeA.fee_slabs) {
+          if (slab.up_to !== null) {
+            const fxA = slab.up_to / rowA.ttbuy;
+            if (fxA > 0 && fxA < safeAmount.value) candidates.push(fxA);
+          }
+        }
+      }
+      if (feeB?.fee_slabs) {
+        for (const slab of feeB.fee_slabs) {
+          if (slab.up_to !== null) {
+            const fxB = slab.up_to / rowB.ttbuy;
+            const fxA = safeAmount.value - fxB;
+            if (fxA > 0 && fxA < safeAmount.value) candidates.push(fxA);
+          }
+        }
+      }
+
+      for (const amtA of candidates) {
+        const amtB = safeAmount.value - amtA;
+        if (amtA <= 0 || amtB <= 0) continue;
+        const totalNet = netInr(rowA.ttbuy, rowA.bank, amtA) + netInr(rowB.ttbuy, rowB.bank, amtB);
+        if (totalNet > bestNet) {
+          bestNet = totalNet;
+          best = { bankA: rowA.bank, bankB: rowB.bank, amtA, amtB };
+        }
+      }
+    }
+  }
+
+  if (!best) return null;
+  const savings = bestNet - bestSingleNet;
+  if (savings < 50) return null;
+  return { ...best, savings };
+});
 </script>
 
 <template>
@@ -414,6 +489,18 @@ const bankStats = computed(() => {
         had the most stable rate among the top {{ stableBank.topN }} banks,
         varying by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
           vs {{ shortName(stableBank.runner.bank) }}'s ₹{{ stableBank.runner.variation.toFixed(2) }}</template>
+      </span>
+    </div>
+
+    <div v-if="splitSuggestion" class="split-callout" role="note">
+      <svg class="split-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 2v5M5 4l3-2 3 2"/>
+        <path d="M5.5 7C3.5 7 2 8.5 2 10.5V14M10.5 7C12.5 7 14 8.5 14 10.5V14"/>
+      </svg>
+      <span>
+        Split saves <strong class="split-save">₹{{ formatInr(splitSuggestion.savings) }}</strong>:
+        send {{ currencySymbol(currency) }}{{ formatInr(Math.round(splitSuggestion.amtA)) }} to {{ shortName(splitSuggestion.bankA) }}
+        + {{ currencySymbol(currency) }}{{ formatInr(Math.round(splitSuggestion.amtB)) }} to {{ shortName(splitSuggestion.bankB) }}
       </span>
     </div>
 
@@ -798,6 +885,32 @@ const bankStats = computed(() => {
 
   strong {
     font-weight: 600;
+  }
+}
+
+.split-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--status-good) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-good) 22%, transparent);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+
+  .split-icon {
+    flex: none;
+    color: var(--success-text);
+    margin-top: 1px;
+  }
+
+  .split-save {
+    color: var(--success-text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 }
 
