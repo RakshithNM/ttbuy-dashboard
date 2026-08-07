@@ -6,6 +6,7 @@ import CalendarHeatmap from "./components/CalendarHeatmap.vue";
 import CurrencyOptimizer from "./components/CurrencyOptimizer.vue";
 import BankHeadToHead from "./components/BankHeadToHead.vue";
 import WhatIfMachine from "./components/WhatIfMachine.vue";
+import MyBankPanel from "./components/MyBankPanel.vue";
 import { brandColor, isPlatform, shortName, sortByBankOrder } from "./bankPalette";
 import { currencyName, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency } from "./types";
@@ -107,6 +108,10 @@ const showTable = ref(
 );
 const currency = ref<string>(queryView.currency ?? storedView.currency ?? "USD");
 const amount = ref<number>(queryView.amount ?? storedView.amount ?? 1000);
+
+const MY_BANK_KEY = "ttbuy-dashboard:mybank";
+const myBank = ref<string>((() => { try { return localStorage.getItem(MY_BANK_KEY) ?? ""; } catch { return ""; } })());
+watch(myBank, (b) => { try { if (b) localStorage.setItem(MY_BANK_KEY, b); else localStorage.removeItem(MY_BANK_KEY); } catch {} });
 
 watch([range, showTable, currency, amount], ([r, t, c, a]) => {
   document.title = `${c} TT Buy Rate | TTBuy Rates`;
@@ -605,6 +610,8 @@ const stableBank = computed<StableBankResult | null>(() => {
   </header>
 
   <main v-if="!loading && !loadError">
+    <MyBankPanel v-model:my-bank="myBank" :series="allSeries" :fees="fees" :currency="currency" :amount="amount" />
+
     <div class="toolbar">
       <div v-if="availableCurrencies.length > 1" class="currency-filter" role="group" aria-label="Currency">
         <button
