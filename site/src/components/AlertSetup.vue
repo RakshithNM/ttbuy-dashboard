@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
+import { shortName } from "../bankPalette";
 
 const props = defineProps<{
   bank: string;
@@ -26,6 +27,8 @@ const status = ref<"idle" | "loading" | "subscribed" | "error">("idle");
 const errorMsg = ref("");
 const alertedBank = ref("");
 const alertedCurrency = ref("");
+const alertedThreshold = ref(0);
+const alertedDirection = ref<"above" | "below">("above");
 
 // Set threshold default once when rate becomes available
 watch(
@@ -55,6 +58,8 @@ async function checkExisting() {
       if (active) {
         alertedBank.value = active.bank;
         alertedCurrency.value = active.currency;
+        alertedThreshold.value = active.threshold;
+        alertedDirection.value = active.direction as "above" | "below";
         status.value = "subscribed";
         if (active.bank === props.bank && active.currency === props.currency) {
           threshold.value = active.threshold;
@@ -108,6 +113,8 @@ async function enable() {
     status.value = "subscribed";
     alertedBank.value = props.bank;
     alertedCurrency.value = props.currency;
+    alertedThreshold.value = threshold.value;
+    alertedDirection.value = direction.value;
     open.value = false;
   } catch (err: unknown) {
     errorMsg.value = err instanceof Error ? err.message : "Something went wrong";
@@ -132,6 +139,8 @@ async function disable() {
     status.value = "idle";
     alertedBank.value = "";
     alertedCurrency.value = "";
+    alertedThreshold.value = 0;
+    alertedDirection.value = "above";
     open.value = false;
   } catch (err: unknown) {
     errorMsg.value = err instanceof Error ? err.message : "Failed to disable";
@@ -151,7 +160,7 @@ async function disable() {
 
       <button class="as-toggle" @click="open = !open" :aria-expanded="open">
         <span v-if="status === 'subscribed' && alertedBank === props.bank && alertedCurrency === props.currency">Alert on</span>
-        <span v-else-if="status === 'subscribed'">Alert for {{ alertedBank.toUpperCase() }}</span>
+        <span v-else-if="status === 'subscribed'">Alert for {{ shortName(alertedBank) }} when rate goes {{ alertedDirection }} ₹{{ alertedThreshold.toFixed(2) }}</span>
         <span v-else>Set alert</span>
         <svg class="as-chevron" :class="{ rotated: open }" viewBox="0 0 10 6" width="9" height="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
           <path d="M1 1l4 4 4-4"/>
