@@ -44,3 +44,11 @@ jobs:
           git add data site/public/data/rates.json
           git diff --cached --quiet || git commit -m "Update TT Buy rates $(date -u +%F)"
           git push
+
+      - name: Trigger rate alerts
+        env:
+          ALERTS_SECRET: ${{ secrets.ALERTS_SECRET }}
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" -X POST \
+            https://ttbuyrates.rakshithnettar.com/api/send-alerts \
+            -H "x-alerts-secret: $ALERTS_SECRET" || true

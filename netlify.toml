@@ -2,3 +2,17 @@
   base = "site"
   command = "npm run build"
   publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "nft"
+
+[[redirects]]
+  from = "/api/subscribe"
+  to = "/.netlify/functions/subscribe"
+  status = 200
+
+[[redirects]]
+  from = "/api/send-alerts"
+  to = "/.netlify/functions/send-alerts"
+  status = 200
