@@ -159,7 +159,7 @@ async function disable() {
       </svg>
 
       <button class="as-toggle" @click="open = !open" :aria-expanded="open">
-        <span v-if="status === 'subscribed' && alertedBank === props.bank && alertedCurrency === props.currency">Alert on</span>
+        <span v-if="status === 'subscribed' && alertedBank === props.bank && alertedCurrency === props.currency">Alert on when rate goes {{ alertedDirection }} ₹{{ alertedThreshold.toFixed(2) }}</span>
         <span v-else-if="status === 'subscribed'">Alert for {{ shortName(alertedBank) }} when rate goes {{ alertedDirection }} ₹{{ alertedThreshold.toFixed(2) }}</span>
         <span v-else>Set alert</span>
         <svg class="as-chevron" :class="{ rotated: open }" viewBox="0 0 10 6" width="9" height="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
