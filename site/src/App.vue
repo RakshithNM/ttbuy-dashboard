@@ -357,6 +357,59 @@ const dowInsight = computed<DowInsight | null>(() => {
   return { day: DAY_NAMES[bestDay], diffPaise: Math.round(diff * 100) };
 });
 
+interface WeekInsight { week: 1 | 2 | 3 | 4; diffPaise: number; }
+
+// Groups qualifying days by week-of-month (W1=days 1–7, W2=8–14, W3=15–21,
+// W4=22+) and surfaces the week that averages highest. Requires 60 qualifying
+// days (~3 full months) AND 3+ occurrences in every week slot so each bucket
+// is statistically comparable. Will be silent until roughly end of October.
+const weekInsight = computed<WeekInsight | null>(() => {
+  const bankSeries = allSeries.value.filter(s => s.category === "bank");
+  if (!bankSeries.length) return null;
+
+  const majorityThreshold = Math.floor(bankSeries.length / 2) + 1;
+  const dateEntries = new Map<string, number>();
+  const dateMax = new Map<string, number>();
+  for (const s of bankSeries) {
+    for (const p of s.points) {
+      dateEntries.set(p.date, (dateEntries.get(p.date) ?? 0) + 1);
+      const curr = dateMax.get(p.date) ?? 0;
+      if (p.ttbuy > curr) dateMax.set(p.date, p.ttbuy);
+    }
+  }
+
+  const sortedDates = [...dateEntries.keys()].sort();
+  const firstValidDate = sortedDates.find(d => dateEntries.get(d)! >= majorityThreshold);
+  if (!firstValidDate) return null;
+  for (const date of dateMax.keys()) {
+    if (date < firstValidDate) dateMax.delete(date);
+  }
+
+  if (dateMax.size < 60) return null;
+
+  const totals = [0, 0, 0, 0];
+  const counts = [0, 0, 0, 0];
+  for (const [date, rate] of dateMax) {
+    const day = Number(date.split("-")[2]);
+    const slot = Math.min(Math.floor((day - 1) / 7), 3);
+    totals[slot] += rate;
+    counts[slot]++;
+  }
+
+  if (counts.some(c => c < 3)) return null;
+
+  const avgs = totals.map((t, i) => t / counts[i]);
+  const overallAvg = avgs.reduce((a, b) => a + b) / 4;
+  let bestSlot = 0;
+  for (let i = 1; i < 4; i++) {
+    if (avgs[i] > avgs[bestSlot]) bestSlot = i;
+  }
+
+  const diff = avgs[bestSlot] - overallAvg;
+  if (diff < 0.02) return null;
+  return { week: (bestSlot + 1) as 1 | 2 | 3 | 4, diffPaise: Math.round(diff * 100) };
+});
+
 function exportCsv() {
   const base = dateFilteredSeries.value.filter(s => s.category === "bank");
   const series = compareMode.value && compareSelected.value.size > 0
@@ -637,7 +690,7 @@ const stableBank = computed<StableBankResult | null>(() => {
 
     <section class="panel">
       <h2>Best value today</h2>
-      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
+      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
     </section>
 
     <section class="panel">

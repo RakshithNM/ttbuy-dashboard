@@ -10,6 +10,7 @@ const props = defineProps<{
   fees: FeesByBank;
   consistency: { bank: string; count: number; total: number; since: string | null } | null;
   dowInsight: { day: string; diffPaise: number } | null;
+  weekInsight: { week: 1 | 2 | 3 | 4; diffPaise: number } | null;
   range: string;
   todaySignal: {
     todayBest: number;
@@ -372,6 +373,21 @@ const bankStats = computed(() => {
       <span>
         Based on history, <strong>{{ currency }} rates tend to peak on {{ dowInsight.day }}s</strong>
         — avg ₹{{ (dowInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the weekly mean
+      </span>
+    </div>
+
+    <div v-if="weekInsight" class="week-callout" role="note">
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <rect x="1.5" y="2.5" width="13" height="12" rx="2" stroke-linejoin="round"/>
+        <line x1="5" y1="1" x2="5" y2="4"/>
+        <line x1="11" y1="1" x2="11" y2="4"/>
+        <line x1="1.5" y1="6.5" x2="14.5" y2="6.5"/>
+        <rect x="3.5" y="8.5" width="3" height="3" rx="0.5" fill="currentColor" stroke="none"/>
+      </svg>
+      <span>
+        Based on history, <strong>{{ currency }} rates tend to peak in
+        {{ ['the first', 'the second', 'the third', 'the last'][weekInsight.week - 1] }} week of the month</strong>
+        — avg ₹{{ (weekInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the monthly mean
       </span>
     </div>
 
@@ -1295,7 +1311,8 @@ const bankStats = computed(() => {
   }
 }
 
-.dow-callout {
+.dow-callout,
+.week-callout {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -1308,7 +1325,8 @@ const bankStats = computed(() => {
   color: var(--text-secondary);
   line-height: 1.4;
 
-  .dow-icon {
+  .dow-icon,
+  svg {
     flex: none;
     color: var(--accent);
     margin-top: 1px;
