@@ -1,14 +1,14 @@
 [build]
   base = "site"
-  command = "npm run build"
+  command = "npm --prefix ../netlify/functions install && npm run build"
   publish = "dist"
+  functions = "../netlify/functions"
 
 [build.environment]
   # VAPID public key is intentionally public — suppress secrets scanner false positive
   SECRETS_SCAN_OMIT_KEYS = "VAPID_PUBLIC_KEY"
 
 [functions]
-  directory = "netlify/functions"
   node_bundler = "nft"
 
 [[redirects]]
