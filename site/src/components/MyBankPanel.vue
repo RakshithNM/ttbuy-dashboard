@@ -198,7 +198,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
       <template v-else-if="stateKind === 'competitive'">
         <div class="mbp-headline">
           <svg class="st-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 8h12"/><path d="M2 5h12" opacity="0.35"/><path d="M2 11h12" opacity="0.35"/></svg>
-          <span>Your bank is <strong>close to the top</strong> — #{{ myRank }} of {{ rankedBanks.length }}</span>
+          <span>Your bank is <strong>close to the top</strong>, #{{ myRank }} of {{ rankedBanks.length }}</span>
         </div>
         <div class="mbp-stats">
           <span class="stat-rate">₹{{ mySnap.ttbuy.toFixed(2) }}</span>
@@ -216,7 +216,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
       <template v-else-if="stateKind === 'behind'">
         <div class="mbp-headline">
           <svg class="st-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v8"/><path d="M5 8l3 3 3-3"/></svg>
-          <span>Your bank is <strong>mid-table</strong> — #{{ myRank }} of {{ rankedBanks.length }} today</span>
+          <span>Your bank is <strong>mid-table</strong>, #{{ myRank }} of {{ rankedBanks.length }} today</span>
         </div>
         <div class="mbp-stats">
           <span class="stat-rate">₹{{ mySnap.ttbuy.toFixed(2) }}</span>
@@ -231,7 +231,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
       <template v-else-if="stateKind === 'lagging'">
         <div class="mbp-headline">
           <svg class="st-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v9"/><path d="M5 8l3 3 3-3"/><path d="M5 12l3 3 3-3"/></svg>
-          <span>Your bank is <strong>near the bottom</strong> — #{{ myRank }} of {{ rankedBanks.length }}</span>
+          <span>Your bank is <strong>near the bottom</strong>, #{{ myRank }} of {{ rankedBanks.length }}</span>
         </div>
         <div class="mbp-stats">
           <span class="stat-rate">₹{{ mySnap.ttbuy.toFixed(2) }}</span>
@@ -240,7 +240,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
           <span class="stat-for">on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}</span>
         </div>
         <div class="mbp-sub">
-          ₹{{ formatInr(gapToBest!) }} less than {{ shortName(bestSnap!.name) }} — switching banks would make a meaningful difference
+          ₹{{ formatInr(gapToBest!) }} less than {{ shortName(bestSnap!.name) }}. Switching banks would make a meaningful difference.
         </div>
       </template>
 
@@ -248,7 +248,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
       <template v-else-if="stateKind === 'stale'">
         <div class="mbp-headline">
           <svg class="st-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M8 1.5L1.5 13h13L8 1.5z" stroke-linejoin="round"/><line x1="8" y1="6" x2="8" y2="9.5"/><circle cx="8" cy="11.5" r="0.75" fill="currentColor" stroke="none"/></svg>
-          <span>Rate is <strong>{{ staleDays }} {{ staleDays === 1 ? 'day' : 'days' }} old</strong> ({{ fmtDate(mySnap.date) }}) — may not reflect today</span>
+          <span>Rate is <strong>{{ staleDays }} {{ staleDays === 1 ? 'day' : 'days' }} old</strong> ({{ fmtDate(mySnap.date) }}), may not reflect today</span>
         </div>
         <div class="mbp-stats">
           <span class="stat-rate">₹{{ mySnap.ttbuy.toFixed(2) }}</span>
