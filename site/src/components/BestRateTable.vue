@@ -18,6 +18,13 @@ const props = defineProps<{
     direction: "above" | "below" | "near";
     trend: "up" | "down" | "flat";
   } | null;
+  stableBank: {
+    bank: string;
+    color: string;
+    variation: number;
+    runner: { bank: string; variation: number } | null;
+    topN: number;
+  } | null;
 }>();
 
 const statPrefix = computed(() => {
@@ -381,6 +388,19 @@ const bankStats = computed(() => {
       </span>
     </div>
 
+    <div v-if="stableBank" class="stable-callout" role="note">
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1,11 5,7 9,9 15,4"/>
+        <line x1="1" y1="13" x2="15" y2="13"/>
+      </svg>
+      <span>
+        <strong :style="{ color: stableBank.color }">{{ shortName(stableBank.bank) }}</strong>
+        was the most consistent among the top {{ stableBank.topN }} banks —
+        rate varied by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
+          vs {{ shortName(stableBank.runner.bank) }}'s ₹{{ stableBank.runner.variation.toFixed(2) }}</template>
+      </span>
+    </div>
+
     <div class="table-wrap">
       <table class="best-rate-table">
         <caption>
@@ -738,6 +758,30 @@ const bankStats = computed(() => {
   .consistency-bank {
     font-weight: 600;
     color: var(--text-primary);
+  }
+}
+
+.stable-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  background: color-mix(in srgb, var(--text-muted) 8%, transparent);
+  border-left: 2px solid var(--text-muted);
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+
+  svg {
+    flex: none;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  strong {
+    font-weight: 600;
   }
 }
 

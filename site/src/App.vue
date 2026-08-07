@@ -489,6 +489,48 @@ const todaySignal = computed<TodaySignal | null>(() => {
 
   return { todayBest, avgBest, daysCount: dailyBests.length, direction, trend };
 });
+
+interface StableBankResult {
+  bank: string;
+  color: string;
+  variation: number;
+  runner: { bank: string; variation: number } | null;
+  topN: number;
+}
+
+// Among the top-N banks by average rate in the current period, find which had
+// the narrowest rate range (max - min). Only compares banks that actually
+// rated in the top tier — avoids naming a stable bank whose rates are low.
+const stableBank = computed<StableBankResult | null>(() => {
+  const bankSeries = filteredSeries.value.filter(
+    s => s.category === "bank" && s.points.length >= 3
+  );
+  if (bankSeries.length < 3) return null;
+
+  const topN = Math.min(5, bankSeries.length);
+  const candidates = [...bankSeries]
+    .map(s => ({
+      name: s.name,
+      color: s.color,
+      avg: s.points.reduce((sum, p) => sum + p.ttbuy, 0) / s.points.length,
+    }))
+    .sort((a, b) => b.avg - a.avg)
+    .slice(0, topN)
+    .map(({ name, color }) => {
+      const pts = bankSeries.find(b => b.name === name)!.points.map(p => p.ttbuy);
+      return { bank: name, color, variation: Math.max(...pts) - Math.min(...pts) };
+    })
+    .sort((a, b) => a.variation - b.variation);
+
+  if (candidates.length < 2) return null;
+  return {
+    bank: candidates[0].bank,
+    color: candidates[0].color,
+    variation: candidates[0].variation,
+    runner: candidates[1],
+    topN,
+  };
+});
 </script>
 
 <template>
@@ -595,7 +637,7 @@ const todaySignal = computed<TodaySignal | null>(() => {
 
     <section class="panel">
       <h2>Best value today</h2>
-      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" :range="range" :today-signal="todaySignal" />
+      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
     </section>
 
     <section class="panel">
