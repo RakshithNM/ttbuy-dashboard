@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import LineChart from "./components/LineChart.vue";
 import BestRateTable from "./components/BestRateTable.vue";
 import CalendarHeatmap from "./components/CalendarHeatmap.vue";
+import CurrencyOptimizer from "./components/CurrencyOptimizer.vue";
 import { brandColor, isPlatform, shortName, sortByBankOrder } from "./bankPalette";
 import { currencyName, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency } from "./types";
@@ -691,6 +692,10 @@ const stableBank = computed<StableBankResult | null>(() => {
     <section class="panel">
       <h2>Best value today</h2>
       <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
+    </section>
+
+    <section v-if="availableCurrencies.length > 1" class="panel">
+      <CurrencyOptimizer :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
     </section>
 
     <section class="panel">
