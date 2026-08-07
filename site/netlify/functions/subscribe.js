@@ -10,7 +10,7 @@ function subKey(endpoint) {
   return crypto.createHash("sha256").update(endpoint).digest("hex").slice(0, 20);
 }
 
-exports.handler = async (event) => {
+async function handle(event) {
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 204,
@@ -49,4 +49,17 @@ exports.handler = async (event) => {
   }
 
   return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: "Method not allowed" }) };
+}
+
+exports.handler = async (event) => {
+  try {
+    return await handle(event);
+  } catch (err) {
+    console.error("subscribe error:", err);
+    return {
+      statusCode: 500,
+      headers: CORS,
+      body: JSON.stringify({ error: err.message, stack: err.stack }),
+    };
+  }
 };
