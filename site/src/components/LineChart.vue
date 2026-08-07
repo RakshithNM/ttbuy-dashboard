@@ -226,15 +226,42 @@ function onTooltipPointerLeave() {
   scheduleHoverClear();
 }
 
+const SPIKE_THRESHOLD = 0.4;
+
+interface SpikePoint {
+  date: string;
+  bank: string;
+  color: string;
+  delta: number;
+  ttbuy: number;
+}
+
+const spikePoints = computed<SpikePoint[]>(() => {
+  const result: SpikePoint[] = [];
+  for (const s of visibleSeries.value) {
+    const sorted = [...s.points].sort((a, b) => a.date.localeCompare(b.date));
+    for (let i = 1; i < sorted.length; i++) {
+      const delta = sorted[i].ttbuy - sorted[i - 1].ttbuy;
+      if (Math.abs(delta) >= SPIKE_THRESHOLD) {
+        result.push({ date: sorted[i].date, bank: s.name, color: s.color, delta, ttbuy: sorted[i].ttbuy });
+      }
+    }
+  }
+  return result;
+});
+
 const tooltipRows = computed(() => {
   if (!hoverDate.value) return [];
   const d = hoverDate.value;
+  const spikesOnDate = new Map(spikePoints.value.filter((sp) => sp.date === d).map((sp) => [sp.bank, sp.delta]));
   return visibleSeries.value
     .map((s) => {
       const point = s.points.find((p) => p.date === d);
-      return point ? { name: s.name, color: s.color, value: point.ttbuy } : null;
+      return point
+        ? { name: s.name, color: s.color, value: point.ttbuy, delta: spikesOnDate.get(s.name) ?? null }
+        : null;
     })
-    .filter((r): r is { name: string; color: string; value: number } => r !== null)
+    .filter((r): r is { name: string; color: string; value: number; delta: number | null } => r !== null)
     .sort((a, b) => b.value - a.value);
 });
 
@@ -414,6 +441,21 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
         </template>
       </g>
 
+      <!-- spike annotations: big single-day moves >= ₹0.50 -->
+      <g aria-hidden="true">
+        <circle
+          v-for="spike in spikePoints"
+          :key="`spike-${spike.bank}-${spike.date}`"
+          :cx="xScale(spike.date)"
+          :cy="yScale(spike.ttbuy)"
+          r="5.5"
+          :fill="spike.color"
+          stroke="var(--surface-1)"
+          stroke-width="2"
+          class="spike-circle"
+        />
+      </g>
+
       <!-- crosshair -->
       <g v-if="hoverDate">
         <line :x1="tooltipX" :x2="tooltipX" :y1="MARGIN.top" :y2="H - MARGIN.bottom" class="crosshair" />
@@ -441,6 +483,9 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
       <div v-for="row in tooltipRows" :key="row.name" class="tooltip-row">
         <span class="line-key" :style="{ background: row.color }" aria-hidden="true"></span>
         <span class="tooltip-name">{{ row.name }}</span>
+        <span v-if="row.delta !== null" class="tooltip-delta" :class="row.delta > 0 ? 'up' : 'down'">
+          {{ row.delta > 0 ? "+" : "" }}{{ row.delta.toFixed(2) }}
+        </span>
         <span class="tooltip-value">{{ row.value.toFixed(2) }}</span>
       </div>
     </div>
@@ -645,6 +690,24 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
   color: var(--text-primary);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+.tooltip-delta {
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  margin-right: 2px;
+
+  &.up {
+    color: #22c55e;
+  }
+  &.down {
+    color: var(--status-critical);
+  }
+}
+
+.spike-circle {
+  pointer-events: none;
 }
 
 .table-wrap {
