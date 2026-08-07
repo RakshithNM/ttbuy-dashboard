@@ -11,10 +11,7 @@ const props = defineProps<{
 }>();
 
 const DEFAULT_AMOUNTS: Record<string, number> = {
-  USD: 1000,
-  GBP: 800,
-  EUR: 900,
-  AED: 3600,
+  USD: 1000, GBP: 800, EUR: 900, AED: 3600,
 };
 
 const amounts = ref<Record<string, string>>(
@@ -28,6 +25,20 @@ function feeFromSlabs(slabs: FeeSlab[], grossInr: number): number {
   return 0;
 }
 
+interface CurrencyBest {
+  currency: string;
+  symbol: string;
+  inputAmount: number;
+  bank: string;
+  color: string;
+  category: "bank" | "platform";
+  ttbuy: number;
+  feeInr: number;
+  feeUnknown: boolean;
+  netInr: number;
+  alsoWins: string[];
+}
+
 interface Combo {
   rank: number;
   currency: string;
@@ -35,7 +46,6 @@ interface Combo {
   color: string;
   category: "bank" | "platform";
   ttbuy: number;
-  grossInr: number;
   feeInr: number;
   feeUnknown: boolean;
   netInr: number;
@@ -43,7 +53,67 @@ interface Combo {
   gapToTop: number;
 }
 
+const activeCurrencies = computed(() =>
+  props.currencies.filter(c => {
+    const v = parseFloat(amounts.value[c] ?? "");
+    return Number.isFinite(v) && v > 0;
+  })
+);
+
+const perCurrencyBest = computed<CurrencyBest[]>(() => {
+  const bests: Omit<CurrencyBest, "alsoWins">[] = [];
+
+  for (const currency of activeCurrencies.value) {
+    const amt = parseFloat(amounts.value[currency] ?? "");
+    if (!Number.isFinite(amt) || amt <= 0) continue;
+
+    const bankRates = props.rawRates[currency] ?? {};
+    let best: Omit<CurrencyBest, "alsoWins"> | null = null;
+
+    for (const [bank, points] of Object.entries(bankRates)) {
+      if (!points.length || isPlatform(bank)) continue;
+      const latest = points[points.length - 1];
+      const grossInr = latest.ttbuy * amt;
+      const fee = props.fees[bank];
+      const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
+      const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, grossInr) : (fee?.fee_inr ?? 0);
+      const netInr = grossInr - feeInr;
+
+      if (!best || netInr > best.netInr) {
+        best = {
+          currency,
+          symbol: currencySymbol(currency),
+          inputAmount: amt,
+          bank,
+          color: brandColor(bank),
+          category: "bank",
+          ttbuy: latest.ttbuy,
+          feeInr,
+          feeUnknown,
+          netInr,
+        };
+      }
+    }
+
+    if (best) bests.push(best);
+  }
+
+  const bankWins = new Map<string, string[]>();
+  for (const b of bests) {
+    if (!bankWins.has(b.bank)) bankWins.set(b.bank, []);
+    bankWins.get(b.bank)!.push(b.currency);
+  }
+
+  return bests.map(b => ({
+    ...b,
+    alsoWins: (bankWins.get(b.bank) ?? []).filter(c => c !== b.currency),
+  }));
+});
+
+const showAllCombos = ref(false);
+
 const sortedCombos = computed<Combo[]>(() => {
+  if (!showAllCombos.value) return [];
   const raw: Omit<Combo, "rank" | "gapToTop">[] = [];
 
   for (const currency of props.currencies) {
@@ -52,26 +122,18 @@ const sortedCombos = computed<Combo[]>(() => {
 
     const bankRates = props.rawRates[currency] ?? {};
     for (const [bank, points] of Object.entries(bankRates)) {
-      if (!points.length) continue;
+      if (!points.length || isPlatform(bank)) continue;
       const latest = points[points.length - 1];
-      const isPlat = isPlatform(bank);
       const grossInr = latest.ttbuy * amt;
       const fee = props.fees[bank];
-      const feeUnknown = !isPlat && !fee?.fee_slabs && fee?.fee_inr == null;
-      const feeInr = isPlat ? 0
-        : fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, grossInr)
-        : (fee?.fee_inr ?? 0);
+      const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
+      const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, grossInr) : (fee?.fee_inr ?? 0);
       raw.push({
-        currency,
-        bank,
+        currency, bank,
         color: brandColor(bank),
-        category: isPlat ? "platform" : "bank",
-        ttbuy: latest.ttbuy,
-        grossInr,
-        feeInr,
-        feeUnknown,
-        netInr: grossInr - feeInr,
-        inputAmount: amt,
+        category: "bank",
+        ttbuy: latest.ttbuy, feeInr, feeUnknown,
+        netInr: grossInr - feeInr, inputAmount: amt,
       });
     }
   }
@@ -81,19 +143,6 @@ const sortedCombos = computed<Combo[]>(() => {
   return raw.map((r, i) => ({ ...r, rank: i + 1, gapToTop: topNet - r.netInr }));
 });
 
-const activeCurrencies = computed(() =>
-  props.currencies.filter(c => {
-    const v = parseFloat(amounts.value[c] ?? "");
-    return Number.isFinite(v) && v > 0;
-  })
-);
-
-const showAll = ref(false);
-const PREVIEW_COUNT = 8;
-const displayedCombos = computed(() =>
-  showAll.value ? sortedCombos.value : sortedCombos.value.slice(0, PREVIEW_COUNT)
-);
-
 function formatInr(n: number): string {
   return "₹" + Math.round(n).toLocaleString("en-IN");
 }
@@ -102,10 +151,8 @@ function formatInr(n: number): string {
 <template>
   <div class="optimizer">
     <div class="optimizer-header">
-      <div>
-        <h2 class="optimizer-title">Currency optimizer</h2>
-        <p class="optimizer-sub">Enter the amount your sender could wire in each currency — see which combination puts the most rupees in your account.</p>
-      </div>
+      <h2 class="optimizer-title">Currency optimizer</h2>
+      <p class="optimizer-sub">Enter the amount for each currency to see which bank gives you the most rupees.</p>
     </div>
 
     <div class="amount-row">
@@ -130,59 +177,97 @@ function formatInr(n: number): string {
     </div>
 
     <template v-else>
-      <div class="results-wrap">
+      <div class="results-wrap summary-wrap">
         <table class="results-table">
           <thead>
             <tr>
-              <th class="col-rank">#</th>
-              <th>Bank</th>
               <th class="col-ccy">Currency</th>
-              <th class="col-num">Rate</th>
+              <th>Best bank</th>
+              <th class="col-num">TT Buy</th>
               <th class="col-num">You receive</th>
-              <th class="col-num">vs best</th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="row in displayedCombos"
-              :key="`${row.currency}-${row.bank}`"
-              :class="{ winner: row.rank === 1 }"
-            >
-              <td class="col-rank">
-                <span v-if="row.rank === 1" class="winner-badge" aria-label="Best combination">★</span>
-                <span v-else class="rank-num">{{ row.rank }}</span>
+            <tr v-for="best in perCurrencyBest" :key="best.currency">
+              <td class="col-ccy">
+                <span class="ccy-pill">{{ best.currency }}</span>
+                <span class="rate-detail">{{ best.symbol }}{{ best.inputAmount.toLocaleString("en-IN") }}</span>
               </td>
               <td class="col-bank">
-                <span class="bank-dot" :style="{ background: row.color }" aria-hidden="true"></span>
-                {{ shortName(row.bank) }}
-                <span v-if="row.category === 'platform'" class="platform-tag">platform</span>
+                <span class="bank-dot" :style="{ background: best.color }" aria-hidden="true"></span>
+                <span class="bank-name-text">{{ shortName(best.bank) }}</span>
+                <span v-if="best.alsoWins.length" class="also-wins">also best for {{ best.alsoWins.join(', ') }}</span>
               </td>
-              <td class="col-ccy">
-                <span class="ccy-pill">{{ row.currency }}</span>
-                <span class="rate-detail">{{ currencySymbol(row.currency) }}{{ row.inputAmount.toLocaleString("en-IN") }}</span>
-              </td>
-              <td class="col-num">₹{{ row.ttbuy.toFixed(2) }}</td>
+              <td class="col-num">₹{{ best.ttbuy.toFixed(2) }}</td>
               <td class="col-num col-receive">
-                {{ formatInr(row.netInr) }}
-                <span v-if="row.feeUnknown" class="approx-mark" title="Fee unknown — shown without deduction">≈</span>
-              </td>
-              <td class="col-num col-gap">
-                <span v-if="row.rank === 1" class="dash">—</span>
-                <span v-else class="gap-value">−{{ formatInr(row.gapToTop) }}</span>
+                {{ formatInr(best.netInr) }}
+                <span v-if="best.feeUnknown" class="approx-mark" title="Fee unknown, shown without deduction">≈</span>
               </td>
             </tr>
           </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="3" class="total-label">Total</td>
+              <td class="col-num total-value">{{ formatInr(perCurrencyBest.reduce((s, b) => s + b.netInr, 0)) }}</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 
-      <button
-        v-if="sortedCombos.length > PREVIEW_COUNT"
-        type="button"
-        class="show-all-btn"
-        @click="showAll = !showAll"
-      >
-        {{ showAll ? "Show less" : `Show all ${sortedCombos.length} combinations` }}
+      <button type="button" class="show-all-btn" @click="showAllCombos = !showAllCombos">
+        {{ showAllCombos ? "Hide all combinations" : "Compare all combinations" }}
       </button>
+
+      <div v-if="showAllCombos" class="all-combos-wrap">
+        <div class="results-wrap">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th class="col-rank">#</th>
+                <th>Bank</th>
+                <th class="col-ccy">Currency</th>
+                <th class="col-num">Rate</th>
+                <th class="col-num">You receive</th>
+                <th class="col-num">vs best</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="row in sortedCombos"
+                :key="`${row.currency}-${row.bank}`"
+                :class="{ winner: row.rank === 1 }"
+              >
+                <td class="col-rank">
+                  <span v-if="row.rank === 1" class="winner-badge" aria-label="Best combination">
+                    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                      <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                  <span v-else class="rank-num">{{ row.rank }}</span>
+                </td>
+                <td class="col-bank">
+                  <span class="bank-dot" :style="{ background: row.color }" aria-hidden="true"></span>
+                  {{ shortName(row.bank) }}
+                  <span v-if="row.category === 'platform'" class="platform-tag">platform</span>
+                </td>
+                <td class="col-ccy">
+                  <span class="ccy-pill">{{ row.currency }}</span>
+                  <span class="rate-detail">{{ currencySymbol(row.currency) }}{{ row.inputAmount.toLocaleString("en-IN") }}</span>
+                </td>
+                <td class="col-num">₹{{ row.ttbuy.toFixed(2) }}</td>
+                <td class="col-num col-receive">
+                  {{ formatInr(row.netInr) }}
+                  <span v-if="row.feeUnknown" class="approx-mark" title="Fee unknown — shown without deduction">≈</span>
+                </td>
+                <td class="col-num col-gap">
+                  <span v-if="row.rank === 1" class="dash">—</span>
+                  <span v-else class="gap-value">−{{ formatInr(row.gapToTop) }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </template>
   </div>
 </template>
@@ -222,6 +307,7 @@ function formatInr(n: number): string {
   flex-direction: column;
   gap: 5px;
   cursor: default;
+  flex: 1;
 }
 
 .currency-label {
@@ -288,6 +374,10 @@ function formatInr(n: number): string {
   border-radius: 8px;
 }
 
+.all-combos-wrap {
+  margin-top: 12px;
+}
+
 .results-table {
   width: 100%;
   border-collapse: collapse;
@@ -340,6 +430,7 @@ function formatInr(n: number): string {
   align-items: center;
   gap: 7px;
   color: var(--text-primary);
+  flex-wrap: wrap;
 }
 
 .bank-dot {
@@ -347,6 +438,16 @@ function formatInr(n: number): string {
   height: 8px;
   border-radius: 50%;
   flex: none;
+}
+
+.bank-name-text {
+  flex: none;
+}
+
+.also-wins {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 .platform-tag {
@@ -381,9 +482,16 @@ function formatInr(n: number): string {
   font-size: 12px;
 }
 
+.col-receive {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .winner-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--status-good);
-  font-size: 13px;
 }
 
 .rank-num {
@@ -404,6 +512,36 @@ function formatInr(n: number): string {
 
 .gap-value {
   color: var(--text-muted);
+}
+
+.summary-wrap .results-table {
+  tbody td { border-bottom: none; }
+  tbody tr { border-bottom: 1px solid var(--gridline); }
+  tbody tr:last-child { border-bottom: none; }
+}
+
+.total-row {
+  td {
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
+
+.total-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.total-value {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .show-all-btn {

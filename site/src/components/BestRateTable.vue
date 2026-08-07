@@ -328,7 +328,7 @@ const bankStats = computed(() => {
         Best bank beats worst by
         <span class="spread-rate">₹{{ rateSpread.rateGap.toFixed(2) }}/{{ currency }}</span>
         <template v-if="rateSpread.receiveGap !== null">
-          — <span class="spread-amount">₹{{ formatInr(rateSpread.receiveGap) }} more</span>
+          , or <span class="spread-amount">₹{{ formatInr(rateSpread.receiveGap) }} more</span>
           on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}
         </template>
       </span>
@@ -345,7 +345,7 @@ const bankStats = computed(() => {
         <strong>₹{{ todaySignal.todayBest.toFixed(2) }}</strong>
         is {{ todaySignal.direction === 'above' ? 'above' : todaySignal.direction === 'below' ? 'below' : 'near' }}
         the {{ todaySignal.daysCount }}-day average
-        <strong>₹{{ todaySignal.avgBest.toFixed(2) }}</strong><template v-if="todaySignal.trend === 'up'"> — rates have been rising</template><template v-else-if="todaySignal.trend === 'down'"> — rates have been declining</template>
+        <strong>₹{{ todaySignal.avgBest.toFixed(2) }}</strong><template v-if="todaySignal.trend === 'up'">. Rates have been rising.</template><template v-else-if="todaySignal.trend === 'down'"> Rates have been falling.</template>
       </span>
     </div>
 
@@ -358,7 +358,7 @@ const bankStats = computed(() => {
       <span>
         Rate data for
         <strong>{{ staleBanks.slice(0, 3).map(r => shortName(r.bank)).join(', ') }}<template v-if="staleBanks.length > 3"> +{{ staleBanks.length - 3 }} more</template></strong>
-        is from {{ formatDate(staleBanks[0].date) }} — may not reflect today's rate
+        is from {{ formatDate(staleBanks[0].date) }} and may not reflect today's rate
       </span>
     </div>
 
@@ -371,8 +371,8 @@ const bankStats = computed(() => {
         <circle cx="8" cy="10.5" r="1.2" fill="currentColor"/>
       </svg>
       <span>
-        Based on history, <strong>{{ currency }} rates tend to peak on {{ dowInsight.day }}s</strong>
-        — avg ₹{{ (dowInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the weekly mean
+        Based on history, <strong>{{ currency }} rates tend to peak on {{ dowInsight.day }}s</strong>,
+        averaging ₹{{ (dowInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the weekly mean
       </span>
     </div>
 
@@ -386,8 +386,8 @@ const bankStats = computed(() => {
       </svg>
       <span>
         Based on history, <strong>{{ currency }} rates tend to peak in
-        {{ ['the first', 'the second', 'the third', 'the last'][weekInsight.week - 1] }} week of the month</strong>
-        — avg ₹{{ (weekInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the monthly mean
+        {{ ['the first', 'the second', 'the third', 'the last'][weekInsight.week - 1] }} week of the month</strong>,
+        averaging ₹{{ (weekInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the monthly mean
       </span>
     </div>
 
@@ -400,7 +400,7 @@ const bankStats = computed(() => {
       </svg>
       <span>
         <span class="consistency-bank">{{ shortName(consistency.bank) }}</span>
-        had the best {{ currency }} rate most often — {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}<template v-if="sinceLabel"> since {{ sinceLabel }}</template>
+        had the best {{ currency }} rate most often: {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}<template v-if="sinceLabel"> since {{ sinceLabel }}</template>
       </span>
     </div>
 
@@ -411,8 +411,8 @@ const bankStats = computed(() => {
       </svg>
       <span>
         <strong :style="{ color: stableBank.color }">{{ shortName(stableBank.bank) }}</strong>
-        had the most stable rate among the top {{ stableBank.topN }} banks —
-        varied by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
+        had the most stable rate among the top {{ stableBank.topN }} banks,
+        varying by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
           vs {{ shortName(stableBank.runner.bank) }}'s ₹{{ stableBank.runner.variation.toFixed(2) }}</template>
       </span>
     </div>
@@ -1317,10 +1317,10 @@ const bankStats = computed(() => {
   align-items: flex-start;
   gap: 8px;
   margin: 0 0 8px;
-  padding: 8px 12px;
-  background: color-mix(in srgb, var(--accent) 6%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
-  border-radius: 6px;
+  padding: 9px 12px;
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 0 6px 6px 0;
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.4;
@@ -1330,6 +1330,7 @@ const bankStats = computed(() => {
     flex: none;
     color: var(--accent);
     margin-top: 1px;
+    opacity: 0.7;
   }
 
   strong {
