@@ -20,32 +20,60 @@ and over time.
 
 ## What the dashboard does
 
-- **Compares TT Buy rates across ~22 Indian banks** side by side, for four
-  currencies: USD, GBP, EUR, and AED.
-- **"Best value today" table** — banks ranked by what you'd actually receive
-  after each bank's own inward remittance fee (where known), not just the raw
-  rate, so a higher TT Buy rate can still lose to a lower-fee bank here.
-- **Amount calculator** — enter how much you're receiving and see exactly how
-  many net rupees each bank would credit you, plus how much less you'd get
-  from every other bank vs. the best one.
-- **Day-over-day change** (▲/▼) on each bank's rate, shown only when there's
-  an actual previous-day rate to compare against (no misleading comparisons
-  across a gap in the data).
-- **Historical chart and table** of every bank's rate over time, with quick
-  filters for last 7/30/90 days, last year, or all time.
-- **Search** to quickly find a specific bank in a long list.
-- **Remembers your last view** (currency, date range, chart vs. table) the
-  next time you visit.
-- **Shareable links** — the URL always reflects the current currency, date
-  range, chart/table toggle, and calculator amount, and a "Copy link" button
-  copies it — so you can send someone the exact view you're looking at.
-- **Updates automatically every day** at 11 AM IST — no one has to run
-  anything manually for the site to stay current.
-- **Inward remittance fee info** — a small ⓘ next to a bank's name shows what
-  it actually charges to receive the money (or, for a few banks whose fee
-  schedules aren't publicly reachable, a note explaining why). Banks with an
-  unconfirmed fee are marked with "≈" in the amount column — that number is
-  the gross conversion only, not a guarantee.
+### Best value today
+
+The first thing you see is a ranked table of every bank's current TT Buy rate for the selected currency.
+
+- **Ranked by net receive, not raw rate** — banks are sorted by what you'd actually receive after each bank's own inward remittance fee (where known). A bank with a slightly lower rate but zero fee can rank above one with a higher rate but a large flat fee.
+- **Amount calculator** — type how much you're receiving (e.g. $1,000) and every row updates instantly: you see the exact rupees credited at each bank and how much less you'd get vs. the best option.
+- **Day-over-day change** (▲/▼) — shows how each bank's rate moved since yesterday. Only shown when there's an actual previous-day reading to compare against.
+- **Fee info** — a small ⓘ next to a bank's name expands a tooltip showing that bank's published inward remittance fee schedule (flat fee, or tiered by amount). Banks whose fee schedule isn't publicly reachable are marked "≈" — that number is gross conversion only, not guaranteed net.
+- **Insight badges** — below the table, the dashboard surfaces data-driven signals:
+  - *Best rate most often* — which bank led the most days in the current period.
+  - *Today's rate vs recent average* — whether today's best rate is above, near, or below the 7-day average, and which direction rates are trending.
+  - *Most stable bank* — among the top-5 banks by average rate, which had the narrowest rate range (useful if you're timing a transfer and want predictability).
+  - *Best day of the week* — if the data shows a statistically meaningful day-of-week pattern (requires ~2 weeks of history), it surfaces it.
+
+### Currency optimizer
+
+Covers all four currencies (USD, GBP, EUR, AED) at once on one screen.
+
+- **Forward mode** — enter amounts for each currency (e.g. $1,000, £800) and see the single best bank for each one: TT Buy rate, fee deducted, and net rupees received.
+- **Reverse mode** — flip to "Foreign → ₹" and enter a target INR amount (e.g. ₹1,50,000). The optimizer finds the bank that minimises how much foreign currency you need to send to clear that target after fees.
+
+### Bank head-to-head
+
+Pick any two banks and see how they stack up across all four currencies in one table.
+
+- Each row is a currency; columns show each bank's TT Buy rate and the net rupees you'd receive at the default transfer amount.
+- The **Advantage** column shows which bank wins that currency and by how much (e.g. "+₹1,525"), colored with that bank's brand color.
+- A one-line **verdict** at the bottom summarises who wins overall: "IOB wins USD and GBP. PNB wins EUR and AED."
+- A **swap button** between the two selectors reverses the comparison without re-selecting.
+
+### Historical chart and table
+
+- Plots every bank's TT Buy rate over time on a single chart, color-coded by bank.
+- **Spike annotations** — dates where any bank's rate moved by more than ₹0.40 in a single day are marked with a filled circle on the chart. Hover a spike to see the exact move in the tooltip (e.g. "▲ ₹0.46").
+- **Compare mode** — click "Compare" to enter a multi-select picker. Choose up to 4 banks to overlay; all other banks drop off the chart so the comparison stays readable.
+- **Date range filters** — Last 7 days / 30 days / 90 days / 1 year / All time.
+- **Toggle between chart and table** — the table view shows the same data as rows and columns, useful for exact figures.
+- **CSV export** — downloads the currently visible data (selected currency, date range, banks) as a spreadsheet.
+- **Search** — type a bank name or abbreviation (e.g. "SBI" finds "State Bank of India") to filter the bank list.
+
+### Best bank per day calendar
+
+A compact calendar heatmap where each day is colored by which bank had the highest TT Buy rate that day. Useful for spotting patterns — whether a particular bank consistently led on certain days, or whether there's a clear seasonal or weekly rhythm in who comes out on top.
+
+### Shareable links and persistence
+
+- **The URL always reflects your current view** — currency, date range, chart/table toggle, and calculator amount are all kept in the query string. Copy the URL from the address bar at any time to share the exact view you're looking at.
+- **"Copy link" / "Share" button** — one click copies the URL to the clipboard (or triggers the native share sheet on mobile).
+- **Remembers your last view** — the currency, date range, and toggle state are saved in `localStorage` so the next visit picks up where you left off. A shared link overrides saved state, so the recipient sees what you sent them, not their own saved settings.
+- **Light / dark mode** — toggle at the top right. Preference is saved and applied before the first paint so there's no flash.
+
+### Data freshness
+
+The scraper runs automatically every day at 11 AM IST (with a 16:00 IST retry). The "Data last updated" line at the top of the page shows the most recent date present in the data.
 
 ## Layout
 
