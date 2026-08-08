@@ -9,7 +9,7 @@ import WhatIfMachine from "./components/WhatIfMachine.vue";
 import MyBankPanel from "./components/MyBankPanel.vue";
 import { brandColor, isPlatform, shortName, sortByBankOrder } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
-import { currencyName, sortByCurrencyOrder } from "./currencies";
+import { sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
 
 const rawRates = ref<RatesByCurrency>({});
