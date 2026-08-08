@@ -42,6 +42,14 @@ const noDataSeries = computed(() =>
   props.series.filter((s) => !props.hidden.has(s.name) && s.points.length === 0)
 );
 
+const legendGroups = computed(() => {
+  return [
+    { label: "Benchmarks", series: props.series.filter(s => s.category === "benchmark") },
+    { label: "Platforms", series: props.series.filter(s => s.category === "platform") },
+    { label: "Banks", series: props.series.filter(s => s.category === "bank") }
+  ].filter(g => g.series.length > 0);
+});
+
 const allDates = computed(() => {
   const set = new Set<string>();
   for (const s of visibleSeries.value) for (const p of s.points) set.add(p.date);
@@ -371,24 +379,29 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
 
 <template>
   <div class="line-chart">
-    <div v-if="!showTable && !compareMode" class="legend" role="group" aria-label="Toggle banks">
-      <button
-        v-for="s in series"
-        :key="s.name"
-        type="button"
-        class="legend-item"
-        :class="{ dim: hidden.has(s.name) }"
-        :aria-pressed="!hidden.has(s.name)"
-        @click="emit('toggle', s.name)"
-      >
-        <span
-          class="key"
-          :class="{ wrapped: s.wrapped }"
-          :style="{ background: s.color, borderColor: s.color }"
-          aria-hidden="true"
-        ></span>
-        {{ s.name }}
-      </button>
+    <div v-if="!showTable && !compareMode" class="legend-container" role="group" aria-label="Toggle banks">
+      <div v-for="group in legendGroups" :key="group.label" class="legend-group">
+        <span class="legend-group-label">{{ group.label }}</span>
+        <div class="legend-items">
+          <button
+            v-for="s in group.series"
+            :key="s.name"
+            type="button"
+            class="legend-item"
+            :class="{ dim: hidden.has(s.name) }"
+            :aria-pressed="!hidden.has(s.name)"
+            @click="emit('toggle', s.name)"
+          >
+            <span
+              class="key"
+              :class="{ wrapped: s.wrapped, dashed: s.category === 'benchmark' }"
+              :style="{ background: s.category === 'benchmark' || s.wrapped ? 'transparent' : s.color, borderColor: s.color }"
+              aria-hidden="true"
+            ></span>
+            {{ s.name }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <div v-if="!showTable" ref="chartFrame" class="chart-frame" @scroll="onFrameScroll">
@@ -575,12 +588,35 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
   position: relative;
 }
 
-.legend {
+.legend-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.legend-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.legend-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding-top: 6px;
+  width: 75px;
+  flex: none;
+}
+
+.legend-items {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 14px;
-  margin-bottom: 12px;
 }
 
 .legend-item {
@@ -604,7 +640,7 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
     border-radius: 2px;
     display: inline-block;
 
-    &.wrapped {
+    &.wrapped, &.dashed {
       height: 0;
       border-top: 3px dashed;
       border-radius: 0;
