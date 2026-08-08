@@ -1106,7 +1106,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     flex: 1;
     min-width: 180px;
     border-left: 1px solid var(--gridline);
-    padding: 0 0 0 20px;
+    padding: 0 20px 0 20px;
   }
 
   .detail-fee-title {
