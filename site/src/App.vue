@@ -464,6 +464,30 @@ const lastUpdatedFormatted = computed(() => {
   return `${MONTHS[month - 1]} ${day}, ${year}`;
 });
 
+// Spread between the best and worst bank rate on the most recent day with
+// majority bank coverage — powers the stakes line in the hero.
+const bestVsWorstToday = computed<number | null>(() => {
+  const bankSeries = allSeries.value.filter(s => s.category === "bank");
+  if (!bankSeries.length) return null;
+  const dateCount = new Map<string, number>();
+  for (const s of bankSeries) {
+    for (const p of s.points) dateCount.set(p.date, (dateCount.get(p.date) ?? 0) + 1);
+  }
+  const majority = Math.floor(bankSeries.length / 2) + 1;
+  const latest = [...dateCount.entries()]
+    .filter(([, n]) => n >= majority)
+    .map(([d]) => d)
+    .sort()
+    .at(-1);
+  if (!latest) return null;
+  const rates = bankSeries
+    .map(s => s.points.find(p => p.date === latest)?.ttbuy)
+    .filter((r): r is number => r !== undefined);
+  if (rates.length < 2) return null;
+  const spread = Math.max(...rates) - Math.min(...rates);
+  return spread >= 0.01 ? spread : null;
+});
+
 interface ConsistencyResult { bank: string; count: number; total: number; since: string | null }
 
 const consistencyBadge = computed<ConsistencyResult | null>(() => {
@@ -601,15 +625,19 @@ const stableBank = computed<StableBankResult | null>(() => {
 <template>
   <header class="page-header">
     <p class="eyebrow">Inward remittance rates</p>
-    <h1>{{ currency }} TT Buy rate by Indian banks</h1>
+    <h1>Which Indian bank pays you the most for your {{ currency }} transfer?</h1>
     <p class="lede">
-      TT Buy is the rate a bank credits you at when you receive a foreign inward
-      (telegraphic transfer) remittance. A higher TT Buy means more rupees for the
-      same {{ currencyName(currency) }} amount. Rates below are scraped directly from
-      each bank's public forex rate page.
+      When someone sends you {{ currency }} from abroad, your bank converts it to rupees
+      at its own TT Buy rate — and every bank sets this independently. We scrape those
+      rates from 22+ banks' public forex pages daily so you can see who pays the most
+      right now.
+    </p>
+    <p v-if="!loading && bestVsWorstToday !== null" class="stakes-line">
+      Today on {{ currency }} {{ amount.toLocaleString('en-IN') }}: the best bank pays
+      ₹{{ Math.round((bestVsWorstToday || 0) * amount).toLocaleString('en-IN') }} more than the worst.
     </p>
     <p v-if="lastUpdated" class="updated">
-      Data last updated {{ lastUpdatedFormatted }}. Updated daily at 11 AM IST.
+      Rates last updated {{ lastUpdatedFormatted }}. Updated daily at 11 AM IST.
     </p>
   </header>
 
@@ -782,9 +810,12 @@ const stableBank = computed<StableBankResult | null>(() => {
   <p v-else class="loading">Loading rates…</p>
 
   <footer class="site-footer">
-    Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a>
-    <span class="footer-sep">·</span>
-    <a href="https://bellare.gumroad.com/l/tiffp" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
+    <div class="footer-main">
+      Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a>
+      <span class="footer-sep">·</span>
+      <a href="https://bellare.gumroad.com/l/tiffp" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
+    </div>
+    <div class="footer-disclaimer">Data scraped from public bank pages · Not affiliated with any bank</div>
   </footer>
 </template>
 
@@ -810,6 +841,13 @@ const stableBank = computed<StableBankResult | null>(() => {
     max-width: 640px;
     line-height: 1.5;
     margin: 0 0 8px;
+  }
+
+  .stakes-line {
+    margin: 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--status-good);
   }
 
   .updated {
@@ -1247,6 +1285,20 @@ const stableBank = computed<StableBankResult | null>(() => {
     height: 1px;
     background: var(--border);
     transform: translateX(-50%);
+  }
+
+  .footer-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .footer-disclaimer {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-muted);
+    opacity: 0.7;
   }
 
   .footer-sep {
