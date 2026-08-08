@@ -262,6 +262,8 @@ function daysAgo(dateStr: string): string {
   background: var(--surface-1);
   cursor: pointer;
   height: 32px;
+  min-width: 0;
+  box-sizing: border-box;
 
   &:focus {
     outline: 2px solid var(--accent);
