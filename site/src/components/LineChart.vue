@@ -49,7 +49,18 @@ const allDates = computed(() => {
 const xDomain = computed<[number, number]>(() => {
   if (allDates.value.length === 0) return [0, 1];
   const times = allDates.value.map((d) => new Date(d).getTime());
-  return [Math.min(...times), Math.max(...times)];
+  const msPerDay = 86_400_000;
+  let dataMax = Math.max(...times);
+
+  // Extend the right edge through any immediately-following weekend days so
+  // the chart shows WHY data stops (closed) rather than silently cutting off.
+  let next = new Date(dataMax + msPerDay);
+  while (next.getUTCDay() === 0 || next.getUTCDay() === 6) {
+    dataMax = next.getTime();
+    next = new Date(dataMax + msPerDay);
+  }
+
+  return [Math.min(...times), dataMax];
 });
 
 function niceNum(range: number, round: boolean): number {
@@ -91,13 +102,37 @@ const yTicks = computed<number[]>(() => {
   return ticks;
 });
 
+// Dates where more than half of visible series have a data point — excludes
+// weekend-only platform dates so they don't pollute the axis on short ranges.
+const majorityDates = computed<string[]>(() => {
+  const total = visibleSeries.value.length;
+  if (total === 0) return [];
+  const half = total / 2;
+  return allDates.value.filter((date) => {
+    let count = 0;
+    for (const s of visibleSeries.value) {
+      if (s.points.some((p) => p.date === date)) {
+        count++;
+        if (count > half) return true;
+      }
+    }
+    return false;
+  });
+});
+
 const xTicks = computed<string[]>(() => {
   if (allDates.value.length === 0) return [];
   const [d0, d1] = xDomain.value;
   if (d0 === d1) return [allDates.value[0]];
 
-  // Space ticks evenly across the time domain (not by data-point index) so
-  // labels never cluster where points happen to be dense.
+  // For short windows show one tick per well-covered date (no weekend gaps).
+  // For longer windows space ticks evenly so labels don't crowd each other.
+  const spanDays = (d1 - d0) / 86_400_000;
+  if (spanDays <= 14) {
+    const dates = majorityDates.value;
+    return dates.length > 0 ? dates : allDates.value;
+  }
+
   const count = 6;
   const ticks: string[] = [];
   for (let i = 0; i < count; i++) {
@@ -465,7 +500,7 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
 
     <p v-if="weekendBands.length" class="weekend-legend">
       <span class="weekend-swatch" aria-hidden="true"></span>
-      Saturdays &amp; Sundays — banks don't publish forex rates
+      Saturdays &amp; Sundays: banks closed, platforms may differ
     </p>
 
     <!-- tooltip: deliberately outside .chart-frame (which scrolls horizontally
@@ -527,7 +562,7 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
       </table>
       <p class="weekend-legend">
         <span class="weekend-swatch" aria-hidden="true"></span>
-        Saturdays &amp; Sundays — banks don't publish forex rates
+        Saturdays &amp; Sundays: banks closed, platforms may differ
       </p>
     </div>
   </div>
