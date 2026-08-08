@@ -473,8 +473,10 @@ const lastUpdatedFormatted = computed(() => {
   return `${MONTHS[month - 1]} ${day}, ${year}`;
 });
 
-// Spread between the best and worst bank rate on the most recent day with
-// majority bank coverage — powers the stakes line in the hero.
+// Net receive spread (best minus worst, fee-adjusted) on the most recent day
+// with majority bank coverage — powers the stakes line in the hero.
+// Returns total rupee difference for the current amount so it matches the
+// table's receiveGap calculation.
 const bestVsWorstToday = computed<number | null>(() => {
   const bankSeries = allSeries.value.filter(s => s.category === "bank");
   if (!bankSeries.length) return null;
@@ -489,12 +491,26 @@ const bestVsWorstToday = computed<number | null>(() => {
     .sort()
     .at(-1);
   if (!latest) return null;
-  const rates = bankSeries
-    .map(s => s.points.find(p => p.date === latest)?.ttbuy)
-    .filter((r): r is number => r !== undefined);
-  if (rates.length < 2) return null;
-  const spread = Math.max(...rates) - Math.min(...rates);
-  return spread >= 0.01 ? spread : null;
+  const netReceives = bankSeries
+    .map(s => {
+      const pt = s.points.find(p => p.date === latest);
+      if (!pt) return null;
+      const gross = pt.ttbuy * amount.value;
+      const fee = fees.value[s.name];
+      let feeInr = 0;
+      if (fee?.fee_slabs) {
+        for (const sl of fee.fee_slabs) {
+          if (sl.up_to === null || gross <= sl.up_to) { feeInr = sl.fee_inr; break; }
+        }
+      } else {
+        feeInr = fee?.fee_inr ?? 0;
+      }
+      return gross - feeInr;
+    })
+    .filter((r): r is number => r !== null);
+  if (netReceives.length < 2) return null;
+  const spread = Math.max(...netReceives) - Math.min(...netReceives);
+  return spread >= 1 ? spread : null;
 });
 
 interface ConsistencyResult { bank: string; count: number; total: number; since: string | null }
@@ -642,7 +658,7 @@ const stableBank = computed<StableBankResult | null>(() => {
     </p>
     <p v-if="!loading && bestVsWorstToday !== null" class="stakes-line">
       Today on {{ currency }} {{ amount.toLocaleString('en-IN') }}: the best bank pays
-      ₹{{ Math.round((bestVsWorstToday || 0) * amount).toLocaleString('en-IN') }} more than the worst.
+      ₹{{ Math.round(bestVsWorstToday).toLocaleString('en-IN') }} more than the worst.
     </p>
     <p v-if="lastUpdated" class="updated">
       Rates last updated {{ lastUpdatedFormatted }}. Scraped at 11 AM IST. Banks typically publish by 10 AM IST.
