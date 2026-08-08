@@ -613,10 +613,10 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
 }
 
 .legend-items {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 6px 14px;
+  flex: 1;
 }
 
 .legend-item {
