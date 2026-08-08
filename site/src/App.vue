@@ -633,13 +633,12 @@ const stableBank = computed<StableBankResult | null>(() => {
 
 <template>
   <header class="page-header">
-    <p class="eyebrow">Inward remittance rates</p>
+    <p class="eyebrow">Foreign earnings in India</p>
     <h1>Which Indian bank pays you the most for your {{ currency }} transfer?</h1>
     <p class="lede">
-      When someone sends you {{ currency }} from abroad, your bank converts it to rupees
-      at its own TT Buy rate, and every bank sets this independently. We scrape those
-      rates from 22+ banks' public forex pages daily so you can see who pays the most
-      right now.
+      Your bank sets its own rate when foreign currency arrives in your account. That
+      rate varies by hundreds of rupees per $1,000 across banks. We track 22+ Indian
+      banks daily so you can see who pays you the most, right now and over time.
     </p>
     <p v-if="!loading && bestVsWorstToday !== null" class="stakes-line">
       Today on {{ currency }} {{ amount.toLocaleString('en-IN') }}: the best bank pays
@@ -826,8 +825,8 @@ const stableBank = computed<StableBankResult | null>(() => {
       <p>Check the historical chart to see if it's consistently low. A one-day dip is normal; a persistent gap of ₹500+ per $1,000 over weeks is worth acting on. For large one-off transfers, call your bank's forex desk before the sender initiates the transfer. Many banks will offer a better rate on request. For regular transfers, switching to a consistently higher-rated bank is the more reliable fix.</p>
     </details>
     <details class="faq-item">
-      <summary>Does it matter if I have an NRE or NRO account?</summary>
-      <p>Both account types receive inward remittances at the same TT Buy rate; the conversion is the same regardless. The difference is what happens after: NRE account funds (principal and interest) are fully repatriable and the interest is tax-free in India. NRO account funds are subject to Indian tax and have repatriation limits. The choice of account affects taxation and repatriation, not the exchange rate you receive.</p>
+      <summary>What is TT Buy rate?</summary>
+      <p>TT Buy (Telegraphic Transfer Buy) is the rate your bank applies when foreign currency arrives in your account as a wire transfer. It applies whether you receive a salary from a foreign employer, client payments for freelance work, or a family remittance. Banks set this rate independently and update it daily, which is why the same $1,000 can net you ₹500 more at one bank than another.</p>
     </details>
     <details class="faq-item">
       <summary>Can I negotiate a better rate with my bank?</summary>
