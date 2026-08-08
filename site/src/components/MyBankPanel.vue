@@ -52,6 +52,7 @@ interface BankSnap {
   ttbuy: number;
   date: string;
   netInr: number;
+  feeUnknown: boolean;
 }
 
 // All banks with today's data, ranked by net receive
@@ -64,8 +65,9 @@ const rankedBanks = computed<BankSnap[]>(() => {
     if (last.date !== latestDate.value) continue;
     const gross = last.ttbuy * safeAmount.value;
     const fee = props.fees[s.name];
+    const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
     const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, gross) : (fee?.fee_inr ?? 0);
-    out.push({ name: s.name, color: brandColor(s.name), ttbuy: last.ttbuy, date: last.date, netInr: gross - feeInr });
+    out.push({ name: s.name, color: brandColor(s.name), ttbuy: last.ttbuy, date: last.date, netInr: gross - feeInr, feeUnknown });
   }
   return out.sort((a, b) => b.netInr - a.netInr);
 });
@@ -78,8 +80,9 @@ const mySnap = computed<BankSnap | null>(() => {
   const last = s.points.at(-1)!;
   const gross = last.ttbuy * safeAmount.value;
   const fee = props.fees[myBank.value];
+  const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
   const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, gross) : (fee?.fee_inr ?? 0);
-  return { name: myBank.value, color: brandColor(myBank.value), ttbuy: last.ttbuy, date: last.date, netInr: gross - feeInr };
+  return { name: myBank.value, color: brandColor(myBank.value), ttbuy: last.ttbuy, date: last.date, netInr: gross - feeInr, feeUnknown };
 });
 
 const isStale = computed(() =>
@@ -187,7 +190,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
         <div class="mbp-stats">
           <span class="stat-rate">₹{{ mySnap.ttbuy.toFixed(2) }}</span>
           <span class="stat-arr">→</span>
-          <span class="stat-recv">₹{{ formatInr(mySnap.netInr) }}</span>
+          <span class="stat-recv" :title="mySnap.feeUnknown ? 'Fee not confirmed — showing gross conversion; real amount may be lower' : undefined">{{ mySnap.feeUnknown ? '≈' : '' }}₹{{ formatInr(mySnap.netInr) }}</span>
           <span class="stat-for">on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}</span>
         </div>
         <div v-if="leadCount && leadCount.led > 0" class="mbp-sub">
@@ -204,7 +207,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
         <div class="mbp-stats">
           <span class="stat-rate">₹{{ mySnap.ttbuy.toFixed(2) }}</span>
           <span class="stat-arr">→</span>
-          <span class="stat-recv">₹{{ formatInr(mySnap.netInr) }}</span>
+          <span class="stat-recv" :title="mySnap.feeUnknown ? 'Fee not confirmed — showing gross conversion; real amount may be lower' : undefined">{{ mySnap.feeUnknown ? '≈' : '' }}₹{{ formatInr(mySnap.netInr) }}</span>
           <span class="stat-for">on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}</span>
           <span class="stat-gap">· ₹{{ formatInr(gapToBest!) }} less than {{ shortName(bestSnap!.name) }}</span>
         </div>
@@ -222,7 +225,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
         <div class="mbp-stats">
           <span class="stat-rate">₹{{ mySnap.ttbuy.toFixed(2) }}</span>
           <span class="stat-arr">→</span>
-          <span class="stat-recv">₹{{ formatInr(mySnap.netInr) }}</span>
+          <span class="stat-recv" :title="mySnap.feeUnknown ? 'Fee not confirmed — showing gross conversion; real amount may be lower' : undefined">{{ mySnap.feeUnknown ? '≈' : '' }}₹{{ formatInr(mySnap.netInr) }}</span>
           <span class="stat-for">on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}</span>
           <span class="stat-gap">· ₹{{ formatInr(gapToBest!) }} less than {{ shortName(bestSnap!.name) }}</span>
         </div>
@@ -237,7 +240,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
         <div class="mbp-stats">
           <span class="stat-rate">₹{{ mySnap.ttbuy.toFixed(2) }}</span>
           <span class="stat-arr">→</span>
-          <span class="stat-recv">₹{{ formatInr(mySnap.netInr) }}</span>
+          <span class="stat-recv" :title="mySnap.feeUnknown ? 'Fee not confirmed — showing gross conversion; real amount may be lower' : undefined">{{ mySnap.feeUnknown ? '≈' : '' }}₹{{ formatInr(mySnap.netInr) }}</span>
           <span class="stat-for">on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}</span>
         </div>
         <div class="mbp-sub">
@@ -254,7 +257,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
         <div class="mbp-stats">
           <span class="stat-rate">₹{{ mySnap.ttbuy.toFixed(2) }}</span>
           <span class="stat-arr">→</span>
-          <span class="stat-recv">₹{{ formatInr(mySnap.netInr) }}</span>
+          <span class="stat-recv" :title="mySnap.feeUnknown ? 'Fee not confirmed — showing gross conversion; real amount may be lower' : undefined">{{ mySnap.feeUnknown ? '≈' : '' }}₹{{ formatInr(mySnap.netInr) }}</span>
           <span class="stat-for">on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}</span>
           <span v-if="bestSnap" class="stat-gap">· today's best is {{ shortName(bestSnap.name) }} at ₹{{ bestSnap.ttbuy.toFixed(2) }}</span>
         </div>

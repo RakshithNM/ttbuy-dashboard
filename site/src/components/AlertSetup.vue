@@ -84,7 +84,6 @@ onMounted(async () => {
 });
 
 async function enable() {
-  if (!VAPID_KEY) { errorMsg.value = "Push not configured (missing VITE_VAPID_PUBLIC_KEY)"; status.value = "error"; return; }
   status.value = "loading";
   errorMsg.value = "";
   try {

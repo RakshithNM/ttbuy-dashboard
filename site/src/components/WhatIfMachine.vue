@@ -275,7 +275,7 @@ function daysAgo(dateStr: string): string {
 
   @media (max-width: 711px) {
     width: 100%;
-    box-sizing: border-box;
+    max-width: 100%;
   }
 }
 

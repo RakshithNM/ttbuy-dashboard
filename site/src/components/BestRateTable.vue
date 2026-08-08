@@ -1496,8 +1496,8 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   }
 
   &.one-two-days {
-    color: #92400e;
-    background: color-mix(in srgb, #f59e0b 14%, transparent);
+    color: var(--warning-text);
+    background: color-mix(in srgb, var(--status-warning) 14%, transparent);
   }
 
   &.two-three-days {
@@ -1519,8 +1519,8 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   gap: 8px;
   margin: 0 0 8px;
   padding: 8px 12px;
-  background: color-mix(in srgb, #f59e0b 8%, transparent);
-  border: 1px solid color-mix(in srgb, #f59e0b 28%, transparent);
+  background: color-mix(in srgb, var(--status-warning) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-warning) 28%, transparent);
   border-radius: 6px;
   font-size: 13px;
   color: var(--text-secondary);
@@ -1528,7 +1528,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
 
   .stale-icon {
     flex: none;
-    color: #d97706;
+    color: var(--warning-text);
     margin-top: 1px;
   }
 
@@ -1539,10 +1539,10 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
 }
 
 .stale-date {
-  color: #d97706;
+  color: var(--warning-text);
 
   .stale-cell-icon {
-    color: #d97706;
+    color: var(--warning-text);
     vertical-align: middle;
     margin-left: 3px;
   }

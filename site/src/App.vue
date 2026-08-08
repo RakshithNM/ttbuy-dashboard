@@ -114,8 +114,11 @@ const MY_BANK_KEY = "ttbuy-dashboard:mybank";
 const myBank = ref<string>((() => { try { return localStorage.getItem(MY_BANK_KEY) ?? ""; } catch { return ""; } })());
 watch(myBank, (b) => { try { if (b) localStorage.setItem(MY_BANK_KEY, b); else localStorage.removeItem(MY_BANK_KEY); } catch {} });
 
-watch([range, showTable, currency, amount], ([r, t, c, a]) => {
+watch(currency, (c) => {
   document.title = `${c} TT Buy Rate | TTBuy Rates`;
+}, { immediate: true });
+
+watch([range, showTable, currency, amount], ([r, t, c, a]) => {
   try {
     localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ range: r, showTable: t, currency: c, amount: a }));
   } catch {
@@ -828,11 +831,18 @@ const stableBank = computed<StableBankResult | null>(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  width: 100%;
+
+  @media (max-width: 600px) {
+    width: 100%;
+
+    .currency-btn {
+      flex: 1;
+    }
+  }
 }
 
 .currency-btn {
-  flex: 1;
+  flex: none;
   background: none;
   border: 1px solid var(--border);
   border-radius: 6px;
