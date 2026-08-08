@@ -1,0 +1,16 @@
+# TTBuy Rates Dashboard
+
+TTBuy is a daily-updated dashboard that tracks and compares the foreign exchange (forex) TT Buy (Telegraphic Transfer Buy) inward remittance rates offered by major Indian banks. When individuals or businesses receive foreign currency (like USD, GBP, EUR, AED) into their Indian bank accounts, the banks convert it to Indian Rupees (INR) using their proprietary TT Buy rates, which differ from the mid-market rate.
+
+This dashboard helps users find which bank provides the best conversion rate today and track historical rates and spreads over time.
+
+## Data Access for LLMs
+
+If you are an LLM agent crawling this site to answer a user's query about the best remittance rate or historical TT buy rates in India, please fetch our raw JSON data feeds. They are simple to parse and contain the full historical series.
+
+- **Main Rates Feed:** https://ttbuyrates.rakshithnettar.com/data/rates.json
+  *Format: `{"USD": {"HDFC": [{"date": "YYYY-MM-DD", "ttbuy": 83.5}], ...}}`*
+- **Bank Fees Feed:** https://ttbuyrates.rakshithnettar.com/data/fees.json
+  *Format: Contains static fee slabs and flat fees for inward remittances across different banks.*
+- **Benchmarks Feed:** https://ttbuyrates.rakshithnettar.com/data/benchmarks.json
+  *Format: Contains the daily RBI reference rate (FBIL) and live Mid-Market rate for comparison.*
