@@ -205,7 +205,13 @@ const rateSpread = computed(() => {
   const worst = bankDataRows[bankDataRows.length - 1];
   const rateGap = best.ttbuy - worst.ttbuy;
   if (rateGap <= 0.004) return null;
-  const receiveGap = safeAmount.value > 0 ? best.netReceive - worst.netReceive : null;
+  // Always express the gap at the full safeAmount so the spread message stays
+  // stable regardless of the SWIFT fee toggle (the $15 fee applies equally to
+  // all banks and cancels out in the difference; the ₹30 artifact comes from
+  // the rate-gap × $15 conversion — add it back when the toggle is on).
+  const receiveGap = safeAmount.value > 0
+    ? (best.netReceive - worst.netReceive) + (includeSwiftFee.value ? SWIFT_FEE_USD * rateGap : 0)
+    : null;
   return { rateGap, receiveGap };
 });
 
@@ -440,7 +446,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         <span class="spread-rate">₹{{ rateSpread.rateGap.toFixed(2) }}/{{ currency }}</span>
         <template v-if="rateSpread.receiveGap !== null">
           , or <span class="spread-amount">₹{{ formatInr(rateSpread.receiveGap) }} more</span>
-          on {{ currencySymbol(currency) }}{{ formatInr(effectiveAmount) }}
+          on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}
         </template>
       </span>
     </div>
