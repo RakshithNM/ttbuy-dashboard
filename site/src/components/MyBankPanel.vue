@@ -159,9 +159,12 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
   <!-- Collapsed prompt when no bank selected -->
   <div v-if="!myBank" class="mbp-prompt">
     <span class="mbp-swatch-sm" aria-hidden="true" />
-    <label class="mbp-prompt-label" for="mbp-select-empty">My bank</label>
+    <div class="mbp-prompt-text">
+      <label class="mbp-prompt-label" for="mbp-select-empty">Set your bank</label>
+      <span class="mbp-prompt-hint">See instantly how your rate compares to the best today</span>
+    </div>
     <select id="mbp-select-empty" v-model="myBank" class="mbp-select-inline" aria-label="Set my bank">
-      <option value="">Select to see personalized insights…</option>
+      <option value="">Choose your bank…</option>
       <option v-for="bank in allBanks" :key="bank" :value="bank">{{ bank }}</option>
     </select>
   </div>
@@ -306,13 +309,27 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
   flex: none;
 }
 
+.mbp-prompt-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .mbp-prompt-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--text-primary);
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.mbp-prompt-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mbp-select-inline {

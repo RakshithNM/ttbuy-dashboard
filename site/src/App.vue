@@ -637,7 +637,7 @@ const stableBank = computed<StableBankResult | null>(() => {
       ₹{{ Math.round((bestVsWorstToday || 0) * amount).toLocaleString('en-IN') }} more than the worst.
     </p>
     <p v-if="lastUpdated" class="updated">
-      Rates last updated {{ lastUpdatedFormatted }}. Updated daily at 11 AM IST.
+      Rates last updated {{ lastUpdatedFormatted }}. Scraped at 11 AM IST — banks typically publish by 10 AM IST.
     </p>
   </header>
 
@@ -718,6 +718,7 @@ const stableBank = computed<StableBankResult | null>(() => {
     <section class="panel">
       <h2>Best value today</h2>
       <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :credit-times="CREDIT_TIMES" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
+      <p class="panel-footnote">Published retail TT Buy rates. Corporate and HNI rates are negotiated separately and may differ.</p>
     </section>
 
     <section v-if="availableCurrencies.length > 1" class="panel">
@@ -808,6 +809,26 @@ const stableBank = computed<StableBankResult | null>(() => {
 
   <p v-else-if="loadError" class="error">Couldn't load rate data: {{ loadError }}</p>
   <p v-else class="loading">Loading rates…</p>
+
+  <section class="panel faq-panel">
+    <h2>Common questions</h2>
+    <details class="faq-item">
+      <summary>My bank isn't the best rate today. What should I do?</summary>
+      <p>Check the historical chart to see if it's consistently low. A one-day dip is normal; a persistent gap of ₹500+ per $1,000 over weeks is worth acting on. For large one-off transfers, call your bank's forex desk before the sender initiates the transfer — many banks will offer a better rate on request. For regular transfers, switching to a consistently higher-rated bank is the more reliable fix.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Does it matter if I have an NRE or NRO account?</summary>
+      <p>Both account types receive inward remittances at the same TT Buy rate — the conversion rate is the same regardless. The difference is in what happens after: NRE account funds (principal and interest) are fully repatriable and the interest is tax-free in India. NRO account funds are subject to Indian tax and have repatriation limits. The choice of account affects taxation and repatriation, not the exchange rate you receive.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Can I negotiate a better rate with my bank?</summary>
+      <p>Yes, for larger transfers. Most banks will consider a rate improvement for transfers equivalent to roughly ₹5 lakh or more if you call the forex desk before the transfer is sent. The published rate here is the standard retail rate — negotiated rates are not public. It helps to mention you've seen competing rates and are considering your options.</p>
+    </details>
+    <details class="faq-item">
+      <summary>How is this data collected?</summary>
+      <p>An automated scraper fetches each bank's publicly published forex rate page every day at 11 AM IST. The rates are the same ones any customer would see on the bank's website. Banks typically publish by 10 AM IST. This site is not affiliated with any bank and does not have access to live or negotiated rates.</p>
+    </details>
+  </section>
 
   <footer class="site-footer">
     <div class="footer-main">
@@ -1024,6 +1045,63 @@ const stableBank = computed<StableBankResult | null>(() => {
   margin: 0 0 16px;
   font-size: 13px;
   color: var(--text-muted);
+}
+
+.panel-footnote {
+  margin: 12px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.faq-panel {
+  h2 { margin-bottom: 12px; }
+}
+
+.faq-item {
+  border-top: 1px solid var(--border);
+  padding: 0;
+
+  &:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  summary {
+    padding: 12px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    user-select: none;
+
+    &::after {
+      content: "+";
+      font-size: 16px;
+      color: var(--text-muted);
+      flex: none;
+      transition: transform 150ms ease;
+    }
+
+    &::-webkit-details-marker { display: none; }
+    &:focus-visible { outline: 2px solid var(--accent); border-radius: 2px; }
+  }
+
+  &[open] summary::after {
+    content: "−";
+  }
+
+  p {
+    margin: 0 0 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 640px;
+  }
 }
 
 .panel-header {
