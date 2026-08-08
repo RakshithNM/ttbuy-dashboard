@@ -58,7 +58,7 @@ interface DataRow {
   bank: string;
   color: string;
   wrapped: boolean;
-  category: "bank" | "platform";
+  category: "bank" | "platform" | "benchmark";
   hasData: true;
   ttbuy: number;
   date: string;
@@ -87,7 +87,7 @@ interface EmptyRow {
   bank: string;
   color: string;
   wrapped: boolean;
-  category: "bank" | "platform";
+  category: "bank" | "platform" | "benchmark";
   hasData: false;
 }
 
