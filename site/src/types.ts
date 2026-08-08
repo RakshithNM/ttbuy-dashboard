@@ -8,6 +8,12 @@ export interface RatePoint {
 export type RatesByBank = Record<string, RatePoint[]>;
 export type RatesByCurrency = Record<string, RatesByBank>;
 
+export interface Benchmarks {
+  midMarket?: number;
+  rbiReference?: number;
+}
+export type BenchmarksByCurrency = Record<string, Benchmarks>;
+
 export interface BankSeries {
   name: string;
   color: string;

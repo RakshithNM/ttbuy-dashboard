@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import type { BankSeries, FeesByBank, FeeSlab } from "../types";
+import type { BankSeries, FeesByBank, FeeSlab, BenchmarksByCurrency } from "../types";
 import type { CreditTimesByBank, CreditCategory } from "../creditTime";
 import { brandColor, shortName, sourceUrl } from "../bankPalette";
 import { currencySymbol } from "../currencies";
@@ -9,6 +9,7 @@ const props = defineProps<{
   series: BankSeries[];
   currency: string;
   fees: FeesByBank;
+  benchmarks?: BenchmarksByCurrency;
   creditTimes: CreditTimesByBank;
   consistency: { bank: string; count: number; total: number; since: string | null } | null;
   dowInsight: { day: string; diffPaise: number } | null;
@@ -36,6 +37,8 @@ const statPrefix = computed(() => {
   };
   return map[props.range] ?? "Period";
 });
+
+const currentBenchmarks = computed(() => props.benchmarks?.[props.currency]);
 
 const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const sinceLabel = computed(() => {
@@ -504,8 +507,9 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         <line x1="1" y1="13" x2="15" y2="13"/>
       </svg>
       <span>
+        <strong>Volatility insight:</strong>
         <strong :style="{ color: stableBank.color }">{{ shortName(stableBank.bank) }}</strong>
-        had the most stable rate among the top {{ stableBank.topN }} banks,
+        had the lowest rate volatility among the top {{ stableBank.topN }} banks,
         varying by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
           vs {{ shortName(stableBank.runner.bank) }}'s ₹{{ stableBank.runner.variation.toFixed(2) }}</template>
       </span>
@@ -551,6 +555,28 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
           </tr>
         </thead>
         <tbody>
+          <tr v-if="currentBenchmarks?.midMarket" class="benchmark-row">
+            <th scope="row">
+              <span class="row-header">
+                <span class="bank-name">Mid-market rate (XE / Google)</span>
+              </span>
+            </th>
+            <td class="num"><span class="tt-val">₹{{ currentBenchmarks.midMarket.toFixed(4) }}</span></td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="td-date">Live</td>
+          </tr>
+          <tr v-if="currentBenchmarks?.rbiReference" class="benchmark-row">
+            <th scope="row">
+              <span class="row-header">
+                <span class="bank-name">RBI reference rate (FBIL)</span>
+              </span>
+            </th>
+            <td class="num"><span class="tt-val">₹{{ currentBenchmarks.rbiReference.toFixed(4) }}</span></td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="td-date">Daily</td>
+          </tr>
           <template v-for="(row, i) in rows" :key="row.bank">
             <tr v-if="row.category === 'platform' && i === firstPlatformIndex" class="platform-divider">
               <td colspan="5" class="platform-section-header">
@@ -1272,8 +1298,28 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     background: var(--surface-0, var(--surface-1));
   }
 
+  tr.platform-divider td {
+    padding-top: 24px;
+  }
+
+  .benchmark-row {
+    background: color-mix(in srgb, var(--surface-2) 40%, transparent);
+    border-bottom: 2px solid var(--gridline);
+  }
+
+  .benchmark-row th {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .benchmark-row td {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
   .platform-section-header {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;

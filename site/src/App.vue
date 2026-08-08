@@ -10,10 +10,11 @@ import MyBankPanel from "./components/MyBankPanel.vue";
 import { brandColor, isPlatform, shortName, sortByBankOrder } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
 import { currencyName, sortByCurrencyOrder } from "./currencies";
-import type { BankSeries, FeesByBank, RatesByCurrency } from "./types";
+import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
 
 const rawRates = ref<RatesByCurrency>({});
 const fees = ref<FeesByBank>({});
+const benchmarks = ref<BenchmarksByCurrency>({});
 const loading = ref(true);
 const loadError = ref<string | null>(null);
 const hidden = ref<Set<string>>(new Set());
@@ -184,6 +185,14 @@ onMounted(async () => {
     if (res.ok) fees.value = await res.json();
   } catch {
     // No fee info shown for any bank is an acceptable degraded state.
+  }
+
+  // Benchmarks data is also a nice-to-have.
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}data/benchmarks.json`);
+    if (res.ok) benchmarks.value = await res.json();
+  } catch {
+    // Fallback if benchmarks are missing
   }
 });
 
@@ -717,7 +726,7 @@ const stableBank = computed<StableBankResult | null>(() => {
 
     <section class="panel">
       <h2>Best value today</h2>
-      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :credit-times="CREDIT_TIMES" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
+      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :benchmarks="benchmarks" :credit-times="CREDIT_TIMES" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
       <p class="panel-footnote">Published retail TT Buy rates. Corporate and HNI rates are negotiated separately and may differ.</p>
     </section>
 

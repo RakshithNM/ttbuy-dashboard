@@ -31,17 +31,22 @@ jobs:
           INCLUDE_LIVE: "1"
         run: python3 -m scraper.main
 
+      - name: Scrape benchmark rates
+        run: python3 -m scraper.benchmarks
+
       - name: Export rates.json
         run: python3 -m scraper.export_json
 
-      - name: Sync rates.json into site
-        run: cp data/rates.json site/public/data/rates.json
+      - name: Sync data into site
+        run: |
+          cp data/rates.json site/public/data/rates.json
+          cp data/benchmarks.json site/public/data/benchmarks.json || true
 
       - name: Commit updated data
         run: |
           git config user.name "ttbuy-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data site/public/data/rates.json
+          git add data site/public/data/rates.json site/public/data/benchmarks.json
           git diff --cached --quiet || git commit -m "Update TT Buy rates $(date -u +%F)"
           git push
 
