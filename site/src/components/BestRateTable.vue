@@ -206,12 +206,9 @@ const shareText = computed<string | null>(() => {
   return lines.join("\n");
 });
 
-const shareCopied = ref(false);
-async function copyShareText() {
+function shareViaWhatsApp() {
   if (!shareText.value) return;
-  await navigator.clipboard.writeText(shareText.value);
-  shareCopied.value = true;
-  setTimeout(() => { shareCopied.value = false; }, 2000);
+  window.open(`https://wa.me/?text=${encodeURIComponent(shareText.value)}`, "_blank", "noopener");
 }
 
 const staleBanks = computed<DataRow[]>(() => {
@@ -474,17 +471,13 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         v-if="shareText"
         type="button"
         class="share-rates-btn"
-        :class="{ copied: shareCopied }"
-        @click="copyShareText"
-        :aria-label="shareCopied ? 'Copied!' : 'Copy rates to share'"
+        @click="shareViaWhatsApp"
+        aria-label="Share on WhatsApp"
       >
-        <svg v-if="!shareCopied" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6.5 9.5l3-3M6.8 5.3l.9-.9a2.2 2.2 0 013.1 3.1l-.9.9M9.2 10.7l-.9.9a2.2 2.2 0 01-3.1-3.1l.9-.9"/>
+        <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 1.41.37 2.73 1.01 3.88L0 16l4.25-1.11A7.94 7.94 0 008 16c4.42 0 8-3.58 8-8s-3.58-8-8-8zm3.93 11.27c-.17.47-.97.9-1.34.95-.34.05-.77.07-1.24-.08-.29-.09-.65-.21-1.12-.41-1.97-.85-3.25-2.84-3.35-2.97-.1-.13-.8-1.06-.8-2.02 0-.96.5-1.43.68-1.63.17-.19.38-.24.51-.24l.36.01c.12 0 .28-.05.44.33.17.4.57 1.37.62 1.47.05.1.08.22.02.35-.07.13-.1.21-.2.33l-.3.35c-.1.1-.2.2-.09.4.12.2.52.85 1.11 1.37.76.68 1.4.89 1.6.99.2.1.31.08.43-.05.12-.13.5-.58.63-.78.13-.2.27-.17.45-.1l1.43.67c.17.08.28.12.32.19.05.07.05.4-.12.87z"/>
         </svg>
-        <svg v-else viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2.5 8.5l4 4 7-8"/>
-        </svg>
-        {{ shareCopied ? 'Copied!' : 'Share' }}
+        WhatsApp
       </button>
     </div>
 
@@ -970,24 +963,18 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   align-self: center;
   margin-left: auto;
   padding: 3px 10px;
-  border: 1px solid var(--border);
+  border: 1px solid #25d36640;
   border-radius: 5px;
-  background: var(--surface-2);
+  background: #25d3660f;
   font-size: 12px;
-  color: var(--text-secondary);
+  color: #25d366;
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 
   &:hover {
-    color: var(--text-primary);
-    border-color: var(--text-muted);
-  }
-
-  &.copied {
-    color: var(--success-text);
-    border-color: color-mix(in srgb, var(--status-good) 40%, transparent);
-    background: color-mix(in srgb, var(--status-good) 8%, transparent);
+    background: #25d36620;
+    border-color: #25d36670;
   }
 }
 
