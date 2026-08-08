@@ -614,8 +614,9 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
 
 .legend-items {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 6px 14px;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  row-gap: 2px;
+  column-gap: 2px;
   flex: 1;
 }
 
