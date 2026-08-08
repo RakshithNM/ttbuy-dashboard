@@ -637,7 +637,7 @@ const stableBank = computed<StableBankResult | null>(() => {
     <h1>Which Indian bank pays you the most for your {{ currency }} transfer?</h1>
     <p class="lede">
       When someone sends you {{ currency }} from abroad, your bank converts it to rupees
-      at its own TT Buy rate — and every bank sets this independently. We scrape those
+      at its own TT Buy rate, and every bank sets this independently. We scrape those
       rates from 22+ banks' public forex pages daily so you can see who pays the most
       right now.
     </p>
@@ -646,7 +646,7 @@ const stableBank = computed<StableBankResult | null>(() => {
       ₹{{ Math.round((bestVsWorstToday || 0) * amount).toLocaleString('en-IN') }} more than the worst.
     </p>
     <p v-if="lastUpdated" class="updated">
-      Rates last updated {{ lastUpdatedFormatted }}. Scraped at 11 AM IST — banks typically publish by 10 AM IST.
+      Rates last updated {{ lastUpdatedFormatted }}. Scraped at 11 AM IST. Banks typically publish by 10 AM IST.
     </p>
   </header>
 
@@ -783,7 +783,7 @@ const stableBank = computed<StableBankResult | null>(() => {
       <div v-if="compareMode" class="compare-picker">
         <p class="compare-meta">
           <strong>{{ compareSelected.size }}</strong> of {{ MAX_COMPARE }} selected
-          <span v-if="compareSelected.size >= MAX_COMPARE" class="compare-full-hint">— deselect one to swap</span>
+          <span v-if="compareSelected.size >= MAX_COMPARE" class="compare-full-hint">(deselect one to swap)</span>
         </p>
         <div class="compare-chips" role="group" aria-label="Select banks to compare">
           <button
@@ -823,15 +823,15 @@ const stableBank = computed<StableBankResult | null>(() => {
     <h2>Common questions</h2>
     <details class="faq-item">
       <summary>My bank isn't the best rate today. What should I do?</summary>
-      <p>Check the historical chart to see if it's consistently low. A one-day dip is normal; a persistent gap of ₹500+ per $1,000 over weeks is worth acting on. For large one-off transfers, call your bank's forex desk before the sender initiates the transfer — many banks will offer a better rate on request. For regular transfers, switching to a consistently higher-rated bank is the more reliable fix.</p>
+      <p>Check the historical chart to see if it's consistently low. A one-day dip is normal; a persistent gap of ₹500+ per $1,000 over weeks is worth acting on. For large one-off transfers, call your bank's forex desk before the sender initiates the transfer. Many banks will offer a better rate on request. For regular transfers, switching to a consistently higher-rated bank is the more reliable fix.</p>
     </details>
     <details class="faq-item">
       <summary>Does it matter if I have an NRE or NRO account?</summary>
-      <p>Both account types receive inward remittances at the same TT Buy rate — the conversion rate is the same regardless. The difference is in what happens after: NRE account funds (principal and interest) are fully repatriable and the interest is tax-free in India. NRO account funds are subject to Indian tax and have repatriation limits. The choice of account affects taxation and repatriation, not the exchange rate you receive.</p>
+      <p>Both account types receive inward remittances at the same TT Buy rate; the conversion is the same regardless. The difference is what happens after: NRE account funds (principal and interest) are fully repatriable and the interest is tax-free in India. NRO account funds are subject to Indian tax and have repatriation limits. The choice of account affects taxation and repatriation, not the exchange rate you receive.</p>
     </details>
     <details class="faq-item">
       <summary>Can I negotiate a better rate with my bank?</summary>
-      <p>Yes, for larger transfers. Most banks will consider a rate improvement for transfers equivalent to roughly ₹5 lakh or more if you call the forex desk before the transfer is sent. The published rate here is the standard retail rate — negotiated rates are not public. It helps to mention you've seen competing rates and are considering your options.</p>
+      <p>Yes, for larger transfers. Most banks will consider a rate improvement for transfers equivalent to roughly ₹5 lakh or more if you call the forex desk before the transfer is sent. The published rate here is the standard retail rate. Negotiated rates are not published. It helps to mention you've seen competing rates and are considering your options.</p>
     </details>
     <details class="faq-item">
       <summary>How is this data collected?</summary>

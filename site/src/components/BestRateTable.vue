@@ -542,7 +542,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     <div class="table-wrap">
       <table class="best-rate-table">
         <caption>
-          {{ currency }} TT Buy rate by bank — ranked by what you'd actually receive after each bank's own
+          {{ currency }} TT Buy rate by bank, ranked by what you'd actually receive after each bank's own
           inward remittance fee, not just the raw rate
         </caption>
         <thead>
@@ -562,8 +562,8 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
               </span>
             </th>
             <td class="num"><span class="tt-val">₹{{ currentBenchmarks.midMarket.toFixed(4) }}</span></td>
-            <td class="num">—</td>
-            <td class="num">—</td>
+            <td class="num">n/a</td>
+            <td class="num">n/a</td>
             <td class="td-date">Live</td>
           </tr>
           <tr v-if="currentBenchmarks?.rbiReference" class="benchmark-row">
@@ -573,8 +573,8 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
               </span>
             </th>
             <td class="num"><span class="tt-val">₹{{ currentBenchmarks.rbiReference.toFixed(4) }}</span></td>
-            <td class="num">—</td>
-            <td class="num">—</td>
+            <td class="num">n/a</td>
+            <td class="num">n/a</td>
             <td class="td-date">Daily</td>
           </tr>
           <template v-for="(row, i) in rows" :key="row.bank">
@@ -677,7 +677,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                   <div v-if="row.feeInr > 0" class="fee-deducted">−₹{{ formatInr(row.feeInr) }} fee</div>
                 </td>
                 <td class="num gap" :class="{ muted: row.bank === bestBank || row.gapToBest === 0, ahead: row.gapToBest < 0 }">
-                  <template v-if="row.bank === bestBank || row.gapToBest === 0">—</template>
+                  <template v-if="row.bank === bestBank || row.gapToBest === 0"></template>
                   <template v-else-if="row.gapToBest < 0">+₹{{ formatInr(Math.abs(row.gapToBest)) }}</template>
                   <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
                 </td>

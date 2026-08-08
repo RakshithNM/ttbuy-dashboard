@@ -565,7 +565,7 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
               </td>
             </template>
             <td v-else :colspan="tableSeries.length" class="weekend-note">
-              Banks closed — no rates published
+              Banks closed, no rates published
             </td>
           </tr>
           <tr v-if="noDataSeries.length">
