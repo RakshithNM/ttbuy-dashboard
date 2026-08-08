@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { BankSeries, FeesByBank, FeeSlab } from "../types";
+import type { CreditTimesByBank, CreditCategory } from "../creditTime";
 import { brandColor, shortName, sourceUrl } from "../bankPalette";
 import { currencySymbol } from "../currencies";
 
@@ -8,6 +9,7 @@ const props = defineProps<{
   series: BankSeries[];
   currency: string;
   fees: FeesByBank;
+  creditTimes: CreditTimesByBank;
   consistency: { bank: string; count: number; total: number; since: string | null } | null;
   dowInsight: { day: string; diffPaise: number } | null;
   weekInsight: { week: 1 | 2 | 3 | 4; diffPaise: number } | null;
@@ -308,6 +310,23 @@ const bankStats = computed(() => {
   return map;
 });
 
+function creditLabel(category: CreditCategory): string {
+  if (category === "same-day") return "Same day";
+  if (category === "1-2-days") return "1–2 days";
+  if (category === "2-3-days") return "2–3 days";
+  return "Not published";
+}
+
+function creditClass(category: CreditCategory): string {
+  const map: Record<CreditCategory, string> = {
+    "same-day": "same-day",
+    "1-2-days": "one-two-days",
+    "2-3-days": "two-three-days",
+    "not-published": "not-published",
+  };
+  return map[category];
+}
+
 interface SplitSuggestion {
   bankA: string;
   bankB: string;
@@ -504,6 +523,18 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
       </span>
     </div>
 
+    <div class="rate-lock-callout" role="note">
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="8" cy="8" r="6.5"/>
+        <line x1="8" y1="7" x2="8" y2="10.5"/>
+        <circle cx="8" cy="5" r="0.8" fill="currentColor" stroke="none"/>
+      </svg>
+      <span>
+        Banks apply the exchange rate at <strong>time of credit</strong>, not when the sender initiates the SWIFT transfer.
+        A Friday wire may credit on Monday at a different rate.
+      </span>
+    </div>
+
     <div class="table-wrap">
       <table class="best-rate-table">
         <caption>
@@ -675,6 +706,25 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                     <p v-if="fees[row.bank].note" class="fee-note">{{ fees[row.bank].note }}</p>
                     <a :href="fees[row.bank].source_url" target="_blank" rel="noopener noreferrer" class="fee-source">
                       {{ fees[row.bank].rules.length ? "Bank's published schedule ↗" : "Learn more ↗" }}
+                    </a>
+                  </div>
+
+                  <div v-if="creditTimes[row.bank]" class="detail-credit">
+                    <p class="detail-credit-title">Credit time</p>
+                    <span
+                      v-if="creditTimes[row.bank].category !== 'not-published'"
+                      class="credit-badge"
+                      :class="creditClass(creditTimes[row.bank].category)"
+                    >
+                      <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                        <circle cx="8" cy="8" r="6.5"/>
+                        <polyline points="8,5 8,8.5 10.5,8.5"/>
+                      </svg>
+                      {{ creditLabel(creditTimes[row.bank].category) }}
+                    </span>
+                    <p class="credit-note">{{ creditTimes[row.bank].note }}</p>
+                    <a v-if="creditTimes[row.bank].source" :href="creditTimes[row.bank].source!" target="_blank" rel="noopener noreferrer" class="fee-source">
+                      Bank's published statement ↗
                     </a>
                   </div>
                 </div>
@@ -1262,7 +1312,8 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
       padding-right: 0;
     }
 
-    .detail-fees {
+    .detail-fees,
+    .detail-credit {
       border-left: none;
       border-top: 1px solid var(--gridline);
       padding: 12px 0 0;
@@ -1387,6 +1438,79 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   &:hover {
     text-decoration: underline;
   }
+}
+
+.rate-lock-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  background: var(--page-plane);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+
+  svg {
+    flex: none;
+    margin-top: 1px;
+  }
+
+  strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+}
+
+.detail-credit {
+  flex: 1;
+  min-width: 160px;
+  border-left: 1px solid var(--gridline);
+  padding: 0 0 0 20px;
+}
+
+.detail-credit-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+}
+
+.credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+
+  &.same-day {
+    color: var(--success-text);
+    background: color-mix(in srgb, var(--status-good) 12%, transparent);
+  }
+
+  &.one-two-days {
+    color: #92400e;
+    background: color-mix(in srgb, #f59e0b 14%, transparent);
+  }
+
+  &.two-three-days {
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--text-muted) 12%, transparent);
+  }
+}
+
+.credit-note {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 6px;
 }
 
 .stale-callout {

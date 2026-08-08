@@ -8,6 +8,7 @@ import BankHeadToHead from "./components/BankHeadToHead.vue";
 import WhatIfMachine from "./components/WhatIfMachine.vue";
 import MyBankPanel from "./components/MyBankPanel.vue";
 import { brandColor, isPlatform, shortName, sortByBankOrder } from "./bankPalette";
+import { CREDIT_TIMES } from "./creditTime";
 import { currencyName, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency } from "./types";
 
@@ -700,7 +701,7 @@ const stableBank = computed<StableBankResult | null>(() => {
 
     <section class="panel">
       <h2>Best value today</h2>
-      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
+      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :credit-times="CREDIT_TIMES" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
     </section>
 
     <section v-if="availableCurrencies.length > 1" class="panel">
