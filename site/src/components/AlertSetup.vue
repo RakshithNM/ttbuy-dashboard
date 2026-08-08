@@ -293,7 +293,6 @@ async function disable() {
 .as-label {
   font-size: 12px;
   color: var(--text-muted);
-  white-space: nowrap;
 }
 
 .as-dir {

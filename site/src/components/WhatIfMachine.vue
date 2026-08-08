@@ -245,6 +245,11 @@ function daysAgo(dateStr: string): string {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+
+  @media (max-width: 711px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .date-input {
@@ -267,12 +272,25 @@ function daysAgo(dateStr: string): string {
     opacity: 0.5;
     cursor: pointer;
   }
+
+  @media (max-width: 711px) {
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 .cur-tabs {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
+
+  @media (max-width: 711px) {
+    width: 100%;
+
+    .cur-btn {
+      flex: 1;
+    }
+  }
 }
 
 .cur-btn {
@@ -319,6 +337,11 @@ function daysAgo(dateStr: string): string {
     outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
+
+  @media (max-width: 711px) {
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 .amt-sym {
@@ -336,6 +359,11 @@ function daysAgo(dateStr: string): string {
   color: var(--text-primary);
   width: 80px;
   min-width: 0;
+
+  @media (max-width: 711px) {
+    flex: 1;
+    width: auto;
+  }
 
   &:focus {
     outline: none;

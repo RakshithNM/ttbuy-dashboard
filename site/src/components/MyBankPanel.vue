@@ -445,7 +445,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
 
 .mbp-headline {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 7px;
   font-size: 13px;
   color: var(--text-secondary);
@@ -458,7 +458,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
 
   .st-icon {
     flex: none;
-    margin-top: 1px;
+    margin-top: 2px;
   }
 }
 

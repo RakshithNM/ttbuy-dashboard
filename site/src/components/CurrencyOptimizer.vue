@@ -291,7 +291,7 @@ function formatForeign(amount: number, symbol: string): string {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
 }
 

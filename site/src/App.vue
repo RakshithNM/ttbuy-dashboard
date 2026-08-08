@@ -828,9 +828,11 @@ const stableBank = computed<StableBankResult | null>(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  width: 100%;
 }
 
 .currency-btn {
+  flex: 1;
   background: none;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -863,7 +865,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex: 1;
+  flex: 3;
   min-width: 160px;
   margin-bottom: 0;
   padding: 0 10px;
@@ -919,7 +921,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  flex: none;
+  flex: 1;
   background: none;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -987,6 +989,12 @@ const stableBank = computed<StableBankResult | null>(() => {
   h2 {
     margin: 0;
   }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
 
 .chart-controls {
@@ -994,6 +1002,13 @@ const stableBank = computed<StableBankResult | null>(() => {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+
+  @media (max-width: 711px) {
+    .compare-btn,
+    .table-toggle {
+      flex: 1;
+    }
+  }
 }
 
 .table-toggle,
@@ -1001,6 +1016,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  flex: 1;
   background: none;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -1130,6 +1146,14 @@ const stableBank = computed<StableBankResult | null>(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+
+  @media (max-width: 711px) {
+    width: 100%;
+
+    .range-btn {
+      flex: 1;
+    }
+  }
 }
 
 .range-btn {
