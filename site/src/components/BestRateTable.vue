@@ -962,9 +962,8 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   align-self: center;
   margin-left: auto;
   padding: 3px 10px;
-  border: 1px solid #25d36640;
-  border-radius: 5px;
-  background: #25d3660f;
+  border: none;
+  background: transparent;
   font-size: 12px;
   color: #25d366;
   cursor: pointer;
