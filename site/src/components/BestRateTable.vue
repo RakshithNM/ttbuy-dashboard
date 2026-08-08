@@ -202,7 +202,7 @@ const shareText = computed<string | null>(() => {
   if (rateSpread.value?.receiveGap != null) {
     lines.push(`₹${formatInr(rateSpread.value.receiveGap)} more than the worst bank on ${currencySymbol(props.currency)}${formatInr(safeAmount.value)}`);
   }
-  lines.push("ttbuyrates.rakshithnettar.com");
+  lines.push("https://ttbuyrates.rakshithnettar.com");
   return lines.join("\n");
 });
 
