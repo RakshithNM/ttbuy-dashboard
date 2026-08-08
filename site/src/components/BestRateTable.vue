@@ -1316,7 +1316,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     .detail-credit {
       border-left: none;
       border-top: 1px solid var(--gridline);
-      padding: 12px 0 0;
+      padding: 12px 0;
     }
   }
 
