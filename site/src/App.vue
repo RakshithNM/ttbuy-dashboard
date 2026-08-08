@@ -460,6 +460,10 @@ function exportCsv() {
   URL.revokeObjectURL(url);
 }
 
+function printPdf() {
+  window.print();
+}
+
 const lastUpdated = computed(() => {
   const dates = allSeries.value.flatMap((s) => s.points.map((p) => p.date));
   if (dates.length === 0) return null;
@@ -681,6 +685,13 @@ const stableBank = computed<StableBankResult | null>(() => {
           <path d="M3 12h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
         CSV
+      </button>
+      <button type="button" class="export-btn" title="Print or save as PDF" @click="printPdf">
+        <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+          <path d="M4 5V1h8v4M4 11v4h8v-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 5h12a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        PDF
       </button>
       <button type="button" class="share-btn" :class="{ copied }" @click="copyShareLink">
         <svg v-if="canNativeShare" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
