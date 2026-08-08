@@ -15,6 +15,13 @@ def export():
         df["Currency"] = "USD"
     df["Currency"] = df["Currency"].fillna("USD").replace("", "USD")
 
+    midmarket_path = os.path.join(DATA_DIR, "midmarket_history.csv")
+    if os.path.exists(midmarket_path):
+        df_mm = pd.read_csv(midmarket_path, dtype=str)
+        df_mm["TT_Buy"] = pd.to_numeric(df_mm["TT_Buy"], errors="coerce")
+        df_mm = df_mm.dropna(subset=["TT_Buy", "Date"])
+        df = pd.concat([df, df_mm], ignore_index=True)
+
     # Snapshot_Timestamp sorts wayback timestamps ("202...") before live rows
     # ("live-..."), so keeping the last row per (Bank, Currency, Date) prefers
     # a live scrape over an archived one when both exist for the same date.

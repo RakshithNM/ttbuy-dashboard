@@ -1,28 +1,61 @@
+import csv
 import json
 import os
 import requests
+from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 
 from scraper.core import TARGET_CURRENCIES, fetch_rendered_html
 
 DATA_DIR = os.environ.get("TTBUY_DATA_DIR", "data")
 BENCHMARKS_PATH = os.path.join(DATA_DIR, "benchmarks.json")
+MIDMARKET_HISTORY_PATH = os.path.join(DATA_DIR, "midmarket_history.csv")
 
 def fetch_mid_market_rates():
     rates = {}
+    history = []
+    
+    end_date = datetime.utcnow().strftime("%Y-%m-%d")
+    start_date = (datetime.utcnow() - timedelta(days=365)).strftime("%Y-%m-%d")
+    
     for currency in TARGET_CURRENCIES:
         if currency == "AED":
             continue
 
         try:
-            res = requests.get(f"https://api.frankfurter.app/latest?from={currency}&to=INR", timeout=10)
+            # Fetch historical data
+            res = requests.get(f"https://api.frankfurter.app/{start_date}..{end_date}?from={currency}&to=INR", timeout=20)
             if res.status_code == 200:
                 data = res.json()
-                rates[currency] = data["rates"]["INR"]
+                currency_rates = data.get("rates", {})
+                dates = sorted(currency_rates.keys())
+                
+                # Append to history
+                for date in dates:
+                    history.append({
+                        "Bank": "Mid-market",
+                        "Currency": currency,
+                        "Date": date,
+                        "TT_Buy": currency_rates[date]["INR"],
+                        "Snapshot_Timestamp": f"live-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+                    })
+                
+                # Set latest for benchmarks.json
+                if dates:
+                    latest_date = dates[-1]
+                    rates[currency] = currency_rates[latest_date]["INR"]
             else:
                 print(f"Failed to fetch {currency} from Frankfurter API: {res.status_code}")
         except Exception as e:
             print(f"Error fetching {currency} from Frankfurter API: {e}")
+
+    # Write historical data to CSV
+    if history:
+        with open(MIDMARKET_HISTORY_PATH, "w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["Bank", "Currency", "Date", "TT_Buy", "Snapshot_Timestamp"])
+            writer.writeheader()
+            writer.writerows(history)
+        print(f"Wrote {len(history)} historical mid-market rates to {MIDMARKET_HISTORY_PATH}")
 
     return rates
 

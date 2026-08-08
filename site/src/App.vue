@@ -7,7 +7,7 @@ import CurrencyOptimizer from "./components/CurrencyOptimizer.vue";
 import BankHeadToHead from "./components/BankHeadToHead.vue";
 import WhatIfMachine from "./components/WhatIfMachine.vue";
 import MyBankPanel from "./components/MyBankPanel.vue";
-import { brandColor, isPlatform, shortName, sortByBankOrder } from "./bankPalette";
+import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
 import { sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
@@ -207,7 +207,7 @@ const allSeries = computed<BankSeries[]>(() => {
     color: brandColor(name),
     wrapped: false,
     points: bankRates.value[name] ?? [],
-    category: (isPlatform(name) ? "platform" : "bank") as "bank" | "platform",
+    category: (isBenchmark(name) ? "benchmark" : isPlatform(name) ? "platform" : "bank") as "bank" | "platform" | "benchmark",
   }));
 
   // Find the first date where ≥11 banks reported — everything before that is

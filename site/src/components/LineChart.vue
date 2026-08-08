@@ -30,7 +30,9 @@ const plotW = W - MARGIN.left - MARGIN.right;
 const plotH = H - MARGIN.top - MARGIN.bottom;
 
 const visibleSeries = computed(() =>
-  props.series.filter((s) => !props.hidden.has(s.name) && s.points.length > 0)
+  props.series
+    .filter((s) => !props.hidden.has(s.name) && s.points.length > 0)
+    .sort((a, b) => (a.category === "benchmark" ? -1 : b.category === "benchmark" ? 1 : 0))
 );
 
 // Shown (not hidden) but with no points in the current filtered range —
@@ -445,7 +447,7 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          :stroke-dasharray="s.wrapped ? '6 3' : undefined"
+          :stroke-dasharray="s.category === 'benchmark' ? '4 4' : (s.wrapped ? '6 3' : undefined)"
         />
         <circle
           v-for="p in s.points"

@@ -27,6 +27,7 @@ export const BRAND_COLORS: Record<string, string> = {
   "Union Bank of India":        "#00579C", // Union Bank blue
   "Skydo":                      "#1B4FD8", // Skydo blue
   "Remitly":                    "#1D3557", // Remitly dark navy
+  "Mid-market":                 "#888888", // Mid-market grey
 };
 
 const BRAND_COLOR_FALLBACK = "#6b7280";
@@ -84,7 +85,11 @@ export function sourceUrl(name: string): string | null {
 export const PLATFORM_NAMES = new Set(["Skydo", "Remitly"]);
 
 export function isPlatform(name: string): boolean {
-  return PLATFORM_NAMES.has(name);
+  return ["Skydo", "Remitly", "Wise", "Payoneer"].includes(name);
+}
+
+export function isBenchmark(name: string): boolean {
+  return name === "Mid-market";
 }
 
 // Known banks in a stable order. New banks get appended here (never inserted)
