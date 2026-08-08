@@ -193,6 +193,27 @@ const latestDate = computed(() => {
   return dates.length ? [...dates].sort().at(-1)! : null;
 });
 
+const shareText = computed<string | null>(() => {
+  const best = rows.value.find((r): r is DataRow => r.hasData && r.category === "bank");
+  if (!best) return null;
+  const lines: string[] = [
+    `Best ${props.currency} rate today: ${shortName(best.bank)} at ₹${best.ttbuy.toFixed(2)}/${props.currency}`,
+  ];
+  if (rateSpread.value?.receiveGap != null) {
+    lines.push(`₹${formatInr(rateSpread.value.receiveGap)} more than the worst bank on ${currencySymbol(props.currency)}${formatInr(safeAmount.value)}`);
+  }
+  lines.push("ttbuyrates.rakshithnettar.com");
+  return lines.join("\n");
+});
+
+const shareCopied = ref(false);
+async function copyShareText() {
+  if (!shareText.value) return;
+  await navigator.clipboard.writeText(shareText.value);
+  shareCopied.value = true;
+  setTimeout(() => { shareCopied.value = false; }, 2000);
+}
+
 const staleBanks = computed<DataRow[]>(() => {
   if (!latestDate.value) return [];
   return rows.value.filter((r): r is DataRow => r.hasData && r.category === "bank" && r.date < latestDate.value!);
@@ -449,6 +470,22 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
           on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}
         </template>
       </span>
+      <button
+        v-if="shareText"
+        type="button"
+        class="share-rates-btn"
+        :class="{ copied: shareCopied }"
+        @click="copyShareText"
+        :aria-label="shareCopied ? 'Copied!' : 'Copy rates to share'"
+      >
+        <svg v-if="!shareCopied" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6.5 9.5l3-3M6.8 5.3l.9-.9a2.2 2.2 0 013.1 3.1l-.9.9M9.2 10.7l-.9.9a2.2 2.2 0 01-3.1-3.1l.9-.9"/>
+        </svg>
+        <svg v-else viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2.5 8.5l4 4 7-8"/>
+        </svg>
+        {{ shareCopied ? 'Copied!' : 'Share' }}
+      </button>
     </div>
 
     <div v-if="todaySignal" class="today-callout" :class="todaySignal.direction" role="note">
@@ -907,6 +944,11 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     margin-top: 1px;
   }
 
+  > span {
+    flex: 1;
+    min-width: 0;
+  }
+
   .spread-rate {
     font-weight: 600;
     color: var(--text-primary);
@@ -917,6 +959,35 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     font-weight: 700;
     color: var(--success-text);
     font-variant-numeric: tabular-nums;
+  }
+}
+
+.share-rates-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  align-self: center;
+  margin-left: auto;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface-2);
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+
+  &:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+
+  &.copied {
+    color: var(--success-text);
+    border-color: color-mix(in srgb, var(--status-good) 40%, transparent);
+    background: color-mix(in srgb, var(--status-good) 8%, transparent);
   }
 }
 
