@@ -131,6 +131,7 @@ const rows = computed<Row[]>(() => {
   const platformEmptyRows: EmptyRow[] = [];
 
   for (const s of props.series) {
+    if (s.category === "benchmark") continue;
     const isPlatformRow = s.category === "platform";
     const last = s.points[s.points.length - 1];
     if (!last) {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { BankSeries, FeesByBank, FeeSlab } from "../types";
-import { brandColor, isPlatform, shortName } from "../bankPalette";
+import { brandColor, shortName } from "../bankPalette";
 import { currencySymbol } from "../currencies";
 import AlertSetup from "./AlertSetup.vue";
 
@@ -35,11 +35,11 @@ function fmtDate(iso: string): string {
   return `${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1]} ${d}`;
 }
 
-// Most recent date among all non-platform banks
+// Most recent date among all bank series (excludes platforms and benchmarks)
 const latestDate = computed(() => {
   let d = "";
   for (const s of props.series) {
-    if (isPlatform(s.name) || !s.points.length) continue;
+    if (s.category !== "bank" || !s.points.length) continue;
     const last = s.points.at(-1)!.date;
     if (last > d) d = last;
   }
@@ -60,7 +60,7 @@ const rankedBanks = computed<BankSnap[]>(() => {
   if (!safeAmount.value || !latestDate.value) return [];
   const out: BankSnap[] = [];
   for (const s of props.series) {
-    if (isPlatform(s.name) || !s.points.length) continue;
+    if (s.category !== "bank" || !s.points.length) continue;
     const last = s.points.at(-1)!;
     if (last.date !== latestDate.value) continue;
     const gross = last.ttbuy * safeAmount.value;
@@ -124,7 +124,7 @@ const stateKind = computed<StateKind>(() => {
 // How often my bank has led in the last 30 qualifying days
 const leadCount = computed<{ led: number; total: number } | null>(() => {
   if (!myBank.value) return null;
-  const bankSeries = props.series.filter(s => !isPlatform(s.name) && s.points.length > 0);
+  const bankSeries = props.series.filter(s => s.category === "bank" && s.points.length > 0);
   const threshold = Math.floor(bankSeries.length / 2) + 1;
   const byDate = new Map<string, { bank: string; rate: number }[]>();
   for (const s of bankSeries) {
@@ -148,7 +148,7 @@ const leadCount = computed<{ led: number; total: number } | null>(() => {
 
 const allBanks = computed(() =>
   [...new Set(
-    props.series.filter(s => !isPlatform(s.name) && s.points.length > 0).map(s => s.name)
+    props.series.filter(s => s.category === "bank" && s.points.length > 0).map(s => s.name)
   )].sort()
 );
 
