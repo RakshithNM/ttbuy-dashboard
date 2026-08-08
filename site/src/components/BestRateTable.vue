@@ -54,6 +54,12 @@ const safeAmount = computed(() => {
   return Number.isFinite(n) && n > 0 ? n : 0;
 });
 
+const SWIFT_FEE_USD = 15;
+const includeSwiftFee = ref(false);
+const effectiveAmount = computed(() =>
+  safeAmount.value > 0 ? Math.max(0, safeAmount.value - (includeSwiftFee.value ? SWIFT_FEE_USD : 0)) : 0
+);
+
 interface DataRow {
   bank: string;
   color: string;
@@ -138,7 +144,7 @@ const rows = computed<Row[]>(() => {
     // Platforms credit the full converted amount to the recipient (sender pays
     // the platform fee on their side), so feeInr=0 and feeUnknown=false.
     const fee = isPlatformRow ? null : props.fees[s.name];
-    const grossReceive = last.ttbuy * safeAmount.value;
+    const grossReceive = last.ttbuy * effectiveAmount.value;
     const feeUnknown = isPlatformRow ? false : (!fee?.fee_slabs && fee?.fee_inr == null);
     const feeInr = isPlatformRow ? 0 : (
       fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, grossReceive) : (fee?.fee_inr ?? 0)
@@ -415,6 +421,13 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         <input id="remit-amount" v-model.number="amount" type="number" min="1" step="1" inputmode="decimal" class="amount-input" :aria-invalid="hasInvalidAmount ? 'true' : undefined" />
       </div>
       <span class="suffix">{{ currency }}, here's what each bank credits you after fees (where known)</span>
+      <label
+        class="swift-fee-toggle"
+        title="Sending banks and intermediate SWIFT correspondents typically deduct $10–20 before the money reaches India. Check your bank's outward wire fee."
+      >
+        <input type="checkbox" v-model="includeSwiftFee" />
+        Deduct ~${{ SWIFT_FEE_USD }} sending bank / SWIFT fee<template v-if="includeSwiftFee && safeAmount > SWIFT_FEE_USD"> (showing net on ${{ safeAmount - SWIFT_FEE_USD }})</template>
+      </label>
     </div>
 
     <div v-if="rateSpread" class="spread-callout" role="note">
@@ -426,7 +439,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         <span class="spread-rate">₹{{ rateSpread.rateGap.toFixed(2) }}/{{ currency }}</span>
         <template v-if="rateSpread.receiveGap !== null">
           , or <span class="spread-amount">₹{{ formatInr(rateSpread.receiveGap) }} more</span>
-          on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}
+          on {{ currencySymbol(currency) }}{{ formatInr(effectiveAmount) }}
         </template>
       </span>
     </div>
@@ -799,6 +812,25 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
 
   .suffix {
     color: var(--text-muted);
+  }
+}
+
+.swift-fee-toggle {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+
+  input[type="checkbox"] {
+    width: 13px;
+    height: 13px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
   }
 }
 
