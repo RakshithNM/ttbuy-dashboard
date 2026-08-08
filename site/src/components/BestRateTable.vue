@@ -477,7 +477,6 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="currentColor">
           <path d="M8 0C3.58 0 0 3.58 0 8c0 1.41.37 2.73 1.01 3.88L0 16l4.25-1.11A7.94 7.94 0 008 16c4.42 0 8-3.58 8-8s-3.58-8-8-8zm3.93 11.27c-.17.47-.97.9-1.34.95-.34.05-.77.07-1.24-.08-.29-.09-.65-.21-1.12-.41-1.97-.85-3.25-2.84-3.35-2.97-.1-.13-.8-1.06-.8-2.02 0-.96.5-1.43.68-1.63.17-.19.38-.24.51-.24l.36.01c.12 0 .28-.05.44.33.17.4.57 1.37.62 1.47.05.1.08.22.02.35-.07.13-.1.21-.2.33l-.3.35c-.1.1-.2.2-.09.4.12.2.52.85 1.11 1.37.76.68 1.4.89 1.6.99.2.1.31.08.43-.05.12-.13.5-.58.63-.78.13-.2.27-.17.45-.1l1.43.67c.17.08.28.12.32.19.05.07.05.4-.12.87z"/>
         </svg>
-        WhatsApp
       </button>
     </div>
 
@@ -1131,7 +1130,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   tbody tr:last-child td {
     border-bottom: none;
   }
-  
+
   tbody tr.clickable {
     cursor: pointer;
 
@@ -1139,12 +1138,12 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
       color: var(--text-secondary);
     }
   }
-  
+
   tbody tr.expanded th,
   tbody tr.expanded td {
     border-bottom: none;
   }
-  
+
   tbody tr.detail-row th,
   tbody tr.detail-row td {
     padding: 0;
@@ -1451,7 +1450,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     .badge-text {
       display: none;
     }
-    
+
     .detail-panel {
       padding: 12px 8px 16px;
       flex-direction: column;
