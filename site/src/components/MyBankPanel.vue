@@ -292,7 +292,8 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
 .mbp-prompt {
   display: flex;
   align-items: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   padding: 10px 14px;
   background: var(--surface-1);
   border: 1px solid var(--border);
@@ -333,7 +334,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
 }
 
 .mbp-select-inline {
-  flex: 1;
+  flex: 1 1 140px;
   min-width: 0;
   border: none;
   background: none;
