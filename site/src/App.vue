@@ -745,22 +745,6 @@ const stableBank = computed<StableBankResult | null>(() => {
       <p class="panel-footnote">Published retail TT Buy rates. Corporate and HNI rates are negotiated separately and may differ.</p>
     </section>
 
-    <section v-if="availableCurrencies.length > 1" class="panel">
-      <CurrencyOptimizer :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
-    </section>
-
-    <section v-if="availableCurrencies.length > 1" class="panel">
-      <h2>Bank head-to-head</h2>
-      <p class="panel-sub">Pick two banks and see which one gives you more across all currencies</p>
-      <BankHeadToHead :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
-    </section>
-
-    <section class="panel">
-      <h2>What if?</h2>
-      <p class="panel-sub">Pick any past date to replay the rates and see what you'd have received</p>
-      <WhatIfMachine :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
-    </section>
-
     <section class="panel">
       <div class="panel-header">
         <h2>Historical TT Buy rate</h2>
@@ -828,6 +812,22 @@ const stableBank = computed<StableBankResult | null>(() => {
       <h2>Best bank per day</h2>
       <p class="panel-sub">Which bank had the highest {{ currency }} TT Buy rate each day</p>
       <CalendarHeatmap :series="allSeries" :currency="currency" />
+    </section>
+
+    <section class="panel">
+      <h2>What if?</h2>
+      <p class="panel-sub">Pick any past date to replay the rates and see what you'd have received</p>
+      <WhatIfMachine :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
+    </section>
+
+    <section v-if="availableCurrencies.length > 1" class="panel">
+      <CurrencyOptimizer :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
+    </section>
+
+    <section v-if="availableCurrencies.length > 1" class="panel">
+      <h2>Bank head-to-head</h2>
+      <p class="panel-sub">Pick two banks and see which one gives you more across all currencies</p>
+      <BankHeadToHead :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
     </section>
   </main>
 
