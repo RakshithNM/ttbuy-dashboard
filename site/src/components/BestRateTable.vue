@@ -451,8 +451,9 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         title="Sending banks and intermediate SWIFT correspondents typically deduct $10–20 before the money reaches India. Check your bank's outward wire fee."
       >
         <input type="checkbox" v-model="includeSwiftFee" />
-        <span>Deduct ~${{ SWIFT_FEE_USD }} sending bank / SWIFT fee<template v-if="includeSwiftFee && safeAmount > SWIFT_FEE_USD"> (showing net on ${{ safeAmount - SWIFT_FEE_USD }})</template></span>
+        <span>Deduct ~${{ SWIFT_FEE_USD }} sending bank / SWIFT fee</span>
       </label>
+      <span v-if="includeSwiftFee && safeAmount > SWIFT_FEE_USD" class="swift-fee-net-note">(showing net on ${{ safeAmount - SWIFT_FEE_USD }})</span>
     </div>
 
     <div v-if="rateSpread" class="spread-callout" role="note">
@@ -849,6 +850,13 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   .suffix {
     color: var(--text-muted);
   }
+}
+
+.swift-fee-net-note {
+  flex-basis: 100%;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  padding-left: 19px;
 }
 
 .swift-fee-toggle {
