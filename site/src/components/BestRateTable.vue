@@ -453,7 +453,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         @click.prevent="includeSwiftFee = !includeSwiftFee"
       >
         <input id="swift-fee" type="checkbox" :checked="includeSwiftFee" @click.stop="includeSwiftFee = !includeSwiftFee" />
-        <span>Deduct ~${{ SWIFT_FEE_USD }} sending bank / SWIFT fee</span><span v-show="includeSwiftFee && safeAmount > SWIFT_FEE_USD">(showing net on ${{ safeAmount - SWIFT_FEE_USD }})</span>
+        <span>Deduct ~${{ SWIFT_FEE_USD }} sending bank fee</span><span v-show="includeSwiftFee && safeAmount > SWIFT_FEE_USD">(showing net on ${{ safeAmount - SWIFT_FEE_USD }})</span>
       </label>
     </div>
 
@@ -558,7 +558,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         <line x1="1" y1="13" x2="15" y2="13"/>
       </svg>
       <span>
-        <strong>Volatility insight:</strong>
+        <strong>Volatility insight: </strong>
         <strong :style="{ color: stableBank.color }">{{ shortName(stableBank.bank) }}</strong>
         had the lowest rate volatility among the top {{ stableBank.topN }} banks,
         varying by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
