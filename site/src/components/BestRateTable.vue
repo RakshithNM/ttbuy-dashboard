@@ -87,6 +87,8 @@ interface DataRow {
   // the best bank itself. Based on netReceive, not the raw TT Buy rate, so
   // a better rate can still lose to a lower-fee bank here.
   gapToBest: number;
+  // % below the mid-market (interbank) rate; null when no benchmark is available.
+  markupPct: number | null;
 }
 
 interface EmptyRow {
@@ -150,6 +152,7 @@ const rows = computed<Row[]>(() => {
     const feeInr = isPlatformRow ? 0 : (
       fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, grossReceive) : (fee?.fee_inr ?? 0)
     );
+    const benchmark = currentBenchmarks.value?.midMarket ?? currentBenchmarks.value?.rbiReference ?? null;
     const row: Omit<DataRow, "gapToBest"> = {
       bank: s.name,
       color: s.color,
@@ -163,6 +166,7 @@ const rows = computed<Row[]>(() => {
       feeUnknown,
       netReceive: Math.max(0, grossReceive - feeInr),
       delta: showDelta ? last.ttbuy - prev!.ttbuy : null,
+      markupPct: benchmark ? (benchmark - last.ttbuy) / benchmark * 100 : null,
     };
     if (isPlatformRow) platformDataRows.push(row);
     else bankDataRows.push(row);
@@ -600,6 +604,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
           <tr>
             <th scope="col">Bank</th>
             <th scope="col" class="num">TT Buy (₹ / {{ currency }})</th>
+            <th scope="col" class="num mid-col" title="How far the bank's rate is below the interbank mid-market rate (XE / Frankfurter). Lower % = more competitive.">vs mid-market ⓘ</th>
             <th scope="col" class="num">You receive (₹)</th>
             <th scope="col" class="num">vs best</th>
             <th scope="col">As of</th>
@@ -613,6 +618,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
               </span>
             </th>
             <td class="num"><span class="tt-val">₹{{ currentBenchmarks.midMarket.toFixed(4) }}</span></td>
+            <td class="num benchmark-ref-cell">reference</td>
             <td class="num">n/a</td>
             <td class="num">n/a</td>
             <td class="td-date">Live</td>
@@ -624,13 +630,14 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
               </span>
             </th>
             <td class="num"><span class="tt-val">₹{{ currentBenchmarks.rbiReference.toFixed(4) }}</span></td>
+            <td class="num benchmark-ref-cell">reference</td>
             <td class="num">n/a</td>
             <td class="num">n/a</td>
             <td class="td-date">Daily</td>
           </tr>
           <template v-for="(row, i) in rows" :key="row.bank">
             <tr v-if="row.category === 'platform' && i === firstPlatformIndex" class="platform-divider">
-              <td colspan="5" class="platform-section-header">
+              <td colspan="6" class="platform-section-header">
                 Remittance platforms
                 <span class="platform-section-note">Rate applied to your transfer, no deduction on recipient side</span>
               </td>
@@ -717,6 +724,15 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                     </span>
                   </div>
                 </td>
+                <td class="num mid-col">
+                  <span
+                    v-if="row.markupPct !== null"
+                    class="markup-pct"
+                    :class="row.markupPct <= 0.75 ? 'markup-low' : row.markupPct <= 1.5 ? 'markup-mid' : 'markup-high'"
+                    :title="`${row.markupPct.toFixed(2)}% below the interbank mid-market rate`"
+                  >−{{ row.markupPct.toFixed(1) }}%</span>
+                  <span v-else class="markup-na">—</span>
+                </td>
                 <td class="num receive">
                   <span
                     v-if="row.feeUnknown"
@@ -741,10 +757,10 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                   </svg>
                 </td>
               </template>
-              <td v-else colspan="4" class="no-data">No data for this bank</td>
+              <td v-else colspan="5" class="no-data">No data for this bank</td>
             </tr>
             <tr v-if="expandedBank === row.bank" class="detail-row">
-              <td colspan="5">
+              <td colspan="6">
                 <div class="detail-panel">
                   <div v-if="bankStats.has(row.bank)" class="detail-stats">
                     <div class="stat-group">
@@ -1410,6 +1426,27 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
 
   tr.platform-divider td {
     padding-top: 24px;
+  }
+
+  .mid-col {
+    white-space: nowrap;
+    font-size: 0.82em;
+  }
+
+  .markup-pct {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+
+    &.markup-low  { color: #22a36b; }
+    &.markup-mid  { color: #d08b00; }
+    &.markup-high { color: #d84040; }
+  }
+
+  .markup-na, .benchmark-ref-cell {
+    color: var(--text-muted);
+    font-size: 0.8em;
+    font-style: italic;
   }
 
   .benchmark-row {
