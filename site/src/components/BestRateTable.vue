@@ -450,7 +450,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         class="swift-fee-toggle"
         title="Sending banks and intermediate SWIFT correspondents typically deduct $10–20 before the money reaches India. Check your bank's outward wire fee."
       >
-        <input type="checkbox" v-model="includeSwiftFee" />
+        <input type="checkbox" :checked="includeSwiftFee" @click="includeSwiftFee = ($event.target as HTMLInputElement).checked" />
         <span>Deduct ~${{ SWIFT_FEE_USD }} sending bank / SWIFT fee</span>
       </label>
       <span v-if="includeSwiftFee && safeAmount > SWIFT_FEE_USD" class="swift-fee-net-note">(showing net on ${{ safeAmount - SWIFT_FEE_USD }})</span>
