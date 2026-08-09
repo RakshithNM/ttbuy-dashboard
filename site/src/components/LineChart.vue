@@ -73,23 +73,12 @@ const xDomain = computed<[number, number]>(() => {
   return [Math.min(...times), dataMax];
 });
 
-function niceNum(range: number, round: boolean): number {
-  const safeRange = range || 1;
-  const exponent = Math.floor(Math.log10(safeRange));
-  const fraction = safeRange / Math.pow(10, exponent);
-  let niceFraction: number;
-  if (round) {
-    if (fraction < 1.5) niceFraction = 1;
-    else if (fraction < 3) niceFraction = 2;
-    else if (fraction < 7) niceFraction = 5;
-    else niceFraction = 10;
-  } else {
-    if (fraction <= 1) niceFraction = 1;
-    else if (fraction <= 2) niceFraction = 2;
-    else if (fraction <= 5) niceFraction = 5;
-    else niceFraction = 10;
-  }
-  return niceFraction * Math.pow(10, exponent);
+// Pick the smallest "nice" step that keeps tick count at ~6.
+// Supports 0.25 and 0.5 so tight rate spreads get sub-rupee gridlines.
+function yStep(range: number): number {
+  const ideal = range / 6;
+  const candidates = [0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100];
+  return candidates.find(c => c >= ideal) ?? 100;
 }
 
 const yDomain = computed<[number, number]>(() => {
@@ -98,13 +87,15 @@ const yDomain = computed<[number, number]>(() => {
   const min = Math.min(...values);
   const max = Math.max(...values);
   const pad = (max - min) * 0.15 || max * 0.05 || 1;
-  const step = niceNum((max + pad - (min - pad)) / 4, true);
-  return [Math.floor((min - pad) / step) * step, Math.ceil((max + pad) / step) * step];
+  const rawMin = min - pad;
+  const rawMax = max + pad;
+  const step = yStep(rawMax - rawMin);
+  return [Math.floor(rawMin / step) * step, Math.ceil(rawMax / step) * step];
 });
 
 const yTicks = computed<number[]>(() => {
   const [min, max] = yDomain.value;
-  const step = niceNum((max - min) / 4, true) || 1;
+  const step = yStep(max - min);
   const ticks: number[] = [];
   for (let v = Math.ceil(min / step) * step; v <= max + 1e-9; v += step) {
     ticks.push(Math.round(v * 100) / 100);
