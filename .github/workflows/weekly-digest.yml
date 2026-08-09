@@ -1,0 +1,22 @@
+name: Send weekly digest email
+
+on:
+  schedule:
+    - cron: "30 3 * * 5"  # 09:00 IST every Friday
+  workflow_dispatch: {}    # allow manual trigger from GitHub UI
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger weekly digest
+        run: |
+          curl -sf -X POST "$SITE_URL/api/weekly-digest" \
+            -H "x-digest-secret: $DIGEST_SECRET" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            | tee /dev/stderr \
+            | jq -e '.errors == 0'
+        env:
+          SITE_URL: https://ttbuyrates.rakshithnettar.com
+          DIGEST_SECRET: ${{ secrets.DIGEST_SECRET }}

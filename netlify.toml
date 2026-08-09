@@ -35,6 +35,3 @@
   from = "/api/weekly-digest"
   to = "/.netlify/functions/weekly-digest"
   status = 200
-
-[functions."weekly-digest"]
-  schedule = "30 3 * * 5"
