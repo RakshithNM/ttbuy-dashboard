@@ -50,6 +50,15 @@ Pick any two banks and see how they stack up across all four currencies in one t
 - A one-line **verdict** at the bottom summarises who wins overall: "IOB wins USD and GBP. PNB wins EUR and AED."
 - A **swap button** between the two selectors reverses the comparison without re-selecting.
 
+### Mid-market benchmark
+
+A grey dashed **Mid-market** line appears on the historical chart and as a reference row in the "Best value today" table. It shows the interbank/wholesale rate for that day — the rate at which banks trade between themselves, with no retail markup added.
+
+- For USD, GBP, and EUR the mid-market rate comes from the **[Frankfurter API](https://frankfurter.app/)** (ECB-sourced, daily, no API key required). AED/INR is not covered by Frankfurter, so no mid-market line is shown for AED.
+- A **FBIL reference rate** (published by the Financial Benchmarks India Ltd, the RBI-mandated benchmark-setter) is also fetched daily from [fbil.org.in](https://www.fbil.org.in/) for all four currencies. This is the official onshore interbank fixing and covers AED.
+- Both are updated as part of the same daily cron that scrapes bank rates. The mid-market rate is **not** a rate any retail customer can transact at — it is a reference floor that shows how much of a spread each bank is adding on top of the true interbank price.
+- The Mid-market entry is excluded from bank rankings and the "My Bank" selector — it is a context line only, not a real remittance option.
+
 ### Historical chart and table
 
 - Plots every bank's TT Buy rate over time on a single chart, color-coded by bank.
@@ -92,15 +101,30 @@ The scraper runs automatically every day at 11 AM IST (with a 16:00 IST retry). 
   the entrypoint) — a much less standardized set of documents than the daily
   rate pages, so each plugin returns a flexible `{rules, note}` shape rather
   than forcing every bank into the same fee-category axis.
+- `scraper/benchmarks.py` — fetches mid-market and FBIL reference rates.
+  `fetch_mid_market_rates()` calls the Frankfurter API
+  (`https://api.frankfurter.app/{start}..{end}?from={currency}&to=INR`) for
+  up to 365 days of ECB-sourced daily rates for USD, GBP, EUR (AED/INR is not
+  available on Frankfurter and is skipped). Results are written to
+  `data/midmarket_history.csv` and the latest per-currency rate goes into
+  `data/benchmarks.json`. `fetch_rbi_reference_rates()` uses Playwright to
+  render `fbil.org.in` (JS-rendered) and parses the FBIL fixing table for all
+  four currencies; its output also lands in `benchmarks.json` under
+  `rbiReference`. Both are run daily in `scrape.yml` immediately after the
+  bank scrapes. The site loads `benchmarks.json` at startup and inserts a
+  `category: "benchmark"` series into the chart.
 - `data/` — per-bank CSV outputs, a combined `forex_TTBuy.csv`, the
-  `rates.json` the site consumes (nested by currency, then bank), and
-  `fees.json` (inward remittance fee info, nested by bank).
+  `rates.json` the site consumes (nested by currency, then bank),
+  `fees.json` (inward remittance fee info, nested by bank),
+  `benchmarks.json` (mid-market and FBIL reference rates by currency), and
+  `midmarket_history.csv` (daily mid-market history for the chart).
 - `site/` — the dashboard (Vite + Vue 3 + TypeScript + SCSS).
 - `.github/workflows/scrape.yml` — daily cron (11:00 IST, plus a 16:00 IST
   retry — harmless no-op for banks that already got today's rate, since
-  `add_live_row` dedups per date) that re-scrapes live rates, regenerates
-  `rates.json`, and commits the update (Netlify auto-deploys
-  on push once connected to this repo).
+  `add_live_row` dedups per date) that re-scrapes live bank rates, fetches
+  benchmark rates (`scraper/benchmarks.py`), regenerates `rates.json` and
+  `benchmarks.json`, and commits the update (Netlify auto-deploys on push
+  once connected to this repo).
 - `.github/workflows/scrape-fees.yml` — monthly cron (1st of the month) that
   re-scrapes fee schedules. Separate from the daily rate cron since fee
   schedules barely ever change, unlike rates.
