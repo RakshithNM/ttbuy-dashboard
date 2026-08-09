@@ -447,14 +447,14 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
       </div>
       <span class="suffix">{{ currency }}, here's what each bank credits you after fees (where known)</span>
       <label
+        for="swift-fee"
         class="swift-fee-toggle"
         title="Sending banks and intermediate SWIFT correspondents typically deduct $10–20 before the money reaches India. Check your bank's outward wire fee."
         @click.prevent="includeSwiftFee = !includeSwiftFee"
       >
-        <input type="checkbox" :checked="includeSwiftFee" @click.stop="includeSwiftFee = !includeSwiftFee" />
-        <span>Deduct ~${{ SWIFT_FEE_USD }} sending bank / SWIFT fee</span>
+        <input id="swift-fee" type="checkbox" :checked="includeSwiftFee" @click.stop="includeSwiftFee = !includeSwiftFee" />
+        <span>Deduct ~${{ SWIFT_FEE_USD }} sending bank / SWIFT fee</span><span v-show="includeSwiftFee && safeAmount > SWIFT_FEE_USD">(showing net on ${{ safeAmount - SWIFT_FEE_USD }})</span>
       </label>
-      <span v-if="includeSwiftFee && safeAmount > SWIFT_FEE_USD" class="swift-fee-net-note">(showing net on ${{ safeAmount - SWIFT_FEE_USD }})</span>
     </div>
 
     <div v-if="rateSpread" class="spread-callout" role="note">
@@ -880,7 +880,6 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   }
 
   span {
-    flex: 1;
     min-width: 0;
     white-space: normal;
   }
