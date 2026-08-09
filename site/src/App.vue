@@ -857,12 +857,13 @@ const stableBank = computed<StableBankResult | null>(() => {
 
   <footer class="site-footer">
     <DigestSignup />
-    <div class="footer-main">
-      Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a>
-      <span class="footer-sep">·</span>
+    <div class="footer-credits">
+      <span>Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a></span>
+      <span class="footer-sep" aria-hidden="true">·</span>
       <a href="https://bellare.gumroad.com/l/tiffp" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <span>Not affiliated with any bank</span>
     </div>
-    <div class="footer-disclaimer">Data scraped from public bank pages · Not affiliated with any bank</div>
   </footer>
 </template>
 
@@ -1373,50 +1374,42 @@ const stableBank = computed<StableBankResult | null>(() => {
 .site-footer {
   position: relative;
   margin-top: 40px;
-  padding-top: 20px;
-  color: var(--text-muted);
-  font-size: 13px;
-  text-align: center;
+  padding-bottom: 32px;
 
-  // Full-bleed border: the footer itself is constrained to #app's max-width,
-  // but this line should span the whole viewport regardless.
   &::before {
     content: "";
     position: absolute;
     top: 0;
+    bottom: 0;
     left: 50%;
     width: 100vw;
-    height: 1px;
-    background: var(--border);
+    background: var(--surface-1);
     transform: translateX(-50%);
+    z-index: -1;
   }
+}
 
-  .footer-main {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-  }
-
-  .footer-disclaimer {
-    margin-top: 6px;
-    font-size: 11px;
-    color: var(--text-muted);
-    opacity: 0.7;
-  }
-
-  .footer-sep {
-    margin: 0 6px;
-  }
+.footer-credits {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding-top: 16px;
+  border-top: 1px solid var(--gridline);
 
   a {
-    color: var(--text-secondary);
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    color: var(--text-muted);
+    text-decoration: none;
 
     &:hover {
-      color: var(--text-primary);
+      color: var(--text-secondary);
     }
   }
+}
+
+.footer-sep {
+  color: var(--gridline);
 }
 </style>
