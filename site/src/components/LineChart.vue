@@ -64,10 +64,16 @@ const xDomain = computed<[number, number]>(() => {
 
   // Extend the right edge through any immediately-following weekend days so
   // the chart shows WHY data stops (closed) rather than silently cutting off.
-  let next = new Date(dataMax + msPerDay);
-  while (next.getUTCDay() === 0 || next.getUTCDay() === 6) {
+  // Also advance one extra day past the last weekend day so Sunday's band has
+  // full width — without it, Sunday starts at the right edge with zero room.
+  const firstNext = new Date(dataMax + msPerDay);
+  if (firstNext.getUTCDay() === 0 || firstNext.getUTCDay() === 6) {
+    let next = firstNext;
+    while (next.getUTCDay() === 0 || next.getUTCDay() === 6) {
+      dataMax = next.getTime();
+      next = new Date(dataMax + msPerDay);
+    }
     dataMax = next.getTime();
-    next = new Date(dataMax + msPerDay);
   }
 
   return [Math.min(...times), dataMax];
