@@ -7,6 +7,7 @@ import CurrencyOptimizer from "./components/CurrencyOptimizer.vue";
 import BankHeadToHead from "./components/BankHeadToHead.vue";
 import WhatIfMachine from "./components/WhatIfMachine.vue";
 import MyBankPanel from "./components/MyBankPanel.vue";
+import DigestSignup from "./components/DigestSignup.vue";
 import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
 import { sortByCurrencyOrder } from "./currencies";
@@ -855,6 +856,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   </section>
 
   <footer class="site-footer">
+    <DigestSignup />
     <div class="footer-main">
       Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a>
       <span class="footer-sep">·</span>

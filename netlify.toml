@@ -20,3 +20,21 @@
   from = "/api/send-alerts"
   to = "/.netlify/functions/send-alerts"
   status = 200
+
+[[redirects]]
+  from = "/api/email-subscribe"
+  to = "/.netlify/functions/email-subscribe"
+  status = 200
+
+[[redirects]]
+  from = "/api/email-unsubscribe"
+  to = "/.netlify/functions/email-unsubscribe"
+  status = 200
+
+[[redirects]]
+  from = "/api/weekly-digest"
+  to = "/.netlify/functions/weekly-digest"
+  status = 200
+
+[functions."weekly-digest"]
+  schedule = "30 3 * * 5"
