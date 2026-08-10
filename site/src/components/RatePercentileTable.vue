@@ -231,6 +231,14 @@ function setSort(k: SortKey) {
   .th-range,
   .td-range { white-space: nowrap; }
 
+  @media (max-width: 480px) {
+    .pct-header { flex-direction: column; align-items: flex-start; }
+
+    // Keep Bank | Today | Signal — drop bar visualization and range
+    .th-bar, .td-bar,
+    .th-range, .td-range { display: none; }
+  }
+
   .td-bank {
     display: flex;
     align-items: center;

@@ -320,6 +320,14 @@ function sortIcon(k: SortKey) {
     color: var(--text-muted);
   }
 
+  @media (max-width: 480px) {
+    // Keep # | Bank | Wins | Win% — drop avg rate and best ever
+    .th-avg, .td-avg,
+    .th-best, .td-best { display: none; }
+    .td-bank { min-width: 100px; }
+    .wins-bar-track { display: none; }
+  }
+
   .footnote {
     margin: 8px 0 0;
     font-size: 11px;
