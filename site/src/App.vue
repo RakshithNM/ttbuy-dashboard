@@ -8,6 +8,8 @@ import BankHeadToHead from "./components/BankHeadToHead.vue";
 import WhatIfMachine from "./components/WhatIfMachine.vue";
 import MyBankPanel from "./components/MyBankPanel.vue";
 import DigestSignup from "./components/DigestSignup.vue";
+import OpportunityCostChart from "./components/OpportunityCostChart.vue";
+import CumulativeSavingsCalc from "./components/CumulativeSavingsCalc.vue";
 import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
 import { sortByCurrencyOrder } from "./currencies";
@@ -810,6 +812,12 @@ const stableBank = computed<StableBankResult | null>(() => {
     </section>
 
     <section class="panel">
+      <h2>Cost of not shopping around</h2>
+      <p class="panel-sub">Fee-adjusted spread between the best and worst bank on {{ currency }} transfers each day</p>
+      <OpportunityCostChart :series="allSeries" :currency="currency" :fees="fees" :amount="amount" />
+    </section>
+
+    <section class="panel">
       <h2>Best bank per day</h2>
       <p class="panel-sub">Which bank had the highest {{ currency }} TT Buy rate each day</p>
       <CalendarHeatmap :series="allSeries" :currency="currency" />
@@ -830,6 +838,12 @@ const stableBank = computed<StableBankResult | null>(() => {
       <p class="panel-sub">Pick two banks and see which one gives you more across all currencies</p>
       <BankHeadToHead :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
     </section>
+    <section class="panel">
+      <h2>Cumulative savings calculator</h2>
+      <p class="panel-sub">How much more you'd have received if you'd used a different bank every day</p>
+      <CumulativeSavingsCalc :series="allSeries" :fees="fees" :currency="currency" :amount="amount" :my-bank="myBank" />
+    </section>
+
   </main>
 
   <p v-else-if="loadError" class="error">Couldn't load rate data: {{ loadError }}</p>
