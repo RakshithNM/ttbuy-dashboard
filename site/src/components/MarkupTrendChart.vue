@@ -251,7 +251,7 @@ const TOOLTIP_W = 170;
             :width="W"
             :height="H"
             style="display:block"
-            @mousemove="e => onMouseMove(e, $event.currentTarget as SVGSVGElement)"
+            @mousemove="e => onMouseMove(e, e.currentTarget as SVGSVGElement)"
             @mouseleave="onMouseLeave"
           >
             <g :transform="`translate(${MARGIN.left},${MARGIN.top})`">

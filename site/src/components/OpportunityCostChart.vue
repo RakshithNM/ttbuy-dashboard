@@ -191,7 +191,7 @@ const TOOLTIP_H = 44;
         :width="W"
         :height="H"
         style="display:block"
-        @mousemove="e => onMouseMove(e, $event.currentTarget as SVGSVGElement)"
+        @mousemove="e => onMouseMove(e, e.currentTarget as SVGSVGElement)"
         @mouseleave="onMouseLeave"
       >
         <defs>
