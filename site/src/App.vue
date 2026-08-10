@@ -10,6 +10,9 @@ import MyBankPanel from "./components/MyBankPanel.vue";
 import DigestSignup from "./components/DigestSignup.vue";
 import OpportunityCostChart from "./components/OpportunityCostChart.vue";
 import CumulativeSavingsCalc from "./components/CumulativeSavingsCalc.vue";
+import RatePercentileTable from "./components/RatePercentileTable.vue";
+import AllTimeLeaderboard from "./components/AllTimeLeaderboard.vue";
+import MarkupTrendChart from "./components/MarkupTrendChart.vue";
 import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
 import { sortByCurrencyOrder } from "./currencies";
@@ -749,6 +752,12 @@ const stableBank = computed<StableBankResult | null>(() => {
     </section>
 
     <section class="panel">
+      <h2>Rate percentile signal</h2>
+      <p class="panel-sub">Where each bank's rate today sits in its own recent history — spot who's unusually high or low right now</p>
+      <RatePercentileTable :series="allSeries" :currency="currency" />
+    </section>
+
+    <section class="panel">
       <div class="panel-header">
         <h2>Historical TT Buy rate</h2>
         <div class="chart-controls">
@@ -812,9 +821,21 @@ const stableBank = computed<StableBankResult | null>(() => {
     </section>
 
     <section class="panel">
+      <h2>All-time leaderboard</h2>
+      <p class="panel-sub">Ranked by wins — which {{ currency }} bank has had the best rate most often, and by how much</p>
+      <AllTimeLeaderboard :series="allSeries" :currency="currency" />
+    </section>
+
+    <section class="panel">
       <h2>Cost of not shopping around</h2>
       <p class="panel-sub">Fee-adjusted spread between the best and worst bank on {{ currency }} transfers each day</p>
       <OpportunityCostChart :series="allSeries" :currency="currency" :fees="fees" :amount="amount" />
+    </section>
+
+    <section class="panel">
+      <h2>Markup below mid-market</h2>
+      <p class="panel-sub">How much each {{ currency }} bank's TT Buy rate falls below mid-market — lower gap means a more competitive rate</p>
+      <MarkupTrendChart :series="allSeries" :currency="currency" />
     </section>
 
     <section class="panel">
