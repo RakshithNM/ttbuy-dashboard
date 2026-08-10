@@ -827,6 +827,12 @@ const stableBank = computed<StableBankResult | null>(() => {
     </section>
 
     <section class="panel">
+      <h2>Best bank per day</h2>
+      <p class="panel-sub">Which bank had the highest {{ currency }} TT Buy rate each day</p>
+      <CalendarHeatmap :series="allSeries" :currency="currency" />
+    </section>
+
+    <section class="panel">
       <h2>Cost of not shopping around</h2>
       <p class="panel-sub">Fee-adjusted spread between the best and worst bank on {{ currency }} transfers each day</p>
       <OpportunityCostChart :series="allSeries" :currency="currency" :fees="fees" :amount="amount" />
@@ -836,12 +842,6 @@ const stableBank = computed<StableBankResult | null>(() => {
       <h2>Markup below mid-market</h2>
       <p class="panel-sub">How much each {{ currency }} bank's TT Buy rate falls below mid-market — lower gap means a more competitive rate</p>
       <MarkupTrendChart :series="allSeries" :currency="currency" />
-    </section>
-
-    <section class="panel">
-      <h2>Best bank per day</h2>
-      <p class="panel-sub">Which bank had the highest {{ currency }} TT Buy rate each day</p>
-      <CalendarHeatmap :series="allSeries" :currency="currency" />
     </section>
 
     <section class="panel">
