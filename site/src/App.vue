@@ -752,12 +752,6 @@ const stableBank = computed<StableBankResult | null>(() => {
     </section>
 
     <section class="panel">
-      <h2>Rate percentile signal</h2>
-      <p class="panel-sub">Where each bank's rate today sits in its own recent history — spot who's unusually high or low right now</p>
-      <RatePercentileTable :series="allSeries" :currency="currency" />
-    </section>
-
-    <section class="panel">
       <div class="panel-header">
         <h2>Historical TT Buy rate</h2>
         <div class="chart-controls">
@@ -818,6 +812,12 @@ const stableBank = computed<StableBankResult | null>(() => {
       </div>
 
       <LineChart v-model:show-table="showTable" :series="chartSeries" :hidden="chartHidden" :currency="currency" :compare-mode="compareMode" @toggle="toggleBank" />
+    </section>
+
+    <section class="panel">
+      <h2>Rate percentile signal</h2>
+      <p class="panel-sub">Where each bank's rate today sits in its own recent history — spot who's unusually high or low right now</p>
+      <RatePercentileTable :series="allSeries" :currency="currency" />
     </section>
 
     <section class="panel">
