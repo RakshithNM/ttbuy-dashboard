@@ -1141,12 +1141,16 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     text-align: left;
     border-bottom: 1px solid var(--gridline);
     white-space: nowrap;
-    transition: background 80ms ease;
+    transition: background 80ms ease, box-shadow 120ms ease;
   }
 
   tbody tr:not(.platform-divider):not(.best):hover th,
   tbody tr:not(.platform-divider):not(.best):hover td {
     background: var(--page-plane);
+  }
+
+  tbody tr.clickable:not(.best):hover > th:first-child {
+    box-shadow: inset 3px 0 0 var(--accent);
   }
 
   tbody tr:last-child th,

@@ -188,6 +188,34 @@ onMounted(async () => {
   if (!(currency.value in rawRates.value)) {
     currency.value = sortByCurrencyOrder(Object.keys(rawRates.value))[0] ?? "USD";
   }
+
+  // Fade-in panels that start below the fold
+  if (typeof window !== "undefined" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const vh = window.innerHeight;
+    const panels = Array.from(document.querySelectorAll<HTMLElement>(".panel"));
+    const belowFold = panels.filter(p => p.getBoundingClientRect().top > vh + 40);
+    belowFold.forEach(p => {
+      p.style.opacity = "0";
+      p.style.transform = "translateY(12px)";
+      p.style.transition = "opacity 380ms ease, transform 380ms ease";
+    });
+    if (belowFold.length > 0) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              const el = entry.target as HTMLElement;
+              el.style.opacity = "";
+              el.style.transform = "";
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.06 }
+      );
+      belowFold.forEach(p => observer.observe(p));
+    }
+  }
 });
 
 const availableCurrencies = computed(() => sortByCurrencyOrder(Object.keys(rawRates.value)));
@@ -713,22 +741,24 @@ const stableBank = computed<StableBankResult | null>(() => {
         :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
         @click="toggleTheme"
       >
-        <svg v-if="isDark" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-          <circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
-          <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
-            <line x1="8" y1="1.5" x2="8" y2="3"/>
-            <line x1="8" y1="13" x2="8" y2="14.5"/>
-            <line x1="1.5" y1="8" x2="3" y2="8"/>
-            <line x1="13" y1="8" x2="14.5" y2="8"/>
-            <line x1="3.4" y1="3.4" x2="4.4" y2="4.4"/>
-            <line x1="11.6" y1="11.6" x2="12.6" y2="12.6"/>
-            <line x1="12.6" y1="3.4" x2="11.6" y2="4.4"/>
-            <line x1="4.4" y1="11.6" x2="3.4" y2="12.6"/>
-          </g>
-        </svg>
-        <svg v-else viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-          <path d="M13 10.5a6 6 0 0 1-7.5-7.5A5.5 5.5 0 1 0 13 10.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        </svg>
+        <Transition name="icon-swap" mode="out-in">
+          <svg v-if="isDark" key="sun" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+              <line x1="8" y1="1.5" x2="8" y2="3"/>
+              <line x1="8" y1="13" x2="8" y2="14.5"/>
+              <line x1="1.5" y1="8" x2="3" y2="8"/>
+              <line x1="13" y1="8" x2="14.5" y2="8"/>
+              <line x1="3.4" y1="3.4" x2="4.4" y2="4.4"/>
+              <line x1="11.6" y1="11.6" x2="12.6" y2="12.6"/>
+              <line x1="12.6" y1="3.4" x2="11.6" y2="4.4"/>
+              <line x1="4.4" y1="11.6" x2="3.4" y2="12.6"/>
+            </g>
+          </svg>
+          <svg v-else key="moon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path d="M13 10.5a6 6 0 0 1-7.5-7.5A5.5 5.5 0 1 0 13 10.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </Transition>
       </button>
     </div>
     <p v-if="bankQuery && searchedSeries.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
@@ -1134,7 +1164,8 @@ const stableBank = computed<StableBankResult | null>(() => {
       font-size: 16px;
       color: var(--text-muted);
       flex: none;
-      transition: transform 150ms ease;
+      display: inline-block;
+      transition: transform 200ms ease;
     }
 
     &::-webkit-details-marker { display: none; }
@@ -1142,7 +1173,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   }
 
   &[open] summary::after {
-    content: "−";
+    transform: rotate(45deg);
   }
 
   p {
@@ -1152,6 +1183,17 @@ const stableBank = computed<StableBankResult | null>(() => {
     line-height: 1.6;
     max-width: 640px;
   }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &[open] p {
+      animation: faq-reveal 200ms ease both;
+    }
+  }
+}
+
+@keyframes faq-reveal {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .panel-header {
@@ -1384,6 +1426,11 @@ const stableBank = computed<StableBankResult | null>(() => {
     outline-offset: 2px;
   }
 }
+
+.icon-swap-enter-active { transition: opacity 100ms ease, transform 100ms ease; }
+.icon-swap-leave-active { transition: opacity 80ms ease, transform 80ms ease; }
+.icon-swap-enter-from   { opacity: 0; transform: scale(0.6) rotate(-20deg); }
+.icon-swap-leave-to     { opacity: 0; transform: scale(0.6) rotate(20deg); }
 
 .loading,
 .error {
