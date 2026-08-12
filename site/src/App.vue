@@ -189,6 +189,18 @@ onMounted(async () => {
     currency.value = sortByCurrencyOrder(Object.keys(rawRates.value))[0] ?? "USD";
   }
 
+  // FAQ accordion: only one item open at a time
+  if (typeof window !== "undefined") {
+    const faqItems = Array.from(document.querySelectorAll<HTMLDetailsElement>(".faq-item"));
+    faqItems.forEach(item => {
+      item.addEventListener("toggle", () => {
+        if (item.open) {
+          faqItems.forEach(other => { if (other !== item) other.open = false; });
+        }
+      });
+    });
+  }
+
   // Fade-in panels that start below the fold
   if (typeof window !== "undefined" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     const vh = window.innerHeight;
