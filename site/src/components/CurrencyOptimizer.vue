@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { RatesByCurrency, FeesByBank, FeeSlab } from "../types";
-import { brandColor, isPlatform, shortName } from "../bankPalette";
+import { brandColor, isBenchmark, isPlatform, shortName } from "../bankPalette";
 import { currencySymbol } from "../currencies";
 
 const props = defineProps<{
@@ -57,7 +57,7 @@ const perCurrencyBest = computed<CurrencyBest[]>(() => {
     let best: Omit<CurrencyBest, "alsoWins"> | null = null;
 
     for (const [bank, points] of Object.entries(bankRates)) {
-      if (!points.length || isPlatform(bank)) continue;
+      if (!points.length || isPlatform(bank) || isBenchmark(bank)) continue;
       const latest = points[points.length - 1];
       const grossInr = latest.ttbuy * amt;
       const fee = props.fees[bank];
@@ -121,7 +121,7 @@ const reverseResults = computed<ReverseResult[]>(() => {
     let best: { bank: string; color: string; ttbuy: number; feeInr: number; feeUnknown: boolean; foreignAmount: number } | null = null;
 
     for (const [bank, points] of Object.entries(bankRates)) {
-      if (!points.length || isPlatform(bank)) continue;
+      if (!points.length || isPlatform(bank) || isBenchmark(bank)) continue;
       const latest = points[points.length - 1];
       const fee = props.fees[bank];
       const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
