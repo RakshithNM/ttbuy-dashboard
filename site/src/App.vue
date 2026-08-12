@@ -18,10 +18,14 @@ import { CREDIT_TIMES } from "./creditTime";
 import { sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
 
-const rawRates = ref<RatesByCurrency>({});
-const fees = ref<FeesByBank>({});
-const benchmarks = ref<BenchmarksByCurrency>({});
-const loading = ref(true);
+import rawRatesData from "../public/data/rates.json";
+import feesData from "../public/data/fees.json";
+import benchmarksData from "../public/data/benchmarks.json";
+
+const rawRates = ref<RatesByCurrency>(rawRatesData as any);
+const fees = ref<FeesByBank>(feesData as any);
+const benchmarks = ref<BenchmarksByCurrency>(benchmarksData as any);
+const loading = ref(false);
 const loadError = ref<string | null>(null);
 const hidden = ref<Set<string>>(new Set());
 const bankQuery = ref("");
@@ -49,19 +53,23 @@ if (_storedTheme) document.documentElement.setAttribute("data-theme", _storedThe
 const isDark = ref(
   _storedTheme !== null
     ? _storedTheme === "dark"
-    : window.matchMedia("(prefers-color-scheme: dark)").matches
+    : (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches)
 );
 
 function setThemeColor(dark: boolean) {
-  document.querySelector('meta[name="theme-color"]')
-    ?.setAttribute("content", dark ? "#0d0d0d" : "#f9f9f7");
+  if (typeof document !== "undefined") {
+    document.querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", dark ? "#0d0d0d" : "#f9f9f7");
+  }
 }
 setThemeColor(isDark.value);
 
 function toggleTheme() {
   isDark.value = !isDark.value;
   const t = isDark.value ? "dark" : "light";
-  document.documentElement.setAttribute("data-theme", t);
+  if (typeof document !== "undefined") {
+    document.documentElement.setAttribute("data-theme", t);
+  }
   setThemeColor(isDark.value);
   try { localStorage.setItem(THEME_STORAGE_KEY, t); } catch {}
 }
@@ -86,6 +94,7 @@ function loadStoredView(): StoredView {
 // locally — someone opening a link expects to see the sender's view, not
 // their own last one.
 function loadQueryView(): StoredView {
+  if (typeof window === "undefined") return {};
   const params = new URLSearchParams(window.location.search);
   const view: StoredView = {};
 
@@ -122,7 +131,9 @@ const myBank = ref<string>((() => { try { return localStorage.getItem(MY_BANK_KE
 watch(myBank, (b) => { try { if (b) localStorage.setItem(MY_BANK_KEY, b); else localStorage.removeItem(MY_BANK_KEY); } catch {} });
 
 watch(currency, (c) => {
-  document.title = `${c} TT Buy Rate | TTBuy Rates`;
+  if (typeof document !== "undefined") {
+    document.title = `${c} TT Buy Rate | TTBuy Rates`;
+  }
 }, { immediate: true });
 
 watch([range, showTable, currency, amount], ([r, t, c, a]) => {
@@ -134,17 +145,19 @@ watch([range, showTable, currency, amount], ([r, t, c, a]) => {
 
   // Keep the address bar in sync so the current view is shareable just by
   // copying the URL, not only via the explicit "Copy link" button.
-  const params = new URLSearchParams();
-  params.set("currency", c);
-  params.set("range", r);
-  params.set("view", t ? "table" : "chart");
-  params.set("amount", String(a));
-  history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+  if (typeof history !== "undefined" && typeof window !== "undefined") {
+    const params = new URLSearchParams();
+    params.set("currency", c);
+    params.set("range", r);
+    params.set("view", t ? "table" : "chart");
+    params.set("amount", String(a));
+    history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+  }
 }, { immediate: true });
 
 const copied = ref(false);
 let copiedTimer: ReturnType<typeof setTimeout> | null = null;
-const canNativeShare = typeof navigator.share === "function";
+const canNativeShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
 async function copyShareLink() {
   if (canNativeShare) {
@@ -171,34 +184,9 @@ async function copyShareLink() {
 }
 
 onMounted(async () => {
-  try {
-    const res = await fetch(`${import.meta.env.BASE_URL}data/rates.json`);
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    rawRates.value = await res.json();
-    if (!(currency.value in rawRates.value)) {
-      currency.value = sortByCurrencyOrder(Object.keys(rawRates.value))[0] ?? "USD";
-    }
-  } catch (e) {
-    loadError.value = e instanceof Error ? e.message : "Failed to load rate data";
-  } finally {
-    loading.value = false;
-  }
-
-  // Fee data only covers a handful of banks so far and is a nice-to-have —
-  // never worth failing the whole page load over.
-  try {
-    const res = await fetch(`${import.meta.env.BASE_URL}data/fees.json`);
-    if (res.ok) fees.value = await res.json();
-  } catch {
-    // No fee info shown for any bank is an acceptable degraded state.
-  }
-
-  // Benchmarks data is also a nice-to-have.
-  try {
-    const res = await fetch(`${import.meta.env.BASE_URL}data/benchmarks.json`);
-    if (res.ok) benchmarks.value = await res.json();
-  } catch {
-    // Fallback if benchmarks are missing
+  // Ensure the currency value is valid on load (in case of cached invalid currency)
+  if (!(currency.value in rawRates.value)) {
+    currency.value = sortByCurrencyOrder(Object.keys(rawRates.value))[0] ?? "USD";
   }
 });
 
