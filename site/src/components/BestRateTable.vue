@@ -642,7 +642,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                 <span class="platform-section-note">Rate applied to your transfer, no deduction on recipient side</span>
               </td>
             </tr>
-            <tr :class="{ best: row.bank === bestBank, expanded: expandedBank === row.bank, clickable: true }" @click="toggleExpand(row.bank, $event)">
+            <tr :class="{ best: row.bank === bestBank, expanded: expandedBank === row.bank, clickable: true }" :style="{ '--row-accent': row.color }" @click="toggleExpand(row.bank, $event)">
               <th scope="row">
                 <span class="row-header">
                   <span
@@ -1141,7 +1141,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     text-align: left;
     border-bottom: 1px solid var(--gridline);
     white-space: nowrap;
-    transition: background 80ms ease, box-shadow 120ms ease;
+    transition: background 80ms ease;
   }
 
   tbody tr:not(.platform-divider):not(.best):hover th,
@@ -1149,8 +1149,9 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     background: var(--page-plane);
   }
 
-  tbody tr.clickable:not(.best):hover > th:first-child {
-    box-shadow: inset 3px 0 0 var(--accent);
+  tbody tr.clickable:not(.best):hover > th:first-child,
+  tbody tr.clickable:not(.best).expanded > th:first-child {
+    background-image: linear-gradient(to right, var(--row-accent) 3px, transparent 3px);
   }
 
   tbody tr:last-child th,
