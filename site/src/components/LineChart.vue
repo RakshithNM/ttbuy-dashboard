@@ -813,6 +813,7 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
   .num {
     text-align: right;
     font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, "Cascadia Code", "Roboto Mono", monospace
   }
 
   .no-data {

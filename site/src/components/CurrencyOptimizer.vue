@@ -418,6 +418,7 @@ function formatForeign(amount: number, symbol: string): string {
   color: var(--text-primary);
   font-size: 14px;
   font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, "Cascadia Code", "Roboto Mono", monospace;
   outline: none;
 
   &::-webkit-inner-spin-button,
@@ -476,6 +477,7 @@ function formatForeign(amount: number, symbol: string): string {
 
 .col-num {
   text-align: right;
+  font-family: ui-monospace, "Cascadia Code", "Roboto Mono", monospace;
   font-variant-numeric: tabular-nums;
 }
 

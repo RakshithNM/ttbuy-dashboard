@@ -254,7 +254,10 @@ function setSort(k: SortKey) {
     flex-shrink: 0;
   }
 
-  .num { font-variant-numeric: tabular-nums; }
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, "Cascadia Code", "Roboto Mono", monospace;
+  }
 
   .bar-row {
     display: flex;

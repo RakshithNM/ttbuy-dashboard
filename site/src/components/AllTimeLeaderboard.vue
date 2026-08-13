@@ -310,6 +310,7 @@ function sortIcon(k: SortKey) {
 
   .num {
     font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, "Cascadia Code", "Roboto Mono", monospace;
     white-space: nowrap;
   }
 

@@ -476,7 +476,8 @@ const bankBLabel = computed(() => {
     font-size: 26px;
     font-weight: 700;
     line-height: 1.1;
-
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, "Cascadia Code", "Roboto Mono", monospace;
     &.small { font-size: 20px; }
     &.positive { color: var(--status-good); }
     &.negative { color: var(--status-critical); }

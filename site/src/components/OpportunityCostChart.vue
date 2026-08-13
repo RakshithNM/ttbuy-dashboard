@@ -287,6 +287,8 @@ const TOOLTIP_H = 44;
   .stat-value {
     font-size: 20px;
     font-weight: 700;
+    font-family: ui-monospace, "Cascadia Code", "Roboto Mono", monospace;
+    font-variant-numeric: tabular-nums;
     color: var(--text-primary);
 
     &.muted {
