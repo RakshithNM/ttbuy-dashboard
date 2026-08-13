@@ -751,13 +751,16 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                   <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
                 </td>
                 <td :class="{ 'stale-date': latestDate && row.date < latestDate }">
-                  <div class="date-val">{{ formatDate(row.date) }}</div>
+                  <div class="date-val">
+                    {{ formatDate(row.date) }}
+                    <svg v-if="latestDate && row.date < latestDate" class="stale-cell-icon" viewBox="0 0 16 16" width="10" height="10" aria-label="Stale data">
+                      <title>This rate is from an earlier date and may not reflect today's rate</title>
+                      <path d="M8 1.5L1.5 13h13L8 1.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                      <line x1="8" y1="6.5" x2="8" y2="9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <circle cx="8" cy="11.5" r="0.8" fill="currentColor"/>
+                    </svg>
+                  </div>
                   <div v-if="row.publishedAt" class="published-time">{{ row.publishedAt }}</div>
-                  <svg v-if="latestDate && row.date < latestDate" class="stale-cell-icon" viewBox="0 0 16 16" width="10" height="10" aria-label="Stale data">
-                    <path d="M8 1.5L1.5 13h13L8 1.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                    <line x1="8" y1="6.5" x2="8" y2="9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <circle cx="8" cy="11.5" r="0.8" fill="currentColor"/>
-                  </svg>
                 </td>
               </template>
               <td v-else colspan="5" class="no-data">No data for this bank</td>
@@ -1756,7 +1759,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   .stale-cell-icon {
     color: var(--warning-text);
     vertical-align: middle;
-    margin-left: 3px;
+    margin-left: 5px;
   }
 }
 
