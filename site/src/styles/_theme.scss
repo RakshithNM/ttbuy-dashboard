@@ -35,13 +35,13 @@
   :root:where(:not([data-theme="light"])) {
     color-scheme: dark;
 
-    --surface-1: #1a1a19;
-    --page-plane: #0d0d0d;
+    --surface-1: #171a1f;
+    --page-plane: #0d1014;
     --text-primary: #ffffff;
     --text-secondary: #c3c2b7;
     --text-muted: #898781;
-    --gridline: #2c2c2a;
-    --baseline: #383835;
+    --gridline: #252830;
+    --baseline: #343740;
     --border: rgba(255, 255, 255, 0.10);
     --success-text: #0ca30c;
     --warning-text: #d97706;
@@ -60,13 +60,13 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --surface-1: #1a1a19;
-  --page-plane: #0d0d0d;
+  --surface-1: #171a1f;
+  --page-plane: #0d1014;
   --text-primary: #ffffff;
   --text-secondary: #c3c2b7;
   --text-muted: #898781;
-  --gridline: #2c2c2a;
-  --baseline: #383835;
+  --gridline: #252830;
+  --baseline: #343740;
   --border: rgba(255, 255, 255, 0.10);
   --success-text: #0ca30c;
   --warning-text: #d97706;

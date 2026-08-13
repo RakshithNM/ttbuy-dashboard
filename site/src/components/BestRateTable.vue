@@ -1143,7 +1143,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
 
   th,
   td {
-    padding: 10px 12px;
+    padding: 8px 12px;
     text-align: left;
     border-bottom: 1px solid var(--gridline);
     white-space: nowrap;
@@ -1362,6 +1362,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
 
   .num {
     font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, 'Cascadia Code', 'Roboto Mono', monospace;
     text-align: right;
   }
 
