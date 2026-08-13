@@ -68,6 +68,7 @@ interface DataRow {
   hasData: true;
   ttbuy: number;
   date: string;
+  publishedAt: string | null;
   // Straight rate × amount conversion, before any fee.
   grossReceive: number;
   // Approximate flat fee for the standard/individual case, in rupees — 0
@@ -161,6 +162,7 @@ const rows = computed<Row[]>(() => {
       hasData: true,
       ttbuy: last.ttbuy,
       date: last.date,
+      publishedAt: last.publishedAt ?? null,
       grossReceive,
       feeInr,
       feeUnknown,
@@ -749,7 +751,8 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                   <template v-else>−₹{{ formatInr(row.gapToBest) }}</template>
                 </td>
                 <td :class="{ 'stale-date': latestDate && row.date < latestDate }">
-                  {{ formatDate(row.date) }}
+                  <div class="date-val">{{ formatDate(row.date) }}</div>
+                  <div v-if="row.publishedAt" class="published-time">{{ row.publishedAt }}</div>
                   <svg v-if="latestDate && row.date < latestDate" class="stale-cell-icon" viewBox="0 0 16 16" width="10" height="10" aria-label="Stale data">
                     <path d="M8 1.5L1.5 13h13L8 1.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                     <line x1="8" y1="6.5" x2="8" y2="9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -1736,8 +1739,19 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   }
 }
 
+.published-time {
+  font-size: 11px;
+  color: var(--text-tertiary, #888);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
 .stale-date {
   color: var(--warning-text);
+
+  .published-time {
+    color: var(--warning-text);
+  }
 
   .stale-cell-icon {
     color: var(--warning-text);

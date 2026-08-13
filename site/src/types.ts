@@ -2,6 +2,7 @@ export type CurrencyCode = "USD" | "GBP" | "EUR" | "AED";
 
 export interface RatePoint {
   date: string; // YYYY-MM-DD
+  publishedAt?: string | null;
   ttbuy: number;
 }
 
