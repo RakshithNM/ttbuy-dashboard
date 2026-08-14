@@ -647,6 +647,22 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
             <tr :class="{ best: row.bank === bestBank, expanded: expandedBank === row.bank, clickable: true }" :style="{ '--row-accent': row.color }" @click="toggleExpand(row.bank, $event)">
               <th scope="row">
                 <span class="row-header">
+                  <button
+                    v-if="fees[row.bank]"
+                    type="button"
+                    class="fee-info"
+                    aria-label="Inward remittance fee info"
+                    @mouseenter="showFeeTooltip(row.bank, $event)"
+                    @mouseleave="scheduleHideFeeTooltip"
+                    @click="toggleFeeTooltip(row.bank, $event)"
+                    @blur="scheduleHideFeeTooltip"
+                  >
+                    <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                      <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.3" />
+                      <line x1="8" y1="7" x2="8" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                      <circle cx="8" cy="4.6" r="0.9" fill="currentColor" />
+                    </svg>
+                  </button>
                   <span
                     class="key"
                     :class="{ wrapped: row.wrapped }"
@@ -667,22 +683,6 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                       class="consistency-label"
                     >Best rate {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}</span>
                   </span>
-                  <button
-                    v-if="fees[row.bank]"
-                    type="button"
-                    class="fee-info"
-                    aria-label="Inward remittance fee info"
-                    @mouseenter="showFeeTooltip(row.bank, $event)"
-                    @mouseleave="scheduleHideFeeTooltip"
-                    @click="toggleFeeTooltip(row.bank, $event)"
-                    @blur="scheduleHideFeeTooltip"
-                  >
-                    <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
-                      <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.3" />
-                      <line x1="8" y1="7" x2="8" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
-                      <circle cx="8" cy="4.6" r="0.9" fill="currentColor" />
-                    </svg>
-                  </button>
                   <span v-if="row.bank === bestBank" class="badge">
                     <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
                       <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
