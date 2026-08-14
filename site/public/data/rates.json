@@ -741,6 +741,11 @@
         "date": "2026-08-13",
         "publishedAt": null,
         "ttbuy": 25.715
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": null,
+        "ttbuy": 25.725
       }
     ],
     "Citibank": [
@@ -813,6 +818,11 @@
         "date": "2026-08-13",
         "publishedAt": "09:05 AM",
         "ttbuy": 25.4363
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 25.4412
       }
     ],
     "City Union Bank": [
@@ -1869,6 +1879,11 @@
         "date": "2026-08-13",
         "publishedAt": "09:00 AM",
         "ttbuy": 25.76
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": "04:00 AM",
+        "ttbuy": 25.78
       }
     ],
     "RBL Bank": [
@@ -2954,6 +2969,11 @@
         "date": "2026-08-13",
         "publishedAt": null,
         "ttbuy": 109.0825
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": null,
+        "ttbuy": 109.28
       }
     ],
     "Citibank": [
@@ -3026,6 +3046,11 @@
         "date": "2026-08-13",
         "publishedAt": "09:05 AM",
         "ttbuy": 107.6572
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 107.8289
       }
     ],
     "City Union Bank": [
@@ -5389,6 +5414,11 @@
         "date": "2026-08-13",
         "publishedAt": "09:00 AM",
         "ttbuy": 109.26
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": "04:00 AM",
+        "ttbuy": 109.64
       }
     ],
     "RBL Bank": [
@@ -6536,6 +6566,11 @@
         "date": "2026-08-13",
         "publishedAt": null,
         "ttbuy": 127.6825
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": null,
+        "ttbuy": 127.7925
       }
     ],
     "Citibank": [
@@ -6608,6 +6643,11 @@
         "date": "2026-08-13",
         "publishedAt": "09:05 AM",
         "ttbuy": 126.0284
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 126.1197
       }
     ],
     "City Union Bank": [
@@ -8971,6 +9011,11 @@
         "date": "2026-08-13",
         "publishedAt": "09:00 AM",
         "ttbuy": 128.08
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": "04:00 AM",
+        "ttbuy": 128.55
       }
     ],
     "RBL Bank": [
@@ -10158,6 +10203,11 @@
         "date": "2026-08-13",
         "publishedAt": null,
         "ttbuy": 94.9975
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": null,
+        "ttbuy": 95.0375
       }
     ],
     "Citibank": [
@@ -10235,6 +10285,11 @@
         "date": "2026-08-13",
         "publishedAt": "09:05 AM",
         "ttbuy": 93.445
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 93.4698
       }
     ],
     "City Union Bank": [
@@ -12773,6 +12828,11 @@
         "date": "2026-08-13",
         "publishedAt": "09:00 AM",
         "ttbuy": 95.07
+      },
+      {
+        "date": "2026-08-14",
+        "publishedAt": "04:00 AM",
+        "ttbuy": 95.14
       }
     ],
     "RBL Bank": [
