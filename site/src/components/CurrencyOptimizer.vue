@@ -97,7 +97,7 @@ const perCurrencyBest = computed<CurrencyBest[]>(() => {
 });
 
 
-const mode = ref<"forward" | "reverse">("forward");
+const mode = ref<"forward" | "reverse">("reverse");
 const targetInr = ref("150000");
 
 interface ReverseResult {
