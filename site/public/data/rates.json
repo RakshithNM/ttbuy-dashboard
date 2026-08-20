@@ -821,6 +821,11 @@
         "date": "2026-08-19",
         "publishedAt": null,
         "ttbuy": 25.82
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": null,
+        "ttbuy": 25.7875
       }
     ],
     "Citibank": [
@@ -1408,6 +1413,11 @@
         "date": "2026-08-19",
         "publishedAt": "10:30 AM",
         "ttbuy": 25.35
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": "10:15 AM",
+        "ttbuy": 25.32
       }
     ],
     "ICICI Bank": [
@@ -1896,6 +1906,11 @@
         "date": "2026-08-19",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.87
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 25.83
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -3479,6 +3494,11 @@
         "date": "2026-08-19",
         "publishedAt": null,
         "ttbuy": 110.11
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": null,
+        "ttbuy": 110.895
       }
     ],
     "Citibank": [
@@ -4066,6 +4086,11 @@
         "date": "2026-08-19",
         "publishedAt": "10:30 AM",
         "ttbuy": 108.13
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": "10:15 AM",
+        "ttbuy": 108.92
       }
     ],
     "ICICI Bank": [
@@ -4584,6 +4609,11 @@
         "date": "2026-08-19",
         "publishedAt": "10:00 AM",
         "ttbuy": 110.4
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 111.1
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -7531,6 +7561,11 @@
         "date": "2026-08-19",
         "publishedAt": null,
         "ttbuy": 128.6425
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": null,
+        "ttbuy": 129.215
       }
     ],
     "Citibank": [
@@ -8118,6 +8153,11 @@
         "date": "2026-08-19",
         "publishedAt": "10:30 AM",
         "ttbuy": 126.39
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": "10:15 AM",
+        "ttbuy": 126.96
       }
     ],
     "ICICI Bank": [
@@ -8636,6 +8676,11 @@
         "date": "2026-08-19",
         "publishedAt": "10:00 AM",
         "ttbuy": 128.98
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 129.47
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -11623,6 +11668,11 @@
         "date": "2026-08-19",
         "publishedAt": null,
         "ttbuy": 95.385
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": null,
+        "ttbuy": 95.265
       }
     ],
     "Citibank": [
@@ -12265,6 +12315,11 @@
         "date": "2026-08-19",
         "publishedAt": "10:30 AM",
         "ttbuy": 93.91
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": "10:15 AM",
+        "ttbuy": 93.82
       }
     ],
     "ICICI Bank": [
@@ -12893,6 +12948,11 @@
         "date": "2026-08-19",
         "publishedAt": "10:00 AM",
         "ttbuy": 95.49
+      },
+      {
+        "date": "2026-08-20",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 95.36
       }
     ],
     "Jammu & Kashmir Bank": [
