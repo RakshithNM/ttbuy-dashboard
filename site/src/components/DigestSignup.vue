@@ -52,6 +52,7 @@ async function subscribe() {
         <input
           v-model="email"
           type="email"
+          name="email"
           placeholder="your@email.com"
           required
           autocomplete="email"
@@ -60,7 +61,7 @@ async function subscribe() {
           aria-label="Email address"
         />
         <div class="signup-row">
-          <select v-model="currency" class="signup-select" :disabled="state === 'loading'" aria-label="Currency">
+          <select v-model="currency" name="currency" class="signup-select" :disabled="state === 'loading'" aria-label="Currency">
             <option value="USD">USD</option>
             <option value="GBP">GBP</option>
             <option value="EUR">EUR</option>

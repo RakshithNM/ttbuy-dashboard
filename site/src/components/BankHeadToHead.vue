@@ -144,7 +144,7 @@ function swapBanks() {
     <div class="selectors">
       <div class="selector-block">
         <span class="bank-swatch" :style="{ background: colorA }" aria-hidden="true"></span>
-        <select v-model="bankA" class="bank-select" aria-label="Bank A">
+        <select v-model="bankA" name="bank-a" class="bank-select" aria-label="Bank A">
           <option v-for="bank in allBanks" :key="bank" :value="bank">{{ bank }}</option>
         </select>
       </div>
@@ -158,7 +158,7 @@ function swapBanks() {
 
       <div class="selector-block">
         <span class="bank-swatch" :style="{ background: colorB }" aria-hidden="true"></span>
-        <select v-model="bankB" class="bank-select" aria-label="Bank B">
+        <select v-model="bankB" name="bank-b" class="bank-select" aria-label="Bank B">
           <option v-for="bank in allBanks" :key="bank" :value="bank">{{ bank }}</option>
         </select>
       </div>

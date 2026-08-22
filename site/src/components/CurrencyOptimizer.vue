@@ -171,6 +171,7 @@ function formatForeign(amount: number, symbol: string): string {
           <input
             v-model="amounts[c]"
             type="number"
+            :name="`amount-${c.toLowerCase()}`"
             min="1"
             class="amount-input"
             :aria-label="`Amount in ${c}`"
@@ -188,6 +189,7 @@ function formatForeign(amount: number, symbol: string): string {
           <input
             v-model="targetInr"
             type="number"
+            name="target-inr"
             min="1"
             class="amount-input reverse-amount-input"
             aria-label="Target INR amount"

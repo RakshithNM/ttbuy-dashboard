@@ -175,7 +175,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
     <div class="mbp-header">
       <span class="mbp-swatch" :style="{ background: myColor }" aria-hidden="true" />
       <span class="mbp-label">My bank</span>
-      <select v-model="myBank" class="mbp-select" aria-label="Change my bank">
+      <select v-model="myBank" name="my-bank" class="mbp-select" aria-label="Change my bank">
         <option v-for="bank in allBanks" :key="bank" :value="bank">{{ bank }}</option>
       </select>
       <button type="button" class="mbp-clear" aria-label="Clear my bank" @click="myBank = ''">✕</button>

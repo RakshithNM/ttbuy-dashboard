@@ -721,7 +721,7 @@ const stableBank = computed<StableBankResult | null>(() => {
           <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5" />
           <line x1="11" y1="11" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
         </svg>
-        <input v-model="bankQuery" type="search" placeholder="Search banks…" aria-label="Search banks" class="bank-search-input" />
+        <input v-model="bankQuery" type="search" name="bank-search" placeholder="Search banks…" aria-label="Search banks" class="bank-search-input" />
         <button v-if="bankQuery" type="button" class="clear-search" aria-label="Clear search" @click="bankQuery = ''">✕</button>
       </div>
       <button type="button" class="export-btn" :title="`Download ${currency} rates as CSV`" @click="exportCsv">

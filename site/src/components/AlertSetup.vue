@@ -174,7 +174,7 @@ async function disable() {
     <div v-if="open" class="as-panel">
       <div class="as-row">
         <span class="as-label">Notify me when {{ props.bank.toUpperCase() }} rate goes</span>
-        <select v-model="direction" class="as-dir">
+        <select v-model="direction" name="alert-direction" class="as-dir">
           <option value="above">above</option>
           <option value="below">below</option>
         </select>
@@ -182,6 +182,7 @@ async function disable() {
         <input
           v-model.number="threshold"
           type="number"
+          name="alert-threshold"
           step="0.01"
           min="0"
           class="as-thresh"

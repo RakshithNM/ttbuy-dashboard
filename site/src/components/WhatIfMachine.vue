@@ -139,6 +139,7 @@ function daysAgo(dateStr: string): string {
       <input
         v-model="selectedDate"
         type="date"
+        name="what-if-date"
         :min="minDate"
         :max="latestDate"
         class="date-input"
@@ -160,6 +161,7 @@ function daysAgo(dateStr: string): string {
         <input
           v-model="amountStr"
           type="number"
+          name="what-if-amount"
           min="1"
           step="100"
           class="amt-input"
