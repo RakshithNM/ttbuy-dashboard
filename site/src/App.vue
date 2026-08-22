@@ -1016,8 +1016,8 @@ const stableBank = computed<StableBankResult | null>(() => {
   }
 
   &.active {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent), #000 18%);
+    border-color: color-mix(in srgb, var(--accent), #000 18%);
     color: #fff;
   }
 }
@@ -1142,8 +1142,7 @@ const stableBank = computed<StableBankResult | null>(() => {
 .panel-footnote {
   margin: 12px 0 0;
   font-size: 11px;
-  color: var(--text-muted);
-  opacity: 0.8;
+  color: var(--text-secondary);
 }
 
 .faq-panel {

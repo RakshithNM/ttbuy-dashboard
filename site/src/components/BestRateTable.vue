@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import type { BankSeries, FeesByBank, FeeSlab, BenchmarksByCurrency } from "../types";
 import type { CreditTimesByBank, CreditCategory } from "../creditTime";
-import { brandColor, shortName, sourceUrl } from "../bankPalette";
+import { shortName, sourceUrl } from "../bankPalette";
 import { currencySymbol } from "../currencies";
 
 const props = defineProps<{
@@ -553,7 +553,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         <path d="M5 14h6" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
       </svg>
       <span>
-        <span class="consistency-bank" :style="{ color: brandColor(consistency.bank) }">{{ shortName(consistency.bank) }}</span>
+        <span class="consistency-bank">{{ shortName(consistency.bank) }}</span>
         had the best {{ currency }} rate most often: {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}<template v-if="sinceLabel"> since {{ sinceLabel }}</template>
       </span>
     </div>
@@ -1342,7 +1342,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     align-items: center;
     font-size: 10px;
     font-weight: 500;
-    color: var(--accent);
+    color: var(--text-primary);
     background: color-mix(in srgb, var(--accent) 12%, transparent);
     padding: 1px 5px;
     border-radius: 3px;
