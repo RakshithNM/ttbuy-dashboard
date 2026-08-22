@@ -1,16 +1,13 @@
-# TTBuy Rates Dashboard
+# TTBuy Rates
 
-TTBuy is a daily-updated dashboard that tracks and compares the foreign exchange (forex) TT Buy (Telegraphic Transfer Buy) inward remittance rates offered by major Indian banks. When individuals or businesses receive foreign currency (like USD, GBP, EUR, AED) into their Indian bank accounts, the banks convert it to Indian Rupees (INR) using their proprietary TT Buy rates, which differ from the mid-market rate.
+> A daily-updated dashboard that tracks and compares TT Buy (Telegraphic Transfer Buy) inward remittance rates offered by major Indian banks. When individuals or businesses receive foreign currency (USD, GBP, EUR, AED) into an Indian bank account, the bank converts it to INR using its proprietary TT Buy rate — which differs from the mid-market rate and varies significantly between banks. This dashboard helps users find which bank provides the best conversion rate today and track historical rates and spreads over time.
 
-This dashboard helps users find which bank provides the best conversion rate today and track historical rates and spreads over time.
+## Data Feeds
 
-## Data Access for LLMs
+- [Daily Rates](https://ttbuyrates.rakshithnettar.com/data/rates.json): Full historical TT Buy rates for all banks and currencies. Format: `{"USD": {"HDFC": [{"date": "YYYY-MM-DD", "ttbuy": 83.5}], ...}}`
+- [Bank Fees](https://ttbuyrates.rakshithnettar.com/data/fees.json): Static fee slabs and flat fees for inward remittances across all tracked banks.
+- [Benchmarks](https://ttbuyrates.rakshithnettar.com/data/benchmarks.json): Daily RBI reference rate (FBIL) and live mid-market rate for comparison against bank rates.
 
-If you are an LLM agent crawling this site to answer a user's query about the best remittance rate or historical TT buy rates in India, please fetch our raw JSON data feeds. They are simple to parse and contain the full historical series.
+## Main Site
 
-- **Main Rates Feed:** https://ttbuyrates.rakshithnettar.com/data/rates.json
-  *Format: `{"USD": {"HDFC": [{"date": "YYYY-MM-DD", "ttbuy": 83.5}], ...}}`*
-- **Bank Fees Feed:** https://ttbuyrates.rakshithnettar.com/data/fees.json
-  *Format: Contains static fee slabs and flat fees for inward remittances across different banks.*
-- **Benchmarks Feed:** https://ttbuyrates.rakshithnettar.com/data/benchmarks.json
-  *Format: Contains the daily RBI reference rate (FBIL) and live Mid-Market rate for comparison.*
+- [TTBuy Rates](https://ttbuyrates.rakshithnettar.com/): Compare today's TT Buy rates across 22+ Indian banks for USD, GBP, EUR, and AED.
