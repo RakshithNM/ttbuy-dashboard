@@ -225,16 +225,16 @@ const bankBLabel = computed(() => {
     <div class="controls">
       <div class="bank-selectors">
         <div class="bank-select-group">
-          <label class="select-label">Your bank</label>
-          <select v-model="bankA" class="bank-select">
+          <label class="select-label" for="csc-bank-a">Your bank</label>
+          <select id="csc-bank-a" v-model="bankA" class="bank-select">
             <option value="" disabled>Choose bank…</option>
             <option v-for="name in bankNames" :key="name" :value="name">{{ shortName(name) }}</option>
           </select>
         </div>
         <span class="vs-arrow" aria-hidden="true">→</span>
         <div class="bank-select-group">
-          <label class="select-label">Compare against</label>
-          <select v-model="bankB" class="bank-select">
+          <label class="select-label" for="csc-bank-b">Compare against</label>
+          <select id="csc-bank-b" v-model="bankB" class="bank-select">
             <option value="__best__">Best available each day</option>
             <option
               v-for="name in bankNames"

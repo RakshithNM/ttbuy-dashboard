@@ -70,6 +70,13 @@ const calendarCells = computed<(CalCell | null)[]>(() => {
   return cells;
 });
 
+const calendarWeeks = computed(() => {
+  const cells = calendarCells.value;
+  const weeks: (CalCell | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  return weeks;
+});
+
 const monthBanks = computed(() => {
   const counts = new Map<string, { color: string; count: number }>();
   for (const cell of calendarCells.value) {
@@ -162,26 +169,28 @@ function formatCalDate(iso: string): string {
     </div>
 
     <div class="cal-grid" role="grid" :aria-label="`${currency} best bank per day — ${monthLabel}`">
-      <div
-        v-for="(cell, i) in calendarCells"
-        :key="cell ? cell.date : `pad-${i}`"
-        class="cal-cell"
-        :class="{
-          empty: !cell,
-          'has-best': !!cell?.best,
-          'no-data': cell && !cell.best && !cell.isFuture && !cell.isBeforeData,
-          today: cell?.isToday,
-          future: cell?.isFuture,
-          'before-data': cell?.isBeforeData,
-        }"
-        :style="cell?.best ? { '--cell-color': cell.best.color } : {}"
-        role="gridcell"
-        :aria-label="cell?.best ? `${formatCalDate(cell.date)}: ${shortName(cell.best.bank)} ${cell.best.rate.toFixed(2)}` : cell ? formatCalDate(cell.date) : undefined"
-        @mouseenter="cell && !cell.isFuture && !cell.isBeforeData && (hoveredCell = cell)"
-        @mouseleave="hoveredCell = null"
-        @click="cell && !cell.isFuture && !cell.isBeforeData && (hoveredCell = cell)"
-      >
-        <span v-if="cell" class="cal-day-num" aria-hidden="true">{{ cell.day }}</span>
+      <div v-for="(week, wi) in calendarWeeks" :key="wi" role="row" class="cal-row">
+        <div
+          v-for="(cell, ci) in week"
+          :key="cell ? cell.date : `pad-${wi}-${ci}`"
+          class="cal-cell"
+          :class="{
+            empty: !cell,
+            'has-best': !!cell?.best,
+            'no-data': cell && !cell.best && !cell.isFuture && !cell.isBeforeData,
+            today: cell?.isToday,
+            future: cell?.isFuture,
+            'before-data': cell?.isBeforeData,
+          }"
+          :style="cell?.best ? { '--cell-color': cell.best.color } : {}"
+          role="gridcell"
+          :aria-label="cell?.best ? `${formatCalDate(cell.date)}: ${shortName(cell.best.bank)} ${cell.best.rate.toFixed(2)}` : cell ? formatCalDate(cell.date) : undefined"
+          @mouseenter="cell && !cell.isFuture && !cell.isBeforeData && (hoveredCell = cell)"
+          @mouseleave="hoveredCell = null"
+          @click="cell && !cell.isFuture && !cell.isBeforeData && (hoveredCell = cell)"
+        >
+          <span v-if="cell" class="cal-day-num" aria-hidden="true">{{ cell.day }}</span>
+        </div>
       </div>
     </div>
 
@@ -298,6 +307,12 @@ function formatCalDate(iso: string): string {
 }
 
 .cal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cal-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 3px;
