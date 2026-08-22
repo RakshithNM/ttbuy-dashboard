@@ -565,7 +565,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
       </svg>
       <span>
         <strong>Volatility insight: </strong>
-        <strong :style="{ color: stableBank.color }">{{ shortName(stableBank.bank) }}</strong>
+        <strong>{{ shortName(stableBank.bank) }}</strong>
         had the lowest rate volatility among the top {{ stableBank.topN }} banks,
         varying by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
           vs {{ shortName(stableBank.runner.bank) }}'s ₹{{ stableBank.runner.variation.toFixed(2) }}</template>
@@ -871,7 +871,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   }
 
   .suffix {
-    color: var(--text-muted);
+    color: var(--text-secondary);
   }
 }
 
@@ -888,7 +888,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   align-items: flex-start;
   gap: 6px;
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   cursor: pointer;
   user-select: none;
 
@@ -1302,7 +1302,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   }
 
   thead th {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-weight: 500;
     font-size: 12px;
     text-transform: uppercase;
@@ -1473,7 +1473,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   }
 
   .benchmark-row td {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-style: italic;
   }
 
@@ -1482,7 +1482,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--text-muted);
+    color: var(--text-secondary);
   }
 
   .platform-section-note {
@@ -1490,7 +1490,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     font-weight: 400;
     text-transform: none;
     letter-spacing: 0;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     margin-left: 8px;
     font-style: italic;
   }
@@ -1655,7 +1655,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.4;
 
   svg {

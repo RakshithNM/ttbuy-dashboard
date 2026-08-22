@@ -937,7 +937,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   margin-bottom: 32px;
 
   .eyebrow {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -960,11 +960,11 @@ const stableBank = computed<StableBankResult | null>(() => {
     margin: 8px 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--status-good);
+    color: var(--success-text);
   }
 
   .updated {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-size: 13px;
     margin: 0;
   }

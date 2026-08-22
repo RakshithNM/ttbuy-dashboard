@@ -327,7 +327,7 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
 
 .mbp-prompt-hint {
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
