@@ -632,6 +632,11 @@
         "date": "2026-08-21",
         "publishedAt": "09:15 AM",
         "ttbuy": 25.45
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 25.44
       }
     ],
     "Bank of Baroda": [
@@ -856,6 +861,11 @@
         "date": "2026-08-21",
         "publishedAt": null,
         "ttbuy": 25.805
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": null,
+        "ttbuy": 25.795
       }
     ],
     "Citibank": [
@@ -2036,6 +2046,11 @@
         "date": "2026-08-21",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.85
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 25.84
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -3520,6 +3535,11 @@
         "date": "2026-08-21",
         "publishedAt": "09:15 AM",
         "ttbuy": 110.76
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 110.58
       }
     ],
     "Bank of Baroda": [
@@ -3744,6 +3764,11 @@
         "date": "2026-08-21",
         "publishedAt": null,
         "ttbuy": 111.0925
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": null,
+        "ttbuy": 110.9125
       }
     ],
     "Citibank": [
@@ -4954,6 +4979,11 @@
         "date": "2026-08-21",
         "publishedAt": "10:00 AM",
         "ttbuy": 111.39
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 111.25
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -7817,6 +7847,11 @@
         "date": "2026-08-21",
         "publishedAt": "09:15 AM",
         "ttbuy": 129.31
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 129.28
       }
     ],
     "Bank of Baroda": [
@@ -8041,6 +8076,11 @@
         "date": "2026-08-21",
         "publishedAt": null,
         "ttbuy": 129.5975
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": null,
+        "ttbuy": 129.5425
       }
     ],
     "Citibank": [
@@ -9251,6 +9291,11 @@
         "date": "2026-08-21",
         "publishedAt": "10:00 AM",
         "ttbuy": 129.96
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 129.91
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -12134,6 +12179,11 @@
         "date": "2026-08-21",
         "publishedAt": "09:15 AM",
         "ttbuy": 95.04
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 95.0
       }
     ],
     "Bank of Baroda": [
@@ -12378,6 +12428,11 @@
         "date": "2026-08-21",
         "publishedAt": null,
         "ttbuy": 95.33
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": null,
+        "ttbuy": 95.2975
       }
     ],
     "Citibank": [
@@ -13753,6 +13808,11 @@
         "date": "2026-08-21",
         "publishedAt": "10:00 AM",
         "ttbuy": 95.44
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 95.4
       }
     ],
     "Jammu & Kashmir Bank": [
