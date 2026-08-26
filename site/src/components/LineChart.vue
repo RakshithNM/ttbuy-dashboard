@@ -411,16 +411,16 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
       @pointermove="onPointerMove"
       @pointerleave="onPointerLeave"
     >
-      <!-- weekend bands -->
+      <!-- weekend lines -->
       <g aria-hidden="true">
-        <rect
+        <line
           v-for="(band, i) in weekendBands"
           :key="`wknd-${i}`"
-          :x="band.x"
-          :y="MARGIN.top"
-          :width="band.width"
-          :height="plotH"
-          class="weekend-band"
+          :x1="band.x + band.width / 2"
+          :x2="band.x + band.width / 2"
+          :y1="MARGIN.top"
+          :y2="MARGIN.top + plotH"
+          class="weekend-line"
         />
       </g>
 
@@ -666,8 +666,10 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
   touch-action: pan-x;
 }
 
-.weekend-band {
-  fill: color-mix(in srgb, var(--status-critical) 7%, transparent);
+.weekend-line {
+  stroke: var(--gridline);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
   pointer-events: none;
 }
 
@@ -861,11 +863,15 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
 
 .weekend-swatch {
   display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
+  width: 14px;
+  height: 1px;
   flex: none;
-  background: color-mix(in srgb, var(--status-critical) 7%, transparent);
-  border: 1px solid color-mix(in srgb, var(--status-critical) 25%, transparent);
+  background: repeating-linear-gradient(
+    to right,
+    var(--gridline) 0,
+    var(--gridline) 3px,
+    transparent 3px,
+    transparent 6px
+  );
 }
 </style>
