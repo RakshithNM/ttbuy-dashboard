@@ -19,6 +19,7 @@ import { sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
 
 import rawRatesData from "../public/data/rates.json";
+import holidaysData from "../public/data/holidays.json";
 import feesData from "../public/data/fees.json";
 import benchmarksData from "../public/data/benchmarks.json";
 
@@ -507,6 +508,25 @@ const lastUpdatedFormatted = computed(() => {
   return `${MONTHS[month - 1]} ${day}, ${year}`;
 });
 
+const holidayMap = Object.fromEntries(
+  (holidaysData.holidays as { date: string; name: string }[]).map(h => [h.date, h.name])
+);
+
+const stalenessReason = computed(() => {
+  if (!lastUpdated.value) return null;
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  if (lastUpdated.value >= today) return null;
+
+  if (holidayMap[today]) return { type: "holiday" as const, name: holidayMap[today] };
+
+  const d = new Date(today + "T00:00:00");
+  const dow = d.getDay();
+  if (dow === 0) return { type: "sunday" as const };
+  if (dow === 6 && [2, 4].includes(Math.ceil(d.getDate() / 7))) return { type: "bank-saturday" as const };
+
+  return null;
+});
+
 // Net receive spread (best minus worst, fee-adjusted) on the most recent day
 // with majority bank coverage — powers the stakes line in the hero.
 // Returns total rupee difference for the current amount so it matches the
@@ -695,7 +715,18 @@ const stableBank = computed<StableBankResult | null>(() => {
       ₹{{ Math.round(bestVsWorstToday).toLocaleString('en-IN') }} more than the worst.
     </p>
     <p v-if="lastUpdated" class="updated">
-      Rates last updated {{ lastUpdatedFormatted }}. Scraped at 11 AM IST. Banks typically publish by 10 AM IST.
+      <template v-if="stalenessReason?.type === 'holiday'">
+        Today is a bank holiday ({{ stalenessReason.name }}) — rates were last updated {{ lastUpdatedFormatted }}.
+      </template>
+      <template v-else-if="stalenessReason?.type === 'sunday'">
+        Banks are closed on Sundays — rates were last updated {{ lastUpdatedFormatted }}.
+      </template>
+      <template v-else-if="stalenessReason?.type === 'bank-saturday'">
+        Banks close on the 2nd and 4th Saturday — rates were last updated {{ lastUpdatedFormatted }}.
+      </template>
+      <template v-else>
+        Rates last updated {{ lastUpdatedFormatted }}. Scraped at 11 AM IST. Banks typically publish by 10 AM IST.
+      </template>
     </p>
   </header>
 

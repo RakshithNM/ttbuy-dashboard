@@ -1,0 +1,26 @@
+{
+  "year": 2026,
+  "note": "Mumbai/Maharashtra bank holidays. Update annually from RBI holiday matrix at rbi.org.in/Scripts/HolidayMatrixDisplay.aspx",
+  "holidays": [
+    { "date": "2026-01-26", "name": "Republic Day" },
+    { "date": "2026-02-15", "name": "Maha Shivratri" },
+    { "date": "2026-03-03", "name": "Holi" },
+    { "date": "2026-03-20", "name": "Eid al-Fitr (Id-ul-Fitr)" },
+    { "date": "2026-03-26", "name": "Ram Navami" },
+    { "date": "2026-03-31", "name": "Mahavir Jayanti" },
+    { "date": "2026-04-03", "name": "Good Friday" },
+    { "date": "2026-04-14", "name": "Dr. B.R. Ambedkar Jayanti" },
+    { "date": "2026-05-01", "name": "Maharashtra Day" },
+    { "date": "2026-05-27", "name": "Eid al-Adha (Bakrid)" },
+    { "date": "2026-06-25", "name": "Muharram" },
+    { "date": "2026-08-15", "name": "Independence Day" },
+    { "date": "2026-08-26", "name": "Eid Milad-un-Nabi (Mawlid)" },
+    { "date": "2026-09-04", "name": "Janmashtami" },
+    { "date": "2026-09-14", "name": "Ganesh Chaturthi" },
+    { "date": "2026-10-02", "name": "Gandhi Jayanti" },
+    { "date": "2026-10-20", "name": "Dussehra (Vijayadashami)" },
+    { "date": "2026-11-08", "name": "Diwali (Lakshmi Puja)" },
+    { "date": "2026-11-24", "name": "Guru Nanak Jayanti" },
+    { "date": "2026-12-25", "name": "Christmas Day" }
+  ]
+}
