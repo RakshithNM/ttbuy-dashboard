@@ -416,8 +416,8 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
         <line
           v-for="(band, i) in weekendBands"
           :key="`wknd-${i}`"
-          :x1="band.x + band.width / 2"
-          :x2="band.x + band.width / 2"
+          :x1="band.x"
+          :x2="band.x"
           :y1="MARGIN.top"
           :y2="MARGIN.top + plotH"
           class="weekend-line"
@@ -667,7 +667,7 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
 }
 
 .weekend-line {
-  stroke: var(--gridline);
+  stroke: color-mix(in srgb, var(--accent) 35%, transparent);
   stroke-width: 1;
   stroke-dasharray: 3 3;
   pointer-events: none;
@@ -868,8 +868,8 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
   flex: none;
   background: repeating-linear-gradient(
     to right,
-    var(--gridline) 0,
-    var(--gridline) 3px,
+    color-mix(in srgb, var(--accent) 55%, transparent) 0,
+    color-mix(in srgb, var(--accent) 55%, transparent) 3px,
     transparent 3px,
     transparent 6px
   );
