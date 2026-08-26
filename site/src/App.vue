@@ -895,7 +895,7 @@ const stableBank = computed<StableBankResult | null>(() => {
     <section class="panel">
       <h2>Best bank per day</h2>
       <p class="panel-sub">Which bank had the highest {{ currency }} TT Buy rate each day</p>
-      <CalendarHeatmap :series="allSeries" :currency="currency" />
+      <CalendarHeatmap :series="allSeries" :currency="currency" :holidays="holidayMap" />
     </section>
 
     <section class="panel">

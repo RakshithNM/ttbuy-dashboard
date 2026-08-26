@@ -6,6 +6,7 @@ import { shortName } from "../bankPalette";
 const props = defineProps<{
   series: BankSeries[];
   currency: string;
+  holidays?: Record<string, string>;
 }>();
 
 const today = new Date();
@@ -42,6 +43,8 @@ interface CalCell {
   isToday: boolean;
   isFuture: boolean;
   isBeforeData: boolean;
+  isHoliday: boolean;
+  holidayName: string;
 }
 
 const calendarCells = computed<(CalCell | null)[]>(() => {
@@ -65,6 +68,8 @@ const calendarCells = computed<(CalCell | null)[]>(() => {
       isToday: date === todayStr,
       isFuture: date > todayStr,
       isBeforeData: date < firstDate,
+      isHoliday: !!props.holidays?.[date],
+      holidayName: props.holidays?.[date] ?? "",
     });
   }
   return cells;
@@ -126,9 +131,13 @@ function nextMonth() {
 
 const hoveredCell = ref<CalCell | null>(null);
 
-const hasNoData = computed(() => {
-  return calendarCells.value.some(c => c && !c.best && !c.isFuture);
-});
+const hasNoData = computed(() =>
+  calendarCells.value.some(c => c && !c.best && !c.isFuture && !c.isHoliday)
+);
+
+const hasHoliday = computed(() =>
+  calendarCells.value.some(c => c && c.isHoliday && !c.isFuture)
+);
 
 function formatCalDate(iso: string): string {
   const [, m, d] = iso.split("-").map(Number);
@@ -177,14 +186,15 @@ function formatCalDate(iso: string): string {
           :class="{
             empty: !cell,
             'has-best': !!cell?.best,
-            'no-data': cell && !cell.best && !cell.isFuture && !cell.isBeforeData,
+            'no-data': cell && !cell.best && !cell.isFuture && !cell.isBeforeData && !cell.isHoliday,
+            holiday: cell && cell.isHoliday && !cell.isFuture && !cell.isBeforeData && !cell.best,
             today: cell?.isToday,
             future: cell?.isFuture,
             'before-data': cell?.isBeforeData,
           }"
           :style="cell?.best ? { '--cell-color': cell.best.color } : {}"
           role="gridcell"
-          :aria-label="cell?.best ? `${formatCalDate(cell.date)}: ${shortName(cell.best.bank)} ${cell.best.rate.toFixed(2)}` : cell ? formatCalDate(cell.date) : undefined"
+          :aria-label="cell?.isHoliday && !cell?.best ? `${formatCalDate(cell.date)}: Bank holiday — ${cell.holidayName}` : cell?.best ? `${formatCalDate(cell.date)}: ${shortName(cell.best.bank)} ${cell.best.rate.toFixed(2)}` : cell ? formatCalDate(cell.date) : undefined"
           @mouseenter="cell && !cell.isFuture && !cell.isBeforeData && (hoveredCell = cell)"
           @mouseleave="hoveredCell = null"
           @click="cell && !cell.isFuture && !cell.isBeforeData && (hoveredCell = cell)"
@@ -194,7 +204,7 @@ function formatCalDate(iso: string): string {
       </div>
     </div>
 
-    <div v-if="monthBanks.length || hasNoData" class="cal-legend" aria-label="Legend">
+    <div v-if="monthBanks.length || hasNoData || hasHoliday" class="cal-legend" aria-label="Legend">
       <div
         v-for="b in monthBanks"
         :key="b.bank"
@@ -204,6 +214,10 @@ function formatCalDate(iso: string): string {
         <span class="legend-swatch" :style="{ background: b.color }" aria-hidden="true"></span>
         <span class="legend-name">{{ shortName(b.bank) }}</span>
         <span class="legend-count">{{ b.count }}d</span>
+      </div>
+      <div v-if="hasHoliday" class="legend-item" title="Bank holiday — no rates published">
+        <span class="legend-swatch legend-swatch--holiday" aria-hidden="true"></span>
+        <span class="legend-name">Bank holiday</span>
       </div>
       <div v-if="hasNoData" class="legend-item" title="No rate data available">
         <span class="legend-swatch" style="background: color-mix(in srgb, var(--text-muted) 11%, transparent)" aria-hidden="true"></span>
@@ -339,6 +353,10 @@ function formatCalDate(iso: string): string {
     background: color-mix(in srgb, var(--text-muted) 11%, transparent);
   }
 
+  &.holiday {
+    background: color-mix(in srgb, var(--status-warning) 28%, transparent);
+  }
+
   &.future {
     background: color-mix(in srgb, var(--text-muted) 5%, transparent);
   }
@@ -392,6 +410,11 @@ function formatCalDate(iso: string): string {
   height: 10px;
   border-radius: 3px;
   flex: none;
+
+  &--holiday {
+    background: color-mix(in srgb, var(--status-warning) 28%, transparent);
+    border: 1px solid color-mix(in srgb, var(--status-warning) 55%, transparent);
+  }
 }
 
 .legend-name {
