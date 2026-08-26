@@ -1192,6 +1192,11 @@
         "date": "2026-08-25",
         "publishedAt": "11:45 AM",
         "ttbuy": 25.4835
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 25.3798
       }
     ],
     "DCB Bank": [
@@ -1396,6 +1401,11 @@
         "date": "2026-08-25",
         "publishedAt": "09:24 AM",
         "ttbuy": 25.26
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "09:23 AM",
+        "ttbuy": 25.17
       }
     ],
     "HSBC": [
@@ -2407,6 +2417,11 @@
         "date": "2026-08-25",
         "publishedAt": null,
         "ttbuy": 25.05
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": null,
+        "ttbuy": 25.07
       }
     ],
     "Punjab National Bank": [
@@ -2713,6 +2728,11 @@
         "date": "2026-08-25",
         "publishedAt": "11:12 AM",
         "ttbuy": 26.068
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "11:14 AM",
+        "ttbuy": 25.9241
       }
     ],
     "State Bank of India": [
@@ -4200,6 +4220,11 @@
         "date": "2026-08-25",
         "publishedAt": "11:45 AM",
         "ttbuy": 109.1216
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 108.713
       }
     ],
     "DCB Bank": [
@@ -4404,6 +4429,11 @@
         "date": "2026-08-25",
         "publishedAt": "09:24 AM",
         "ttbuy": 109.24
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "09:23 AM",
+        "ttbuy": 108.93
       }
     ],
     "HSBC": [
@@ -5445,14 +5475,14 @@
         "date": "2026-08-25",
         "publishedAt": null,
         "ttbuy": 109.31
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": null,
+        "ttbuy": 109.19
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-08-25",
-        "publishedAt": null,
-        "ttbuy": 102.4185
-      },
       {
         "date": "2025-08-26",
         "publishedAt": null,
@@ -6722,6 +6752,11 @@
         "date": "2026-08-24",
         "publishedAt": null,
         "ttbuy": 111.6875
+      },
+      {
+        "date": "2026-08-25",
+        "publishedAt": null,
+        "ttbuy": 111.276
       }
     ],
     "Punjab National Bank": [
@@ -7008,6 +7043,11 @@
         "date": "2026-08-25",
         "publishedAt": "05:44 AM",
         "ttbuy": 112.13
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "05:44 AM",
+        "ttbuy": 111.85
       }
     ],
     "Skydo": [
@@ -7135,6 +7175,11 @@
         "date": "2026-08-25",
         "publishedAt": "11:12 AM",
         "ttbuy": 111.5809
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "11:14 AM",
+        "ttbuy": 111.0703
       }
     ],
     "State Bank of India": [
@@ -8622,6 +8667,11 @@
         "date": "2026-08-25",
         "publishedAt": "11:45 AM",
         "ttbuy": 127.5542
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 127.0956
       }
     ],
     "DCB Bank": [
@@ -8826,6 +8876,11 @@
         "date": "2026-08-25",
         "publishedAt": "09:24 AM",
         "ttbuy": 126.88
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "09:23 AM",
+        "ttbuy": 126.53
       }
     ],
     "HSBC": [
@@ -9867,14 +9922,14 @@
         "date": "2026-08-25",
         "publishedAt": null,
         "ttbuy": 127.82
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": null,
+        "ttbuy": 127.72
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-08-25",
-        "publishedAt": null,
-        "ttbuy": 118.28
-      },
       {
         "date": "2025-08-26",
         "publishedAt": null,
@@ -11144,6 +11199,11 @@
         "date": "2026-08-24",
         "publishedAt": null,
         "ttbuy": 130.56
+      },
+      {
+        "date": "2026-08-25",
+        "publishedAt": null,
+        "ttbuy": 130.08
       }
     ],
     "Punjab National Bank": [
@@ -11430,6 +11490,11 @@
         "date": "2026-08-25",
         "publishedAt": "05:44 AM",
         "ttbuy": 130.91
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "05:44 AM",
+        "ttbuy": 130.59
       }
     ],
     "Skydo": [
@@ -11557,6 +11622,11 @@
         "date": "2026-08-25",
         "publishedAt": "11:12 AM",
         "ttbuy": 130.4382
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "11:14 AM",
+        "ttbuy": 129.8219
       }
     ],
     "State Bank of India": [
@@ -13099,6 +13169,11 @@
         "date": "2026-08-25",
         "publishedAt": "11:45 AM",
         "ttbuy": 93.8229
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 93.4273
       }
     ],
     "DCB Bank": [
@@ -13328,6 +13403,11 @@
         "date": "2026-08-25",
         "publishedAt": "09:24 AM",
         "ttbuy": 94.03
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "09:23 AM",
+        "ttbuy": 93.72
       }
     ],
     "HSBC": [
@@ -14509,14 +14589,14 @@
         "date": "2026-08-25",
         "publishedAt": null,
         "ttbuy": 94.03
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": null,
+        "ttbuy": 94.1
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-08-25",
-        "publishedAt": null,
-        "ttbuy": 87.56
-      },
       {
         "date": "2025-08-26",
         "publishedAt": null,
@@ -15786,6 +15866,11 @@
         "date": "2026-08-24",
         "publishedAt": null,
         "ttbuy": 95.76
+      },
+      {
+        "date": "2026-08-25",
+        "publishedAt": null,
+        "ttbuy": 95.42
       }
     ],
     "Punjab National Bank": [
@@ -16072,6 +16157,11 @@
         "date": "2026-08-25",
         "publishedAt": "05:44 AM",
         "ttbuy": 96.02
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "05:44 AM",
+        "ttbuy": 95.69
       }
     ],
     "Skydo": [
@@ -16199,6 +16289,11 @@
         "date": "2026-08-25",
         "publishedAt": "11:12 AM",
         "ttbuy": 95.7346
+      },
+      {
+        "date": "2026-08-26",
+        "publishedAt": "11:14 AM",
+        "ttbuy": 95.2062
       }
     ],
     "State Bank of India": [
