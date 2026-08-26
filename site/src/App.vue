@@ -515,14 +515,18 @@ const holidayMap = Object.fromEntries(
 const stalenessReason = computed(() => {
   if (!lastUpdated.value) return null;
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
-  if (lastUpdated.value >= today) return null;
 
-  if (holidayMap[today]) return { type: "holiday" as const, name: holidayMap[today] };
+  // Always surface holidays — even if some banks updated, coverage may be partial
+  if (holidayMap[today]) {
+    return { type: "holiday" as const, name: holidayMap[today], partial: lastUpdated.value >= today };
+  }
+
+  if (lastUpdated.value >= today) return null;
 
   const d = new Date(today + "T00:00:00");
   const dow = d.getDay();
-  if (dow === 0) return { type: "sunday" as const };
-  if (dow === 6 && [2, 4].includes(Math.ceil(d.getDate() / 7))) return { type: "bank-saturday" as const };
+  if (dow === 0) return { type: "sunday" as const, partial: false };
+  if (dow === 6 && [2, 4].includes(Math.ceil(d.getDate() / 7))) return { type: "bank-saturday" as const, partial: false };
 
   return null;
 });
@@ -716,7 +720,8 @@ const stableBank = computed<StableBankResult | null>(() => {
     </p>
     <p v-if="lastUpdated" class="updated">
       <template v-if="stalenessReason?.type === 'holiday'">
-        Today is a bank holiday ({{ stalenessReason.name }}) — rates were last updated {{ lastUpdatedFormatted }}.
+        Today is a bank holiday ({{ stalenessReason.name }}) —
+        {{ stalenessReason.partial ? 'some banks may not publish rates today.' : 'rates were last updated ' + lastUpdatedFormatted + '.' }}
       </template>
       <template v-else-if="stalenessReason?.type === 'sunday'">
         Banks are closed on Sundays — rates were last updated {{ lastUpdatedFormatted }}.
