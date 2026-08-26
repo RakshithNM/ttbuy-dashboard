@@ -179,12 +179,12 @@ function lastPoint(s: BankSeries) {
 
 const showEndLabels = computed(() => visibleSeries.value.length <= 4);
 
-const weekendBands = computed<{ x: number; width: number }[]>(() => {
+const weekendBands = computed<{ x: number; width: number; label: "Sat" | "Sun" }[]>(() => {
   const [d0, d1] = xDomain.value;
   if (d0 === d1 || !allDates.value.length) return [];
   const msPerDay = 86400000;
   const dayWidth = (plotW * msPerDay) / (d1 - d0);
-  const bands: { x: number; width: number }[] = [];
+  const bands: { x: number; width: number; label: "Sat" | "Sun" }[] = [];
   const cur = new Date(d0);
   cur.setUTCHours(0, 0, 0, 0);
   const end = new Date(d1);
@@ -196,7 +196,7 @@ const weekendBands = computed<{ x: number; width: number }[]>(() => {
       const rawX = MARGIN.left + ((t - d0) / (d1 - d0)) * plotW;
       const x1 = Math.max(MARGIN.left, rawX);
       const x2 = Math.min(MARGIN.left + plotW, rawX + dayWidth);
-      if (x2 > x1) bands.push({ x: x1, width: x2 - x1 });
+      if (x2 > x1) bands.push({ x: x1, width: x2 - x1, label: dow === 6 ? "Sat" : "Sun" });
     }
     cur.setUTCDate(cur.getUTCDate() + 1);
   }
@@ -413,15 +413,20 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
     >
       <!-- weekend lines -->
       <g aria-hidden="true">
-        <line
-          v-for="(band, i) in weekendBands"
-          :key="`wknd-${i}`"
-          :x1="band.x"
-          :x2="band.x"
-          :y1="MARGIN.top"
-          :y2="MARGIN.top + plotH"
-          class="weekend-line"
-        />
+        <g v-for="(band, i) in weekendBands" :key="`wknd-${i}`">
+          <line
+            :x1="band.x"
+            :x2="band.x"
+            :y1="MARGIN.top"
+            :y2="MARGIN.top + plotH"
+            class="weekend-line"
+          />
+          <text
+            :x="band.x + 3"
+            :y="MARGIN.top + 9"
+            class="weekend-label"
+          >{{ band.label }}</text>
+        </g>
       </g>
 
       <!-- gridlines + y ticks -->
@@ -670,6 +675,13 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
   stroke: color-mix(in srgb, var(--accent) 35%, transparent);
   stroke-width: 1;
   stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
+.weekend-label {
+  font-size: 8px;
+  fill: color-mix(in srgb, var(--accent) 55%, transparent);
+  font-family: inherit;
   pointer-events: none;
 }
 
