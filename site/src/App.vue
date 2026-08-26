@@ -718,7 +718,7 @@ const stableBank = computed<StableBankResult | null>(() => {
       Today on {{ currency }} {{ amount.toLocaleString('en-IN') }}: the best bank pays
       ₹{{ Math.round(bestVsWorstToday).toLocaleString('en-IN') }} more than the worst.
     </p>
-    <p v-if="lastUpdated" class="updated">
+    <p v-if="lastUpdated" class="updated" :class="{ 'updated--holiday': stalenessReason?.type === 'holiday' }">
       <template v-if="stalenessReason?.type === 'holiday'">
         Today is a bank holiday ({{ stalenessReason.name }}) —
         {{ stalenessReason.partial ? 'some banks may not publish rates today.' : 'rates were last updated ' + lastUpdatedFormatted + '.' }}
@@ -1003,6 +1003,10 @@ const stableBank = computed<StableBankResult | null>(() => {
     color: var(--text-secondary);
     font-size: 13px;
     margin: 0;
+
+    &.updated--holiday {
+      color: var(--status-warning);
+    }
   }
 }
 
