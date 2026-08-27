@@ -7,7 +7,6 @@ const CalendarHeatmap = defineAsyncComponent(() => import("./components/Calendar
 const CurrencyOptimizer = defineAsyncComponent(() => import("./components/CurrencyOptimizer.vue"));
 const BankHeadToHead = defineAsyncComponent(() => import("./components/BankHeadToHead.vue"));
 const WhatIfMachine = defineAsyncComponent(() => import("./components/WhatIfMachine.vue"));
-const DigestSignup = defineAsyncComponent(() => import("./components/DigestSignup.vue"));
 const OpportunityCostChart = defineAsyncComponent(() => import("./components/OpportunityCostChart.vue"));
 const CumulativeSavingsCalc = defineAsyncComponent(() => import("./components/CumulativeSavingsCalc.vue"));
 const RatePercentileTable = defineAsyncComponent(() => import("./components/RatePercentileTable.vue"));
@@ -957,7 +956,6 @@ const stableBank = computed<StableBankResult | null>(() => {
   </section>
 
   <footer class="site-footer">
-    <DigestSignup />
     <div class="footer-credits">
       <span>Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a></span>
       <span class="footer-sep" aria-hidden="true">·</span>
