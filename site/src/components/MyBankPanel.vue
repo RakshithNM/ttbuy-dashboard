@@ -3,8 +3,6 @@ import { computed } from "vue";
 import type { BankSeries, FeesByBank, FeeSlab } from "../types";
 import { brandColor, shortName } from "../bankPalette";
 import { currencySymbol } from "../currencies";
-import AlertSetup from "./AlertSetup.vue";
-
 const props = defineProps<{
   series: BankSeries[];
   fees: FeesByBank;
@@ -278,12 +276,6 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
       </template>
     </div>
 
-    <AlertSetup
-      v-if="mySnap && stateKind !== 'no_data'"
-      :bank="myBank"
-      :currency="props.currency"
-      :current-rate="mySnap.ttbuy"
-    />
   </section>
 </template>
 
