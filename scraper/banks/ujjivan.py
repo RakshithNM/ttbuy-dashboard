@@ -27,7 +27,7 @@ def parse(pdf_bytes, source_url):
         text = pdf.pages[0].extract_text() or ""
         table = pdf.pages[0].extract_tables()[0] if pdf.pages[0].extract_tables() else []
 
-    date_match = re.search(r"Date\s+(\d{2}-\d{2}-\d{2})", text)
+    date_match = re.search(r"Date\s+(\d{2}-\d{2}-\d{2,4})", text)
     time_match = re.search(r"Time\s+([\d.]+\s*[ap]m)", text, re.I)
     rate_date = normalize_date(date_match.group(1)) if date_match else None
     published_at = time_match.group(1).strip() if time_match else None

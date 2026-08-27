@@ -9,8 +9,8 @@ from .base import BankPlugin
 # Previously noted as "image-based PDF" in research, but as of 2026 the PDF
 # has real text layers — pdfplumber extracts cleanly.
 UNIONBANK_URL = (
-    "https://www.unionbankofindia.bank.in/pdf/"
-    "foreign-exchange-card-rates-applicable-to-various-forex-transactions.pdf"
+    "https://www.unionbankofindia.co.in/pdf/"
+    "Foreign-Exchange-card-rates-applicable-to-various-forex-transactions.pdf"
 )
 
 
@@ -31,15 +31,15 @@ def parse(pdf_bytes, source_url):
     results = {}
     for table in tables:
         for row in table:
-            if not row or len(row) < 4:
+            if not row or len(row) < 5:
                 continue
-            code = row[0]
+            code = row[1]
             if code not in TARGET_CURRENCIES or code in results:
                 continue
             results[code] = {
                 "Rate_Date": rate_date,
                 "Published_At": published_at,
-                "TT_Buy": row[3],
+                "TT_Buy": row[4],
                 "Raw_Data_Row": row,
             }
     return results or None
