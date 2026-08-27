@@ -2989,31 +2989,6 @@
     ],
     "Ujjivan Small Finance Bank": [
       {
-        "date": "2020-08-18",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 25.23
-      },
-      {
-        "date": "2020-08-19",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 25.25
-      },
-      {
-        "date": "2020-08-24",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 25.22
-      },
-      {
-        "date": "2020-08-25",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 25.26
-      },
-      {
-        "date": "2020-08-27",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 25.18
-      },
-      {
         "date": "2026-07-30",
         "publishedAt": "09:00 AM",
         "ttbuy": 25.21
@@ -3069,6 +3044,16 @@
         "ttbuy": 25.19
       },
       {
+        "date": "2026-08-18",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.23
+      },
+      {
+        "date": "2026-08-19",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.25
+      },
+      {
         "date": "2026-08-20",
         "publishedAt": "09:00 AM",
         "ttbuy": 25.23
@@ -3077,6 +3062,21 @@
         "date": "2026-08-21",
         "publishedAt": "09:00 AM",
         "ttbuy": 25.24
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.22
+      },
+      {
+        "date": "2026-08-25",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.26
+      },
+      {
+        "date": "2026-08-27",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.18
       }
     ],
     "Union Bank of India": [
@@ -3134,6 +3134,11 @@
         "date": "2026-08-20",
         "publishedAt": "09:15 AM",
         "ttbuy": 25.93
+      },
+      {
+        "date": "2026-08-27",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 25.87
       }
     ]
   },
@@ -7556,31 +7561,6 @@
     ],
     "Ujjivan Small Finance Bank": [
       {
-        "date": "2020-08-18",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 109.01
-      },
-      {
-        "date": "2020-08-19",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 109.21
-      },
-      {
-        "date": "2020-08-24",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 110.03
-      },
-      {
-        "date": "2020-08-25",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 109.94
-      },
-      {
-        "date": "2020-08-27",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 109.52
-      },
-      {
         "date": "2026-07-30",
         "publishedAt": "09:00 AM",
         "ttbuy": 107.83
@@ -7636,6 +7616,16 @@
         "ttbuy": 109.02
       },
       {
+        "date": "2026-08-18",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 109.01
+      },
+      {
+        "date": "2026-08-19",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 109.21
+      },
+      {
         "date": "2026-08-20",
         "publishedAt": "09:00 AM",
         "ttbuy": 109.98
@@ -7644,6 +7634,21 @@
         "date": "2026-08-21",
         "publishedAt": "09:00 AM",
         "ttbuy": 110.19
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 110.03
+      },
+      {
+        "date": "2026-08-25",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 109.94
+      },
+      {
+        "date": "2026-08-27",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 109.52
       }
     ],
     "Union Bank of India": [
@@ -7701,6 +7706,11 @@
         "date": "2026-08-20",
         "publishedAt": "09:15 AM",
         "ttbuy": 111.01
+      },
+      {
+        "date": "2026-08-27",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 110.52
       }
     ]
   },
@@ -12123,31 +12133,6 @@
     ],
     "Ujjivan Small Finance Bank": [
       {
-        "date": "2020-08-18",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 127.5
-      },
-      {
-        "date": "2020-08-19",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 127.62
-      },
-      {
-        "date": "2020-08-24",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 128.53
-      },
-      {
-        "date": "2020-08-25",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 128.5
-      },
-      {
-        "date": "2020-08-27",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 127.7
-      },
-      {
         "date": "2026-07-30",
         "publishedAt": "09:00 AM",
         "ttbuy": 125.69
@@ -12203,6 +12188,16 @@
         "ttbuy": 127.54
       },
       {
+        "date": "2026-08-18",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 127.5
+      },
+      {
+        "date": "2026-08-19",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 127.62
+      },
+      {
         "date": "2026-08-20",
         "publishedAt": "09:00 AM",
         "ttbuy": 128.18
@@ -12211,6 +12206,21 @@
         "date": "2026-08-21",
         "publishedAt": "09:00 AM",
         "ttbuy": 128.6
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 128.53
+      },
+      {
+        "date": "2026-08-25",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 128.5
+      },
+      {
+        "date": "2026-08-27",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 127.7
       }
     ],
     "Union Bank of India": [
@@ -12268,6 +12278,11 @@
         "date": "2026-08-20",
         "publishedAt": "09:15 AM",
         "ttbuy": 129.45
+      },
+      {
+        "date": "2026-08-27",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 128.96
       }
     ]
   },
@@ -16925,31 +16940,6 @@
     ],
     "Ujjivan Small Finance Bank": [
       {
-        "date": "2020-08-18",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 94.21
-      },
-      {
-        "date": "2020-08-19",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 94.29
-      },
-      {
-        "date": "2020-08-24",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 94.2
-      },
-      {
-        "date": "2020-08-25",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 94.29
-      },
-      {
-        "date": "2020-08-27",
-        "publishedAt": "09:00 AM",
-        "ttbuy": 93.97
-      },
-      {
         "date": "2026-07-29",
         "publishedAt": "09:00 AM",
         "ttbuy": 94.3
@@ -17010,6 +17000,16 @@
         "ttbuy": 94.14
       },
       {
+        "date": "2026-08-18",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 94.21
+      },
+      {
+        "date": "2026-08-19",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 94.29
+      },
+      {
         "date": "2026-08-20",
         "publishedAt": "09:00 AM",
         "ttbuy": 94.19
@@ -17018,6 +17018,21 @@
         "date": "2026-08-21",
         "publishedAt": "09:00 AM",
         "ttbuy": 94.26
+      },
+      {
+        "date": "2026-08-24",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 94.2
+      },
+      {
+        "date": "2026-08-25",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 94.29
+      },
+      {
+        "date": "2026-08-27",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 93.97
       }
     ],
     "Union Bank of India": [
@@ -17075,6 +17090,11 @@
         "date": "2026-08-20",
         "publishedAt": "09:15 AM",
         "ttbuy": 95.31
+      },
+      {
+        "date": "2026-08-27",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 95.09
       }
     ]
   }
