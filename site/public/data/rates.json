@@ -2928,6 +2928,11 @@
         "date": "2026-08-28",
         "publishedAt": "01:47 PM",
         "ttbuy": 25.9834
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "11:04 AM",
+        "ttbuy": 25.9856
       }
     ],
     "State Bank of India": [
@@ -3085,6 +3090,11 @@
         "date": "2026-08-28",
         "publishedAt": "09:11 AM",
         "ttbuy": 25.38
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.36
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -5874,11 +5884,6 @@
     ],
     "Mid-market": [
       {
-        "date": "2025-08-28",
-        "publishedAt": null,
-        "ttbuy": 102.2535
-      },
-      {
         "date": "2025-08-29",
         "publishedAt": null,
         "ttbuy": 102.8035
@@ -7473,6 +7478,11 @@
         "date": "2026-08-28",
         "publishedAt": "08:18 AM",
         "ttbuy": 111.63
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "05:35 AM",
+        "ttbuy": 111.01
       }
     ],
     "Skydo": [
@@ -7615,6 +7625,11 @@
         "date": "2026-08-28",
         "publishedAt": "01:47 PM",
         "ttbuy": 111.1405
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "11:05 AM",
+        "ttbuy": 110.5279
       }
     ],
     "State Bank of India": [
@@ -7772,6 +7787,11 @@
         "date": "2026-08-28",
         "publishedAt": "09:11 AM",
         "ttbuy": 109.9
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 109.2
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -10561,11 +10581,6 @@
     ],
     "Mid-market": [
       {
-        "date": "2025-08-28",
-        "publishedAt": null,
-        "ttbuy": 118.39
-      },
-      {
         "date": "2025-08-29",
         "publishedAt": null,
         "ttbuy": 118.6
@@ -12160,6 +12175,11 @@
         "date": "2026-08-28",
         "publishedAt": "08:18 AM",
         "ttbuy": 130.05
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "05:35 AM",
+        "ttbuy": 129.55
       }
     ],
     "Skydo": [
@@ -12302,6 +12322,11 @@
         "date": "2026-08-28",
         "publishedAt": "01:47 PM",
         "ttbuy": 129.6391
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "11:05 AM",
+        "ttbuy": 129.1378
       }
     ],
     "State Bank of India": [
@@ -12459,6 +12484,11 @@
         "date": "2026-08-28",
         "publishedAt": "09:11 AM",
         "ttbuy": 128.4
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 127.7
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -15468,11 +15498,6 @@
     ],
     "Mid-market": [
       {
-        "date": "2025-08-28",
-        "publishedAt": null,
-        "ttbuy": 87.57
-      },
-      {
         "date": "2025-08-29",
         "publishedAt": null,
         "ttbuy": 88.18
@@ -17209,6 +17234,11 @@
         "date": "2026-08-28",
         "publishedAt": "01:47 PM",
         "ttbuy": 95.4239
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "11:05 AM",
+        "ttbuy": 95.4298
       }
     ],
     "State Bank of India": [
@@ -17381,6 +17411,11 @@
         "date": "2026-08-28",
         "publishedAt": "09:11 AM",
         "ttbuy": 95.1
+      },
+      {
+        "date": "2026-08-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 95.0
       }
     ],
     "Ujjivan Small Finance Bank": [
