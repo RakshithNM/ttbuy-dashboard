@@ -941,6 +941,11 @@
         "date": "2026-08-28",
         "publishedAt": null,
         "ttbuy": 25.74
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": null,
+        "ttbuy": 25.74
       }
     ],
     "Citibank": [
@@ -2321,6 +2326,11 @@
         "date": "2026-08-27",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.78
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 25.77
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -2540,6 +2550,11 @@
         "date": "2026-08-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 25.65
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.64
       }
     ],
     "Kotak Mahindra Bank": [
@@ -4309,6 +4324,11 @@
         "date": "2026-08-28",
         "publishedAt": null,
         "ttbuy": 110.395
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": null,
+        "ttbuy": 109.8625
       }
     ],
     "Citibank": [
@@ -5719,6 +5739,11 @@
         "date": "2026-08-27",
         "publishedAt": "10:00 AM",
         "ttbuy": 110.62
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 110.1
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -5938,6 +5963,11 @@
         "date": "2026-08-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 109.71
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 109.14
       }
     ],
     "Kotak Mahindra Bank": [
@@ -9116,6 +9146,11 @@
         "date": "2026-08-28",
         "publishedAt": null,
         "ttbuy": 128.765
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": null,
+        "ttbuy": 128.3275
       }
     ],
     "Citibank": [
@@ -10526,6 +10561,11 @@
         "date": "2026-08-27",
         "publishedAt": "10:00 AM",
         "ttbuy": 129.05
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 128.62
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -10745,6 +10785,11 @@
         "date": "2026-08-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 128.02
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 127.52
       }
     ],
     "Kotak Mahindra Bank": [
@@ -13963,6 +14008,11 @@
         "date": "2026-08-28",
         "publishedAt": null,
         "ttbuy": 95.09
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": null,
+        "ttbuy": 95.09
       }
     ],
     "Citibank": [
@@ -15538,6 +15588,11 @@
         "date": "2026-08-27",
         "publishedAt": "10:00 AM",
         "ttbuy": 95.19
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 95.15
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -15767,6 +15822,11 @@
         "date": "2026-08-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 94.7
+      },
+      {
+        "date": "2026-08-31",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 94.65
       }
     ],
     "Kotak Mahindra Bank": [
