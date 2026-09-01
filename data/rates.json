@@ -2162,6 +2162,11 @@
         "date": "2026-08-31",
         "publishedAt": null,
         "ttbuy": 25.15
+      },
+      {
+        "date": "2026-09-01",
+        "publishedAt": null,
+        "ttbuy": 25.02
       }
     ],
     "IDFC FIRST Bank": [
@@ -2391,6 +2396,11 @@
         "date": "2026-08-31",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.77
+      },
+      {
+        "date": "2026-09-01",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 25.62
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -5650,6 +5660,11 @@
         "date": "2026-08-31",
         "publishedAt": null,
         "ttbuy": 108.18
+      },
+      {
+        "date": "2026-09-01",
+        "publishedAt": null,
+        "ttbuy": 107.76
       }
     ],
     "IDFC FIRST Bank": [
@@ -5909,6 +5924,11 @@
         "date": "2026-08-31",
         "publishedAt": "10:00 AM",
         "ttbuy": 110.1
+      },
+      {
+        "date": "2026-09-01",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 109.5
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -10582,6 +10602,11 @@
         "date": "2026-08-31",
         "publishedAt": null,
         "ttbuy": 126.39
+      },
+      {
+        "date": "2026-09-01",
+        "publishedAt": null,
+        "ttbuy": 125.72
       }
     ],
     "IDFC FIRST Bank": [
@@ -10841,6 +10866,11 @@
         "date": "2026-08-31",
         "publishedAt": "10:00 AM",
         "ttbuy": 128.62
+      },
+      {
+        "date": "2026-09-01",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 127.81
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -15644,6 +15674,11 @@
         "date": "2026-08-31",
         "publishedAt": null,
         "ttbuy": 93.94
+      },
+      {
+        "date": "2026-09-01",
+        "publishedAt": null,
+        "ttbuy": 93.45
       }
     ],
     "IDFC FIRST Bank": [
@@ -15978,6 +16013,11 @@
         "date": "2026-08-31",
         "publishedAt": "10:00 AM",
         "ttbuy": 95.15
+      },
+      {
+        "date": "2026-09-01",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 94.55
       }
     ],
     "Jammu & Kashmir Bank": [
