@@ -2591,6 +2591,11 @@
         "date": "2026-09-03",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.52
+      },
+      {
+        "date": "2026-09-04",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 25.53
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -3418,6 +3423,11 @@
         "date": "2026-09-04",
         "publishedAt": "11:07 AM",
         "ttbuy": 25.7265
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "11:04 AM",
+        "ttbuy": 25.7133
       }
     ],
     "State Bank of India": [
@@ -3605,6 +3615,11 @@
         "date": "2026-09-04",
         "publishedAt": "09:07 AM",
         "ttbuy": 25.12
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "09:11 AM",
+        "ttbuy": 25.1
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -6439,6 +6454,11 @@
         "date": "2026-09-03",
         "publishedAt": "10:00 AM",
         "ttbuy": 109.0
+      },
+      {
+        "date": "2026-09-04",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 109.31
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -6843,11 +6863,6 @@
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-09-04",
-        "publishedAt": null,
-        "ttbuy": 102.6255
-      },
       {
         "date": "2025-09-05",
         "publishedAt": null,
@@ -8117,6 +8132,11 @@
         "date": "2026-09-03",
         "publishedAt": null,
         "ttbuy": 109.75
+      },
+      {
+        "date": "2026-09-04",
+        "publishedAt": null,
+        "ttbuy": 109.8165
       }
     ],
     "Punjab National Bank": [
@@ -8518,6 +8538,11 @@
         "date": "2026-09-04",
         "publishedAt": "05:38 AM",
         "ttbuy": 110.4
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "05:35 AM",
+        "ttbuy": 110.27
       }
     ],
     "Skydo": [
@@ -8695,6 +8720,11 @@
         "date": "2026-09-04",
         "publishedAt": "11:07 AM",
         "ttbuy": 109.8686
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "11:04 AM",
+        "ttbuy": 109.6717
       }
     ],
     "State Bank of India": [
@@ -8882,6 +8912,11 @@
         "date": "2026-09-04",
         "publishedAt": "09:07 AM",
         "ttbuy": 108.6
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "09:11 AM",
+        "ttbuy": 108.4
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -11716,6 +11751,11 @@
         "date": "2026-09-03",
         "publishedAt": "10:00 AM",
         "ttbuy": 126.87
+      },
+      {
+        "date": "2026-09-04",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 127.18
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -12120,11 +12160,6 @@
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-09-04",
-        "publishedAt": null,
-        "ttbuy": 118.47
-      },
       {
         "date": "2025-09-05",
         "publishedAt": null,
@@ -13394,6 +13429,11 @@
         "date": "2026-09-03",
         "publishedAt": null,
         "ttbuy": 127.53
+      },
+      {
+        "date": "2026-09-04",
+        "publishedAt": null,
+        "ttbuy": 127.85
       }
     ],
     "Punjab National Bank": [
@@ -13795,6 +13835,11 @@
         "date": "2026-09-04",
         "publishedAt": "05:38 AM",
         "ttbuy": 128.34
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "05:35 AM",
+        "ttbuy": 128.24
       }
     ],
     "Skydo": [
@@ -13972,6 +14017,11 @@
         "date": "2026-09-04",
         "publishedAt": "11:07 AM",
         "ttbuy": 127.8679
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "11:04 AM",
+        "ttbuy": 127.6452
       }
     ],
     "State Bank of India": [
@@ -14159,6 +14209,11 @@
         "date": "2026-09-04",
         "publishedAt": "09:07 AM",
         "ttbuy": 126.5
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "09:11 AM",
+        "ttbuy": 126.2
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -17198,6 +17253,11 @@
         "date": "2026-09-03",
         "publishedAt": "10:00 AM",
         "ttbuy": 94.2
+      },
+      {
+        "date": "2026-09-04",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 94.22
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -17617,11 +17677,6 @@
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-09-04",
-        "publishedAt": null,
-        "ttbuy": 88.12
-      },
       {
         "date": "2025-09-05",
         "publishedAt": null,
@@ -18891,6 +18946,11 @@
         "date": "2026-09-03",
         "publishedAt": null,
         "ttbuy": 94.49
+      },
+      {
+        "date": "2026-09-04",
+        "publishedAt": null,
+        "ttbuy": 94.49
       }
     ],
     "Punjab National Bank": [
@@ -19464,6 +19524,11 @@
         "date": "2026-09-04",
         "publishedAt": "11:07 AM",
         "ttbuy": 94.4803
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "11:04 AM",
+        "ttbuy": 94.432
       }
     ],
     "State Bank of India": [
@@ -19666,6 +19731,11 @@
         "date": "2026-09-04",
         "publishedAt": "09:07 AM",
         "ttbuy": 94.13
+      },
+      {
+        "date": "2026-09-05",
+        "publishedAt": "09:11 AM",
+        "ttbuy": 94.03
       }
     ],
     "Ujjivan Small Finance Bank": [
