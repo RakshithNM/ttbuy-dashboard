@@ -1076,6 +1076,11 @@
         "date": "2026-09-07",
         "publishedAt": null,
         "ttbuy": 25.4625
+      },
+      {
+        "date": "2026-09-09",
+        "publishedAt": null,
+        "ttbuy": 25.6025
       }
     ],
     "Citibank": [
@@ -2786,6 +2791,11 @@
         "date": "2026-09-08",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.58
+      },
+      {
+        "date": "2026-09-09",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 25.67
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -5229,6 +5239,11 @@
         "date": "2026-09-07",
         "publishedAt": null,
         "ttbuy": 108.8425
+      },
+      {
+        "date": "2026-09-09",
+        "publishedAt": null,
+        "ttbuy": 109.635
       }
     ],
     "Citibank": [
@@ -6969,6 +6984,11 @@
         "date": "2026-09-08",
         "publishedAt": "10:00 AM",
         "ttbuy": 109.54
+      },
+      {
+        "date": "2026-09-09",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 110.05
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -10861,6 +10881,11 @@
         "date": "2026-09-07",
         "publishedAt": null,
         "ttbuy": 126.5975
+      },
+      {
+        "date": "2026-09-09",
+        "publishedAt": null,
+        "ttbuy": 127.64
       }
     ],
     "Citibank": [
@@ -12601,6 +12626,11 @@
         "date": "2026-09-08",
         "publishedAt": "10:00 AM",
         "ttbuy": 127.54
+      },
+      {
+        "date": "2026-09-09",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 128.12
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -16533,6 +16563,11 @@
         "date": "2026-09-07",
         "publishedAt": null,
         "ttbuy": 94.065
+      },
+      {
+        "date": "2026-09-09",
+        "publishedAt": null,
+        "ttbuy": 94.58
       }
     ],
     "Citibank": [
@@ -18438,6 +18473,11 @@
         "date": "2026-09-08",
         "publishedAt": "10:00 AM",
         "ttbuy": 94.42
+      },
+      {
+        "date": "2026-09-09",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 94.78
       }
     ],
     "Jammu & Kashmir Bank": [
