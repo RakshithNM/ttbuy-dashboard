@@ -1116,6 +1116,11 @@
         "date": "2026-09-10",
         "publishedAt": null,
         "ttbuy": 25.7
+      },
+      {
+        "date": "2026-09-11",
+        "publishedAt": null,
+        "ttbuy": 25.8025
       }
     ],
     "Citibank": [
@@ -5479,6 +5484,11 @@
         "date": "2026-09-10",
         "publishedAt": null,
         "ttbuy": 110.125
+      },
+      {
+        "date": "2026-09-11",
+        "publishedAt": null,
+        "ttbuy": 110.2325
       }
     ],
     "Citibank": [
@@ -11331,6 +11341,11 @@
         "date": "2026-09-10",
         "publishedAt": null,
         "ttbuy": 128.2125
+      },
+      {
+        "date": "2026-09-11",
+        "publishedAt": null,
+        "ttbuy": 128.2
       }
     ],
     "Citibank": [
@@ -17223,6 +17238,11 @@
         "date": "2026-09-10",
         "publishedAt": null,
         "ttbuy": 94.9475
+      },
+      {
+        "date": "2026-09-11",
+        "publishedAt": null,
+        "ttbuy": 95.3175
       }
     ],
     "Citibank": [
