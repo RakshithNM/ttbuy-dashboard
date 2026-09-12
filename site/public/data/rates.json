@@ -3903,6 +3903,11 @@
         "date": "2026-09-11",
         "publishedAt": "11:06 AM",
         "ttbuy": 26.0606
+      },
+      {
+        "date": "2026-09-12",
+        "publishedAt": "11:06 AM",
+        "ttbuy": 26.032
       }
     ],
     "State Bank of India": [
@@ -7799,11 +7804,6 @@
     ],
     "Mid-market": [
       {
-        "date": "2025-09-11",
-        "publishedAt": null,
-        "ttbuy": 103.331
-      },
-      {
         "date": "2025-09-12",
         "publishedAt": null,
         "ttbuy": 103.4388
@@ -9072,6 +9072,11 @@
         "date": "2026-09-10",
         "publishedAt": null,
         "ttbuy": 110.8645
+      },
+      {
+        "date": "2026-09-11",
+        "publishedAt": null,
+        "ttbuy": 110.7675
       }
     ],
     "Punjab National Bank": [
@@ -9548,6 +9553,11 @@
         "date": "2026-09-11",
         "publishedAt": "05:37 AM",
         "ttbuy": 111.68
+      },
+      {
+        "date": "2026-09-12",
+        "publishedAt": "05:37 AM",
+        "ttbuy": 111.37
       }
     ],
     "Skydo": [
@@ -9760,6 +9770,11 @@
         "date": "2026-09-11",
         "publishedAt": "11:06 AM",
         "ttbuy": 111.1467
+      },
+      {
+        "date": "2026-09-12",
+        "publishedAt": "11:06 AM",
+        "ttbuy": 110.8828
       }
     ],
     "State Bank of India": [
@@ -13656,11 +13671,6 @@
     ],
     "Mid-market": [
       {
-        "date": "2025-09-11",
-        "publishedAt": null,
-        "ttbuy": 119.5
-      },
-      {
         "date": "2025-09-12",
         "publishedAt": null,
         "ttbuy": 119.54
@@ -14929,6 +14939,11 @@
         "date": "2026-09-10",
         "publishedAt": null,
         "ttbuy": 129.03
+      },
+      {
+        "date": "2026-09-11",
+        "publishedAt": null,
+        "ttbuy": 129.08
       }
     ],
     "Punjab National Bank": [
@@ -15405,6 +15420,11 @@
         "date": "2026-09-11",
         "publishedAt": "05:36 AM",
         "ttbuy": 129.79
+      },
+      {
+        "date": "2026-09-12",
+        "publishedAt": "05:37 AM",
+        "ttbuy": 129.67
       }
     ],
     "Skydo": [
@@ -15617,6 +15637,11 @@
         "date": "2026-09-11",
         "publishedAt": "11:06 AM",
         "ttbuy": 129.3142
+      },
+      {
+        "date": "2026-09-12",
+        "publishedAt": "11:06 AM",
+        "ttbuy": 129.3304
       }
     ],
     "State Bank of India": [
@@ -19733,11 +19758,6 @@
     ],
     "Mid-market": [
       {
-        "date": "2025-09-11",
-        "publishedAt": null,
-        "ttbuy": 88.43
-      },
-      {
         "date": "2025-09-12",
         "publishedAt": null,
         "ttbuy": 88.27
@@ -21006,6 +21026,11 @@
         "date": "2026-09-10",
         "publishedAt": null,
         "ttbuy": 95.44
+      },
+      {
+        "date": "2026-09-11",
+        "publishedAt": null,
+        "ttbuy": 95.56
       }
     ],
     "Punjab National Bank": [
@@ -21472,6 +21497,11 @@
         "date": "2026-09-11",
         "publishedAt": "05:36 AM",
         "ttbuy": 96.14
+      },
+      {
+        "date": "2026-09-12",
+        "publishedAt": "05:37 AM",
+        "ttbuy": 95.97
       }
     ],
     "Skydo": [
@@ -21684,6 +21714,11 @@
         "date": "2026-09-11",
         "publishedAt": "11:06 AM",
         "ttbuy": 95.7073
+      },
+      {
+        "date": "2026-09-12",
+        "publishedAt": "11:06 AM",
+        "ttbuy": 95.6023
       }
     ],
     "State Bank of India": [
