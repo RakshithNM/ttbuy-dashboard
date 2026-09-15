@@ -369,6 +369,26 @@ const bankStats = computed(() => {
   return map;
 });
 
+const sparklines7d = computed(() => {
+  const map = new Map<string, string>();
+  for (const s of props.series) {
+    const pts = s.points.slice(-7);
+    if (pts.length < 2) continue;
+    const W = 48, H = 18, PAD = 1;
+    const rates = pts.map(p => p.ttbuy);
+    const min = Math.min(...rates);
+    const max = Math.max(...rates);
+    const yRange = max > min ? max - min : 1;
+    const coords = pts.map((p, i) => {
+      const x = PAD + (i / (pts.length - 1)) * (W - PAD * 2);
+      const y = PAD + (1 - (p.ttbuy - min) / yRange) * (H - PAD * 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    });
+    map.set(s.name, `M ${coords.join(" L ")}`);
+  }
+  return map;
+});
+
 function creditLabel(category: CreditCategory): string {
   if (category === "same-day") return "Same day";
   if (category === "1-2-days") return "1–2 days";
@@ -738,6 +758,17 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
               <template v-if="row.hasData">
                 <td class="num">
                   <div class="ttbuy-inner">
+                    <svg
+                      v-if="sparklines7d.get(row.bank)"
+                      class="inline-sparkline"
+                      viewBox="0 0 48 18"
+                      width="48"
+                      height="18"
+                      aria-hidden="true"
+                      :title="`${shortName(row.bank)}: 7-day rate trend`"
+                    >
+                      <path :d="sparklines7d.get(row.bank)" fill="none" :stroke="row.color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                     <span class="rate-val">{{ row.ttbuy.toFixed(2) }}</span>
                     <span class="delta-slot">
                       <span
@@ -1436,6 +1467,16 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     justify-content: flex-end;
     align-items: center;
     gap: 6px;
+  }
+
+  .inline-sparkline {
+    flex: none;
+    opacity: 0.75;
+    transition: opacity 120ms ease;
+
+    tr:hover & { opacity: 1; }
+
+    @media (max-width: 480px) { display: none; }
   }
 
   // Fixed-width slot so the rate-val column stays aligned regardless of
