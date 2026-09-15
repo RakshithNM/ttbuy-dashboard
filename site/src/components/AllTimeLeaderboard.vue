@@ -16,17 +16,18 @@ const RANGES: { key: RangeKey; label: string; days: number | null }[] = [
 ];
 const range = ref<RangeKey>("all");
 
-type SortKey = "wins" | "winPct" | "avgRate" | "bestRate";
+type SortKey = "wins" | "winPct" | "avgRate" | "bestRate" | "stdDev";
 type SortDir = "desc" | "asc";
 const sortKey = ref<SortKey>("wins");
 const sortDir = ref<SortDir>("desc");
 
+// Consistency sorts ascending by default (lower stddev = more consistent = better)
 function setSort(k: SortKey) {
   if (sortKey.value === k) {
     sortDir.value = sortDir.value === "desc" ? "asc" : "desc";
   } else {
     sortKey.value = k;
-    sortDir.value = "desc";
+    sortDir.value = k === "stdDev" ? "asc" : "desc";
   }
 }
 
@@ -41,6 +42,7 @@ interface Row {
   winPct: number;
   avgRate: number;
   bestRate: number;
+  stdDev: number;
   daysAppeared: number;
 }
 
@@ -69,6 +71,7 @@ const leaderboardData = computed(() => {
   const sumRate: Record<string, number> = {};
   const cntRate: Record<string, number> = {};
   const bestMap: Record<string, number> = {};
+  const rateValues: Record<string, number[]> = {};
   let qualifyingDays = 0;
   const qualDates: string[] = [];
 
@@ -82,7 +85,16 @@ const leaderboardData = computed(() => {
       sumRate[e.bank] = (sumRate[e.bank] ?? 0) + e.rate;
       cntRate[e.bank] = (cntRate[e.bank] ?? 0) + 1;
       if (!bestMap[e.bank] || e.rate > bestMap[e.bank]) bestMap[e.bank] = e.rate;
+      if (!rateValues[e.bank]) rateValues[e.bank] = [];
+      rateValues[e.bank].push(e.rate);
     }
+  }
+
+  function popStdDev(vals: number[]): number {
+    if (vals.length < 2) return 0;
+    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+    const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / vals.length;
+    return Math.sqrt(variance);
   }
 
   const rows: Row[] = bs
@@ -93,6 +105,7 @@ const leaderboardData = computed(() => {
       winPct: qualifyingDays > 0 ? ((wins[s.name] ?? 0) / qualifyingDays) * 100 : 0,
       avgRate: cntRate[s.name] ? sumRate[s.name] / cntRate[s.name] : 0,
       bestRate: bestMap[s.name] ?? 0,
+      stdDev: rateValues[s.name] ? popStdDev(rateValues[s.name]) : 0,
       daysAppeared: cntRate[s.name] ?? 0,
     }))
     .filter(r => r.daysAppeared > 0);
@@ -162,6 +175,10 @@ function sortIcon(k: SortKey) {
             <th class="th-best sortable" @click="setSort('bestRate')">
               Best ever <span class="sort-icon">{{ sortIcon('bestRate') }}</span>
             </th>
+            <th class="th-std sortable" @click="setSort('stdDev')"
+              title="Population standard deviation of TT Buy rates in this period. Lower = more predictable.">
+              Consistency <span class="sort-icon">{{ sortIcon('stdDev') }}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -183,6 +200,9 @@ function sortIcon(k: SortKey) {
             <td class="td-winpct num">{{ row.winPct.toFixed(1) }}%</td>
             <td class="td-avg num">₹{{ row.avgRate.toFixed(2) }}</td>
             <td class="td-best num">₹{{ row.bestRate.toFixed(2) }}</td>
+            <td class="td-std num" :class="{ 'std-best': sortKey === 'stdDev' && i === 0 }">
+              ±{{ row.stdDev.toFixed(2) }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -321,10 +341,18 @@ function sortIcon(k: SortKey) {
     color: var(--text-muted);
   }
 
+  .th-std { text-align: right; }
+  .td-std {
+    text-align: right;
+    color: var(--text-secondary);
+    &.std-best { color: var(--success-text); font-weight: 600; }
+  }
+
   @media (max-width: 480px) {
-    // Keep # | Bank | Wins | Win% — drop avg rate and best ever
+    // Keep # | Bank | Wins | Win% — drop avg, best, consistency
     .th-avg, .td-avg,
-    .th-best, .td-best { display: none; }
+    .th-best, .td-best,
+    .th-std, .td-std { display: none; }
     .td-bank { min-width: 100px; }
     .wins-bar-track { display: none; }
   }
