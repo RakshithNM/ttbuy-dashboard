@@ -90,6 +90,8 @@ interface DataRow {
   gapToBest: number;
   // % below the mid-market (interbank) rate; null when no benchmark is available.
   markupPct: number | null;
+  // 5-day linear-regression trend direction — null when fewer than 3 points available.
+  momentum: "up" | "down" | "flat" | null;
 }
 
 interface EmptyRow {
@@ -118,6 +120,22 @@ function feeFromSlabs(slabs: FeeSlab[], grossInr: number): number {
     if (s.up_to === null || grossInr <= s.up_to) return s.fee_inr;
   }
   return 0;
+}
+
+function computeMomentum(points: { ttbuy: number }[]): "up" | "down" | "flat" | null {
+  const last = points.slice(-5);
+  if (last.length < 3) return null;
+  const n = last.length;
+  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+  for (let i = 0; i < n; i++) {
+    sumX += i; sumY += last[i].ttbuy;
+    sumXY += i * last[i].ttbuy; sumXX += i * i;
+  }
+  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+  const totalChange = slope * (n - 1);
+  if (totalChange > 0.05) return "up";
+  if (totalChange < -0.05) return "down";
+  return "flat";
 }
 
 function isPreviousCalendarDay(earlierDate: string, laterDate: string): boolean {
@@ -169,6 +187,7 @@ const rows = computed<Row[]>(() => {
       netReceive: Math.max(0, grossReceive - feeInr),
       delta: showDelta ? last.ttbuy - prev!.ttbuy : null,
       markupPct: benchmark ? (benchmark - last.ttbuy) / benchmark * 100 : null,
+      momentum: computeMomentum(s.points),
     };
     if (isPlatformRow) platformDataRows.push(row);
     else bankDataRows.push(row);
@@ -670,14 +689,23 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                     aria-hidden="true"
                   ></span>
                   <span class="bank-info">
-                    <a
-                      v-if="sourceUrl(row.bank)"
-                      :href="sourceUrl(row.bank)!"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="bank-name bank-link"
-                    >{{ shortName(row.bank) }}</a>
-                    <span v-else class="bank-name">{{ shortName(row.bank) }}</span>
+                    <span class="bank-name-row">
+                      <a
+                        v-if="sourceUrl(row.bank)"
+                        :href="sourceUrl(row.bank)!"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="bank-name bank-link"
+                      >{{ shortName(row.bank) }}</a>
+                      <span v-else class="bank-name">{{ shortName(row.bank) }}</span>
+                      <span
+                        v-if="row.hasData && row.momentum"
+                        class="momentum"
+                        :class="row.momentum"
+                        :title="row.momentum === 'up' ? '5-day trend: rising — rate has been climbing' : row.momentum === 'down' ? '5-day trend: falling — rate has been declining' : '5-day trend: stable'"
+                        aria-hidden="true"
+                      >{{ row.momentum === 'up' ? '↑' : row.momentum === 'down' ? '↓' : '→' }}</span>
+                    </span>
                     <span
                       v-if="consistency && row.bank === consistency.bank"
                       class="consistency-label"
@@ -1332,9 +1360,26 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     min-width: 0;
   }
 
+  .bank-name-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
   .bank-name {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .momentum {
+    flex: none;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+
+    &.up   { color: var(--success-text); }
+    &.down { color: var(--status-critical); }
+    &.flat { color: var(--text-muted); }
   }
 
   .consistency-label {
