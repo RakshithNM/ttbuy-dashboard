@@ -24,3 +24,6 @@ class BankPlugin:
     # Wise, etc.) whose rate is what the recipient gets, with the sender paying
     # the platform fee on their end rather than a deduction from the credited amount.
     category: str = "bank"
+    # Set to False for banks whose TLS cert chain is incomplete (missing intermediate
+    # CA). SSL is still used; only chain verification is skipped.
+    verify_ssl: bool = True

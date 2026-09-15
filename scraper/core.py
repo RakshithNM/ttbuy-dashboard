@@ -59,7 +59,7 @@ def get_with_retries(url, attempts=5, backoff=10, **kwargs):
     raise last_error
 
 
-def fetch_html(url, is_wayback=False):
+def fetch_html(url, is_wayback=False, verify=True):
     """Fetch a URL and return decoded HTML text.
 
     Wayback snapshot URLs need the 'id_' infix to get the raw archived HTML
@@ -67,7 +67,7 @@ def fetch_html(url, is_wayback=False):
     even though requests already decompressed the transport encoding.
     """
     fetch_url = url.replace("/http", "id_/http") if is_wayback else url
-    res = get_with_retries(fetch_url, timeout=20)
+    res = get_with_retries(fetch_url, timeout=20, verify=verify)
 
     content = res.content
     if content[:2] == b"\x1f\x8b":
@@ -76,12 +76,12 @@ def fetch_html(url, is_wayback=False):
     return content.decode(res.encoding or "utf-8", errors="replace")
 
 
-def fetch_bytes(url, is_wayback=False):
+def fetch_bytes(url, is_wayback=False, verify=True):
     """Fetch a URL and return raw bytes, decompressing gzip if needed (some
     archived responses are gzip even though requests already handled
     transport-level Content-Encoding)."""
     fetch_url = url.replace("/http", "id_/http") if is_wayback else url
-    res = get_with_retries(fetch_url, timeout=20)
+    res = get_with_retries(fetch_url, timeout=20, verify=verify)
 
     content = res.content
     if content[:2] == b"\x1f\x8b":

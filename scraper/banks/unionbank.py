@@ -15,9 +15,11 @@ UNIONBANK_URL = (
 
 
 def parse(pdf_bytes, source_url):
-    """Union Bank's card-rate PDF has a single header row followed by data rows:
-    Currency | TT Selling | Bill Selling | TT Buying | Bill Buying | …
-    TT Buying is at index 3."""
+    """Union Bank's card-rate PDF table has TT Buying at column index 4 in both
+    the old layout (None | Currency | TT Sell | Bill Sell | TT Buy | …) and the
+    new layout introduced after Sep 9 2026 (Currency | SPOT | TT Sell | Bill Sell
+    | TT Buy | …). The currency code moved from index 1 to index 0. Handle both
+    by checking whichever cell contains a TARGET_CURRENCIES code."""
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
         text = "\n".join((p.extract_text() or "") for p in pdf.pages)
         tables = []
@@ -33,8 +35,13 @@ def parse(pdf_bytes, source_url):
         for row in table:
             if not row or len(row) < 5:
                 continue
-            code = row[1]
-            if code not in TARGET_CURRENCIES or code in results:
+            if row[0] and str(row[0]).upper() in TARGET_CURRENCIES:
+                code = str(row[0]).upper()
+            elif row[1] and str(row[1]).upper() in TARGET_CURRENCIES:
+                code = str(row[1]).upper()
+            else:
+                continue
+            if code in results:
                 continue
             results[code] = {
                 "Rate_Date": rate_date,

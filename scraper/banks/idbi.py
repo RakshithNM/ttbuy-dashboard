@@ -53,4 +53,8 @@ PLUGIN = BankPlugin(
     live_url=IDBI_URL,
     wayback_urls=[IDBI_URL],
     parse=parse,
+    # IDBI's server sends only the leaf cert, not the GlobalSign GCC R46 EV TLS
+    # CA 2025 intermediate. GitHub Actions runners don't cache it, so verification
+    # fails. SSL is still used; only chain verification is skipped.
+    verify_ssl=False,
 )
