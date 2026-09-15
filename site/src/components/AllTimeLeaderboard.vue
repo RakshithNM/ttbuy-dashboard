@@ -343,7 +343,6 @@ function sortIcon(k: SortKey) {
 
   .th-std { text-align: right; }
   .td-std {
-    text-align: right;
     color: var(--text-secondary);
     &.std-best { color: var(--success-text); font-weight: 600; }
   }
