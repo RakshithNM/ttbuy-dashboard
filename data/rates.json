@@ -2672,6 +2672,11 @@
         "date": "2026-09-07",
         "publishedAt": null,
         "ttbuy": 24.87
+      },
+      {
+        "date": "2026-09-15",
+        "publishedAt": null,
+        "ttbuy": 25.23
       }
     ],
     "IDFC FIRST Bank": [
@@ -4499,6 +4504,11 @@
         "date": "2026-09-09",
         "publishedAt": "10:40 AM",
         "ttbuy": 26.01
+      },
+      {
+        "date": "2026-09-15",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 25.97
       }
     ]
   },
@@ -7175,6 +7185,11 @@
         "date": "2026-09-07",
         "publishedAt": null,
         "ttbuy": 107.16
+      },
+      {
+        "date": "2026-09-15",
+        "publishedAt": null,
+        "ttbuy": 108.03
       }
     ],
     "IDFC FIRST Bank": [
@@ -10506,6 +10521,11 @@
         "date": "2026-09-09",
         "publishedAt": "10:40 AM",
         "ttbuy": 111.31
+      },
+      {
+        "date": "2026-09-15",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 109.85
       }
     ]
   },
@@ -13182,6 +13202,11 @@
         "date": "2026-09-07",
         "publishedAt": null,
         "ttbuy": 124.69
+      },
+      {
+        "date": "2026-09-15",
+        "publishedAt": null,
+        "ttbuy": 126.28
       }
     ],
     "IDFC FIRST Bank": [
@@ -16513,6 +16538,11 @@
         "date": "2026-09-09",
         "publishedAt": "10:40 AM",
         "ttbuy": 129.6
+      },
+      {
+        "date": "2026-09-15",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 128.44
       }
     ]
   },
@@ -19319,6 +19349,11 @@
         "date": "2026-09-07",
         "publishedAt": null,
         "ttbuy": 92.92
+      },
+      {
+        "date": "2026-09-15",
+        "publishedAt": null,
+        "ttbuy": 94.24
       }
     ],
     "IDFC FIRST Bank": [
@@ -22750,6 +22785,11 @@
         "date": "2026-09-09",
         "publishedAt": "10:40 AM",
         "ttbuy": 95.43
+      },
+      {
+        "date": "2026-09-15",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 95.46
       }
     ]
   }
