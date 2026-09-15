@@ -12,6 +12,7 @@ const CumulativeSavingsCalc = defineAsyncComponent(() => import("./components/Cu
 const RatePercentileTable = defineAsyncComponent(() => import("./components/RatePercentileTable.vue"));
 const AllTimeLeaderboard = defineAsyncComponent(() => import("./components/AllTimeLeaderboard.vue"));
 const MarkupTrendChart = defineAsyncComponent(() => import("./components/MarkupTrendChart.vue"));
+const DayOfWeekChart = defineAsyncComponent(() => import("./components/DayOfWeekChart.vue"));
 import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
 import { sortByCurrencyOrder } from "./currencies";
@@ -907,6 +908,12 @@ const stableBank = computed<StableBankResult | null>(() => {
       <h2>Markup below mid-market</h2>
       <p class="panel-sub">How much each {{ currency }} bank's TT Buy rate falls below mid-market — lower gap means a more competitive rate</p>
       <MarkupTrendChart :series="allSeries" :currency="currency" />
+    </section>
+
+    <section class="panel">
+      <h2>Best day to send</h2>
+      <p class="panel-sub">Average {{ currency }} TT Buy rate by day of the week — deviation from the weekly mean across all available banks</p>
+      <DayOfWeekChart :series="allSeries" :currency="currency" />
     </section>
 
     <section class="panel">
