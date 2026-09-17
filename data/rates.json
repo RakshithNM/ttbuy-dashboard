@@ -1176,6 +1176,11 @@
         "date": "2026-09-16",
         "publishedAt": null,
         "ttbuy": 25.8575
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": null,
+        "ttbuy": 25.8975
       }
     ],
     "Citibank": [
@@ -1358,6 +1363,11 @@
         "date": "2026-09-16",
         "publishedAt": "09:05 AM",
         "ttbuy": 25.5701
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 25.6194
       }
     ],
     "City Union Bank": [
@@ -3126,6 +3136,11 @@
         "date": "2026-09-16",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.91
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 25.89
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -5899,6 +5914,11 @@
         "date": "2026-09-16",
         "publishedAt": null,
         "ttbuy": 109.9
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": null,
+        "ttbuy": 109.2725
       }
     ],
     "Citibank": [
@@ -6081,6 +6101,11 @@
         "date": "2026-09-16",
         "publishedAt": "09:05 AM",
         "ttbuy": 108.4117
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 107.846
       }
     ],
     "City Union Bank": [
@@ -7879,6 +7904,11 @@
         "date": "2026-09-16",
         "publishedAt": "10:00 AM",
         "ttbuy": 110.21
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 109.33
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -12136,6 +12166,11 @@
         "date": "2026-09-16",
         "publishedAt": null,
         "ttbuy": 128.3225
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": null,
+        "ttbuy": 127.4825
       }
     ],
     "Citibank": [
@@ -12318,6 +12353,11 @@
         "date": "2026-09-16",
         "publishedAt": "09:05 AM",
         "ttbuy": 126.5993
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 125.8328
       }
     ],
     "City Union Bank": [
@@ -14116,6 +14156,11 @@
         "date": "2026-09-16",
         "publishedAt": "10:00 AM",
         "ttbuy": 128.73
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 127.55
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -18413,6 +18458,11 @@
         "date": "2026-09-16",
         "publishedAt": null,
         "ttbuy": 95.5425
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": null,
+        "ttbuy": 95.6775
       }
     ],
     "Citibank": [
@@ -18600,6 +18650,11 @@
         "date": "2026-09-16",
         "publishedAt": "09:05 AM",
         "ttbuy": 93.9345
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 94.0998
       }
     ],
     "City Union Bank": [
@@ -20558,6 +20613,11 @@
         "date": "2026-09-16",
         "publishedAt": "10:00 AM",
         "ttbuy": 95.66
+      },
+      {
+        "date": "2026-09-17",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 95.56
       }
     ],
     "Jammu & Kashmir Bank": [
