@@ -354,6 +354,14 @@ interface AugmentedRow {
   date: string;
   isWeekend: boolean;
   values: { name: string; value: number | null }[] | null;
+  rowBest: number | null;
+  rowWorst: number | null;
+}
+
+function rowExtremes(values: { name: string; value: number | null }[]): { best: number | null; worst: number | null } {
+  const nums = values.map(v => v.value).filter((v): v is number => v !== null);
+  if (nums.length < 2) return { best: null, worst: null };
+  return { best: Math.max(...nums), worst: Math.min(...nums) };
 }
 
 // Extends tableRows (newest-first) by inserting synthetic weekend rows into
@@ -362,11 +370,12 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
   const result: AugmentedRow[] = [];
   const rows = tableRows.value;
   for (let i = 0; i < rows.length; i++) {
-    result.push({ ...rows[i], isWeekend: isWeekend(rows[i].date) });
+    const { best: rowBest, worst: rowWorst } = rowExtremes(rows[i].values);
+    result.push({ ...rows[i], isWeekend: isWeekend(rows[i].date), rowBest, rowWorst });
     const next = rows[i + 1];
     if (next) {
       for (const d of datesBetween(next.date, rows[i].date).reverse()) {
-        if (isWeekend(d)) result.push({ date: d, isWeekend: true, values: null });
+        if (isWeekend(d)) result.push({ date: d, isWeekend: true, values: null, rowBest: null, rowWorst: null });
       }
     }
   }
@@ -562,9 +571,15 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
           <tr v-for="row in augmentedTableRows" :key="row.date" :class="{ weekend: row.isWeekend }">
             <th scope="row">{{ formatShortDate(row.date) }}</th>
             <template v-if="row.values !== null">
-              <td v-for="cell in row.values" :key="cell.name" class="num">
-                {{ cell.value !== null ? cell.value.toFixed(2) : "—" }}
-              </td>
+              <td
+                v-for="cell in row.values"
+                :key="cell.name"
+                class="num"
+                :class="{
+                  'cell-best': cell.value !== null && cell.value === row.rowBest,
+                  'cell-worst': cell.value !== null && cell.value === row.rowWorst,
+                }"
+              >{{ cell.value !== null ? cell.value.toFixed(2) : "—" }}</td>
             </template>
             <td v-else :colspan="tableSeries.length" class="weekend-note">
               Banks closed, no rates published
@@ -828,6 +843,15 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
     text-align: right;
     font-variant-numeric: tabular-nums;
     font-family: ui-monospace, "Cascadia Code", "Roboto Mono", monospace
+  }
+
+  .cell-best {
+    color: var(--success-text);
+    font-weight: 600;
+  }
+
+  .cell-worst {
+    color: var(--status-critical);
   }
 
   .no-data {
