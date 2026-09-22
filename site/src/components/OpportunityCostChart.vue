@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { BankSeries, FeesByBank } from "../types";
+import { areaPathFor, bisectNearest, createLinearScale, createTimeScale, downsampleDates, linePathFor, ticksAtStep } from "../chartScales";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -79,47 +80,33 @@ const yDomain = computed<[number, number]>(() => {
   return [0, Math.ceil((max * 1.15) / step) * step];
 });
 
+const xScaleD3 = computed(() => createTimeScale(xDomain.value, [0, plotW]));
+const yScaleD3 = computed(() => createLinearScale(yDomain.value, [plotH, 0]));
+
 function xPos(date: string): number {
   const [min, max] = xDomain.value;
-  const t = new Date(date).getTime();
-  return max === min ? 0 : ((t - min) / (max - min)) * plotW;
+  return max === min ? 0 : xScaleD3.value(new Date(date).getTime());
 }
 
 function yPos(value: number): number {
   const [min, max] = yDomain.value;
-  return max === min ? plotH : plotH - ((value - min) / (max - min)) * plotH;
+  return max === min ? plotH : yScaleD3.value(value);
 }
 
-const linePath = computed(() =>
-  chartData.value.map((pt, i) => `${i === 0 ? "M" : "L"}${xPos(pt.date).toFixed(1)},${yPos(pt.spread).toFixed(1)}`).join(" ")
-);
+const linePath = computed(() => linePathFor(chartData.value, (pt) => xPos(pt.date), (pt) => yPos(pt.spread)));
 
 const areaPath = computed(() => {
   if (!chartData.value.length) return "";
-  const line = chartData.value.map((pt, i) => `${i === 0 ? "M" : "L"}${xPos(pt.date).toFixed(1)},${yPos(pt.spread).toFixed(1)}`).join(" ");
-  const last = chartData.value[chartData.value.length - 1];
-  const first = chartData.value[0];
-  return `${line} L${xPos(last.date).toFixed(1)},${plotH} L${xPos(first.date).toFixed(1)},${plotH} Z`;
+  return areaPathFor(chartData.value, (pt) => xPos(pt.date), (pt) => yPos(pt.spread), plotH);
 });
 
 const yTicks = computed<number[]>(() => {
-  const [, max] = yDomain.value;
+  const [min, max] = yDomain.value;
   const step = max <= 200 ? 50 : max <= 500 ? 100 : max <= 1000 ? 200 : 500;
-  const ticks: number[] = [];
-  for (let v = 0; v <= max + 1e-9; v += step) ticks.push(v);
-  return ticks;
+  return ticksAtStep(min, max, step);
 });
 
-const xTicks = computed<string[]>(() => {
-  const data = chartData.value;
-  if (!data.length) return [];
-  if (data.length <= 5) return data.map(d => d.date);
-  const step = Math.floor(data.length / 5);
-  const ticks: string[] = [];
-  for (let i = 0; i < data.length; i += step) ticks.push(data[i].date);
-  if (ticks[ticks.length - 1] !== data[data.length - 1].date) ticks.push(data[data.length - 1].date);
-  return ticks;
-});
+const xTicks = computed<string[]>(() => downsampleDates(chartData.value, 5).map(d => d.date));
 
 function formatDate(dateStr: string): string {
   const [, m, d] = dateStr.split("-").map(Number);
@@ -138,14 +125,9 @@ function onMouseMove(e: MouseEvent, svg: SVGSVGElement) {
   const rect = svg.getBoundingClientRect();
   const plotX = ((e.clientX - rect.left) / rect.width) * W - MARGIN.left;
   if (plotX < 0 || plotX > plotW || !chartData.value.length) { tooltip.value = null; return; }
-  const [min, max] = xDomain.value;
-  const targetTime = min + (plotX / plotW) * (max - min);
-  let closest = chartData.value[0];
-  let minDist = Infinity;
-  for (const pt of chartData.value) {
-    const dist = Math.abs(new Date(pt.date).getTime() - targetTime);
-    if (dist < minDist) { minDist = dist; closest = pt; }
-  }
+  const targetTime = xScaleD3.value.invert(plotX).getTime();
+  const closest = bisectNearest(chartData.value, (pt) => new Date(pt.date).getTime(), targetTime);
+  if (closest === undefined) { tooltip.value = null; return; }
   tooltip.value = { x: MARGIN.left + xPos(closest.date), y: MARGIN.top + yPos(closest.spread), date: closest.date, spread: closest.spread };
 }
 

@@ -2,6 +2,7 @@
 import { computed, ref, watch } from "vue";
 import type { BankSeries } from "../types";
 import { shortName, brandColor } from "../bankPalette";
+import { bisectNearest, createLinearScale, createTimeScale, downsampleDates, linePathFor, ticksAtStep } from "../chartScales";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -114,19 +115,21 @@ const yDomain = computed<[number, number]>(() => {
   return [Math.floor((min - pad) / step) * step, Math.ceil((max + pad) / step) * step];
 });
 
+const xScaleD3 = computed(() => createTimeScale(xDomain.value, [0, plotW]));
+const yScaleD3 = computed(() => createLinearScale(yDomain.value, [plotH, 0]));
+
 function xPos(date: string): number {
   const [min, max] = xDomain.value;
-  const t = new Date(date).getTime();
-  return max === min ? 0 : ((t - min) / (max - min)) * plotW;
+  return max === min ? 0 : xScaleD3.value(new Date(date).getTime());
 }
 
 function yPos(value: number): number {
   const [min, max] = yDomain.value;
-  return max === min ? plotH / 2 : plotH - ((value - min) / (max - min)) * plotH;
+  return max === min ? plotH / 2 : yScaleD3.value(value);
 }
 
 function linePath(b: BankGap): string {
-  return b.points.map((p, i) => `${i === 0 ? "M" : "L"}${xPos(p.date).toFixed(1)},${yPos(p.gap).toFixed(1)}`).join(" ");
+  return linePathFor(b.points, (p) => xPos(p.date), (p) => yPos(p.gap));
 }
 
 const yStep = computed(() => {
@@ -137,24 +140,10 @@ const yStep = computed(() => {
 
 const yTicks = computed<number[]>(() => {
   const [min, max] = yDomain.value;
-  const step = yStep.value;
-  const ticks: number[] = [];
-  for (let v = Math.ceil(min / step) * step; v <= max + 1e-9; v += step) {
-    ticks.push(Math.round(v * 100) / 100);
-  }
-  return ticks;
+  return ticksAtStep(min, max, yStep.value);
 });
 
-const xTicks = computed<string[]>(() => {
-  const dates = allDates.value;
-  if (!dates.length) return [];
-  if (dates.length <= 6) return dates;
-  const step = Math.floor(dates.length / 5);
-  const ticks: string[] = [];
-  for (let i = 0; i < dates.length; i += step) ticks.push(dates[i]);
-  if (ticks[ticks.length - 1] !== dates[dates.length - 1]) ticks.push(dates[dates.length - 1]);
-  return ticks;
-});
+const xTicks = computed<string[]>(() => downsampleDates(allDates.value, 5));
 
 const zeroY = computed(() => yPos(0));
 
@@ -172,14 +161,9 @@ function onMouseMove(e: MouseEvent, svg: SVGSVGElement) {
   const dates = allDates.value;
   if (plotX < 0 || plotX > plotW || !dates.length) { tooltip.value = null; return; }
 
-  const [min, max] = xDomain.value;
-  const targetTime = min + (plotX / plotW) * (max - min);
-  let closestDate = dates[0];
-  let minDist = Infinity;
-  for (const d of dates) {
-    const dist = Math.abs(new Date(d).getTime() - targetTime);
-    if (dist < minDist) { minDist = dist; closestDate = d; }
-  }
+  const targetTime = xScaleD3.value.invert(plotX).getTime();
+  const closestDate = bisectNearest(dates, (d) => new Date(d).getTime(), targetTime);
+  if (closestDate === undefined) { tooltip.value = null; return; }
 
   const items = visibleGaps.value
     .map(b => {

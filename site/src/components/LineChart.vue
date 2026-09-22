@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import type { BankSeries } from "../types";
 import { shortName } from "../bankPalette";
+import { bisectNearest, createLinearScale, createTimeScale, linePathFor, ticksAtStep } from "../chartScales";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -101,12 +102,7 @@ const yDomain = computed<[number, number]>(() => {
 
 const yTicks = computed<number[]>(() => {
   const [min, max] = yDomain.value;
-  const step = yStep(max - min);
-  const ticks: number[] = [];
-  for (let v = Math.ceil(min / step) * step; v <= max + 1e-9; v += step) {
-    ticks.push(Math.round(v * 100) / 100);
-  }
-  return ticks;
+  return ticksAtStep(min, max, yStep(max - min));
 });
 
 // Dates where more than half of visible series have a data point — excludes
@@ -154,23 +150,27 @@ function formatShortDate(dateStr: string): string {
   return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
 }
 
+// d3 scales are degenerate (domain start === end) when there's a single
+// date/value — d3 still maps everything to the range start in that case,
+// not the midpoint the old manual code used, so those cases are special-cased
+// to keep the chart centered rather than pinned to an edge.
+const xScaleD3 = computed(() => createTimeScale(xDomain.value, [MARGIN.left, MARGIN.left + plotW]));
+const yScaleD3 = computed(() => createLinearScale(yDomain.value, [MARGIN.top + plotH, MARGIN.top]));
+
 function xScale(dateStr: string): number {
   const [d0, d1] = xDomain.value;
-  const t = new Date(dateStr).getTime();
   if (d1 === d0) return MARGIN.left + plotW / 2;
-  return MARGIN.left + ((t - d0) / (d1 - d0)) * plotW;
+  return xScaleD3.value(new Date(dateStr).getTime());
 }
 function yScale(value: number): number {
   const [v0, v1] = yDomain.value;
   if (v1 === v0) return MARGIN.top + plotH / 2;
-  return MARGIN.top + plotH - ((value - v0) / (v1 - v0)) * plotH;
+  return yScaleD3.value(value);
 }
 
 function linePath(points: { date: string; ttbuy: number }[]): string {
   const sorted = [...points].sort((a, b) => a.date.localeCompare(b.date));
-  return sorted
-    .map((p, i) => `${i === 0 ? "M" : "L"}${xScale(p.date).toFixed(1)},${yScale(p.ttbuy).toFixed(1)}`)
-    .join(" ");
+  return linePathFor(sorted, (p) => xScale(p.date), (p) => yScale(p.ttbuy));
 }
 
 function lastPoint(s: BankSeries) {
@@ -246,15 +246,9 @@ function onPointerMove(evt: PointerEvent) {
   if (!ctm) return;
   const loc = pt.matrixTransform(ctm.inverse());
 
-  let nearest = allDates.value[0];
-  let best = Infinity;
-  for (const d of allDates.value) {
-    const dx = Math.abs(xScale(d) - loc.x);
-    if (dx < best) {
-      best = dx;
-      nearest = d;
-    }
-  }
+  const targetTime = xScaleD3.value.invert(loc.x).getTime();
+  const nearest = bisectNearest(allDates.value, (d) => new Date(d).getTime(), targetTime);
+  if (nearest === undefined) return;
   cancelHoverClear();
   hoverDate.value = nearest;
 }
