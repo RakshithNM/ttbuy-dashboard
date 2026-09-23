@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { BankSeries, FeesByBank, FeeSlab } from "../types";
 import { brandColor, shortName } from "../bankPalette";
 import { currencySymbol } from "../currencies";
@@ -151,6 +151,77 @@ const allBanks = computed(() =>
 );
 
 const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--text-muted)");
+
+// Negotiation card export — a static PNG a user can send to their bank's
+// forex officer as evidence for a better rate. Only worth offering when
+// there's an actual gap to point to (not when already leading, and not on
+// stale/missing data, which wouldn't be credible evidence).
+const showNegotiationExport = computed(() =>
+  !!mySnap.value && !!bestSnap.value &&
+  (stateKind.value === "competitive" || stateKind.value === "behind" || stateKind.value === "lagging")
+);
+
+// Top 5 by net receive, with my bank pinned at the end if it fell outside that.
+const leaderboardRows = computed<BankSnap[]>(() => {
+  const top = rankedBanks.value.slice(0, 5);
+  if (!mySnap.value || top.some(b => b.name === mySnap.value!.name)) return top;
+  return [...top, mySnap.value];
+});
+
+function fmtLongDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1]} ${d}, ${y}`;
+}
+
+// Rendered as a fixed-layout hidden SVG — independent of the site's own
+// theme (always light, since it's meant to be read/printed by someone else)
+// — then rasterized to PNG via canvas on click. Serialize -> Blob -> Image ->
+// canvas is a dependency-free way to export an SVG as PNG, so this doesn't
+// need an image-export library.
+const CARD_W = 1200;
+const CARD_H = 675;
+const negotiationSvgRef = ref<SVGSVGElement | null>(null);
+const exportingCard = ref(false);
+
+async function downloadNegotiationCard() {
+  const svgEl = negotiationSvgRef.value;
+  if (!svgEl || exportingCard.value) return;
+  exportingCard.value = true;
+  try {
+    const svgString = new XMLSerializer().serializeToString(svgEl);
+    const svgUrl = URL.createObjectURL(new Blob([svgString], { type: "image/svg+xml;charset=utf-8" }));
+    const img = new Image();
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("card render failed"));
+      img.src = svgUrl;
+    });
+    const scale = 2; // export at 2x for a crisp, zoomable/printable image
+    const canvas = document.createElement("canvas");
+    canvas.width = CARD_W * scale;
+    canvas.height = CARD_H * scale;
+    const ctx = canvas.getContext("2d");
+    URL.revokeObjectURL(svgUrl);
+    if (!ctx) return;
+    ctx.scale(scale, scale);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, CARD_W, CARD_H);
+    ctx.drawImage(img, 0, 0, CARD_W, CARD_H);
+
+    const pngBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+    if (!pngBlob) return;
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(pngBlob);
+    link.download = `ttbuy-rate-comparison-${myBank.value.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${props.currency}.png`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  } catch {
+    // Best-effort export — if SVG rasterization fails (unsupported browser,
+    // blocked canvas), just no-op rather than surfacing a broken flow.
+  } finally {
+    exportingCard.value = false;
+  }
+}
 </script>
 
 <template>
@@ -274,6 +345,67 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
           Today's best is {{ shortName(bestSnap.name) }} at ₹{{ bestSnap.ttbuy.toFixed(2) }}
         </div>
       </template>
+    </div>
+
+    <div v-if="showNegotiationExport" class="mbp-negotiate">
+      <button type="button" class="mbp-negotiate-btn" :disabled="exportingCard" @click="downloadNegotiationCard">
+        <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8"/><path d="M4.5 7l3.5 3 3.5-3"/><path d="M2.5 12.5h11"/></svg>
+        {{ exportingCard ? "Preparing…" : "Download comparison to show your bank" }}
+      </button>
+
+      <!-- Export-only card, rasterized to PNG on click — never shown on screen. -->
+      <svg
+        ref="negotiationSvgRef"
+        :viewBox="`0 0 ${CARD_W} ${CARD_H}`"
+        :width="CARD_W"
+        :height="CARD_H"
+        style="display: none"
+        aria-hidden="true"
+      >
+        <rect width="100%" height="100%" fill="#ffffff" />
+
+        <text x="48" y="50" font-size="26" font-weight="700" fill="#111827" font-family="system-ui, sans-serif">TT Buy Rate Comparison</text>
+        <text x="1152" y="50" font-size="14" fill="#6b7280" text-anchor="end" font-family="system-ui, sans-serif">{{ currency }} · as of {{ fmtLongDate(latestDate) }}</text>
+        <line x1="48" y1="72" x2="1152" y2="72" stroke="#e5e7eb" stroke-width="1.5" />
+
+        <g v-if="mySnap">
+          <rect x="48" y="96" width="536" height="160" rx="10" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5" />
+          <text x="72" y="124" font-size="12" font-weight="700" letter-spacing="1" fill="#6b7280" font-family="system-ui, sans-serif">YOUR BANK</text>
+          <text x="72" y="158" font-size="20" font-weight="700" fill="#111827" font-family="system-ui, sans-serif">{{ mySnap.name }}</text>
+          <text x="72" y="204" font-size="32" font-weight="700" fill="#111827" font-family="system-ui, sans-serif">₹{{ mySnap.ttbuy.toFixed(2) }}</text>
+          <text x="72" y="236" font-size="14" fill="#6b7280" font-family="system-ui, sans-serif">{{ mySnap.feeUnknown ? "≈" : "" }}₹{{ formatInr(mySnap.netInr) }} net on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}</text>
+        </g>
+
+        <g v-if="bestSnap">
+          <rect x="616" y="96" width="536" height="160" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" />
+          <text x="640" y="124" font-size="12" font-weight="700" letter-spacing="1" fill="#15803d" font-family="system-ui, sans-serif">BEST RATE TODAY</text>
+          <text x="640" y="158" font-size="20" font-weight="700" :fill="brandColor(bestSnap.name)" font-family="system-ui, sans-serif">{{ bestSnap.name }}</text>
+          <text x="640" y="204" font-size="32" font-weight="700" fill="#111827" font-family="system-ui, sans-serif">₹{{ bestSnap.ttbuy.toFixed(2) }}</text>
+          <text x="640" y="236" font-size="14" fill="#6b7280" font-family="system-ui, sans-serif">{{ bestSnap.feeUnknown ? "≈" : "" }}₹{{ formatInr(bestSnap.netInr) }} net on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}</text>
+        </g>
+
+        <text v-if="gapToBest !== null" x="600" y="290" font-size="17" font-weight="600" fill="#111827" text-anchor="middle" font-family="system-ui, sans-serif">+₹{{ formatInr(gapToBest) }} more at {{ shortName(bestSnap!.name) }} on the same {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }} transfer</text>
+
+        <text x="48" y="326" font-size="15" font-weight="700" fill="#111827" font-family="system-ui, sans-serif">Today's rates, ranked</text>
+        <text x="48" y="350" font-size="11" font-weight="700" fill="#6b7280" font-family="system-ui, sans-serif">#</text>
+        <text x="90" y="350" font-size="11" font-weight="700" fill="#6b7280" font-family="system-ui, sans-serif">BANK</text>
+        <text x="760" y="350" font-size="11" font-weight="700" fill="#6b7280" text-anchor="end" font-family="system-ui, sans-serif">TT BUY</text>
+        <text x="1152" y="350" font-size="11" font-weight="700" fill="#6b7280" text-anchor="end" font-family="system-ui, sans-serif">YOU RECEIVE</text>
+        <line x1="48" y1="360" x2="1152" y2="360" stroke="#e5e7eb" stroke-width="1" />
+
+        <g v-for="(row, i) in leaderboardRows" :key="row.name">
+          <rect v-if="row.name === myBank" x="40" :y="380 + i * 30 - 20" width="1120" height="26" rx="6" fill="#eff6ff" />
+          <circle cx="60" :cy="380 + i * 30 - 5" r="8" :fill="brandColor(row.name)" />
+          <text x="60" :y="380 + i * 30 - 2" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="system-ui, sans-serif">{{ i + 1 }}</text>
+          <text x="90" :y="380 + i * 30" font-size="14" :font-weight="row.name === myBank ? 700 : 500" fill="#111827" font-family="system-ui, sans-serif">{{ shortName(row.name) }}{{ row.name === myBank ? " (you)" : "" }}</text>
+          <text x="760" :y="380 + i * 30" font-size="14" fill="#111827" text-anchor="end" font-family="system-ui, sans-serif">₹{{ row.ttbuy.toFixed(2) }}</text>
+          <text x="1152" :y="380 + i * 30" font-size="14" font-weight="600" fill="#111827" text-anchor="end" font-family="system-ui, sans-serif">{{ row.feeUnknown ? "≈" : "" }}₹{{ formatInr(row.netInr) }}</text>
+        </g>
+
+        <line x1="48" y1="575" x2="1152" y2="575" stroke="#e5e7eb" stroke-width="1" />
+        <text x="48" y="598" font-size="12" fill="#6b7280" font-family="system-ui, sans-serif">Rates scraped directly from each bank's public forex page, updated daily. Confirm today's rate before transacting.</text>
+        <text x="48" y="618" font-size="12" font-weight="600" fill="#111827" font-family="system-ui, sans-serif">ttbuyrates.rakshithnettar.com</text>
+      </svg>
     </div>
 
   </section>
@@ -515,5 +647,39 @@ const myColor = computed(() => myBank.value ? brandColor(myBank.value) : "var(--
   color: var(--text-muted);
   line-height: 1.4;
   padding-left: 21px;
+}
+
+.mbp-negotiate {
+  margin-top: 12px;
+}
+
+.mbp-negotiate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 80ms ease, border-color 80ms ease, color 80ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 }
 </style>
