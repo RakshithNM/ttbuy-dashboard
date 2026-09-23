@@ -168,9 +168,38 @@ function yScale(value: number): number {
   return yScaleD3.value(value);
 }
 
+// Beyond a normal weekend (3 days) plus a little slack for a weekday holiday
+// next to it (4 days), a gap this wide likely means missing/failed scrapes
+// rather than an expected closure — connecting straight across it would
+// draw a smooth transition through days we actually know nothing about.
+const MAX_CONNECTED_GAP_DAYS = 4;
+const MS_PER_DAY = 86_400_000;
+
+function daysBetween(a: string, b: string): number {
+  return Math.round((new Date(b).getTime() - new Date(a).getTime()) / MS_PER_DAY);
+}
+
+// Splits a date-sorted array into runs with no gap wider than maxGapDays —
+// used to break the line (and skip spike detection) across genuine gaps
+// while still connecting normal weekend/holiday closures.
+function splitByGap<T extends { date: string }>(sorted: T[], maxGapDays: number): T[][] {
+  const segments: T[][] = [];
+  for (const p of sorted) {
+    const current = segments[segments.length - 1];
+    if (current && daysBetween(current[current.length - 1].date, p.date) <= maxGapDays) {
+      current.push(p);
+    } else {
+      segments.push([p]);
+    }
+  }
+  return segments;
+}
+
 function linePath(points: { date: string; ttbuy: number }[]): string {
   const sorted = [...points].sort((a, b) => a.date.localeCompare(b.date));
-  return linePathFor(sorted, (p) => xScale(p.date), (p) => yScale(p.ttbuy));
+  return splitByGap(sorted, MAX_CONNECTED_GAP_DAYS)
+    .map((seg) => linePathFor(seg, (p) => xScale(p.date), (p) => yScale(p.ttbuy)))
+    .join(" ");
 }
 
 function lastPoint(s: BankSeries) {
@@ -277,6 +306,9 @@ const spikePoints = computed<SpikePoint[]>(() => {
   for (const s of visibleSeries.value) {
     const sorted = [...s.points].sort((a, b) => a.date.localeCompare(b.date));
     for (let i = 1; i < sorted.length; i++) {
+      // Skip pairs separated by a real gap — the delta would reflect drift
+      // over several unknown days, not a genuine single-day move.
+      if (daysBetween(sorted[i - 1].date, sorted[i].date) > MAX_CONNECTED_GAP_DAYS) continue;
       const delta = sorted[i].ttbuy - sorted[i - 1].ttbuy;
       if (Math.abs(delta) >= SPIKE_THRESHOLD) {
         result.push({ date: sorted[i].date, bank: s.name, color: s.color, delta, ttbuy: sorted[i].ttbuy });
