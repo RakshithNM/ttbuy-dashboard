@@ -1404,7 +1404,15 @@ const stableBank = computed<StableBankResult | null>(() => {
 .compare-chip {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
+  // Grows to fill leftover space on a wrapped row instead of leaving it
+  // blank (basis: auto keeps each chip's own content-width as the
+  // starting point, so growth is added on top rather than equalizing
+  // short/long bank names to the same width). Capped so a chip left
+  // alone on the last row doesn't stretch to the full row width.
+  flex: 1 1 auto;
+  max-width: 220px;
   padding: 3px 8px;
   border: 1px solid var(--border);
   border-radius: 4px;
