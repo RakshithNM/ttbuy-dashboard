@@ -23,6 +23,39 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="TTBuy" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      The stylesheet is loaded async (preload + onload swap, see
+      vite.config.ts's asyncCssPlugin) so it doesn't block first paint. That
+      means the browser paints before it arrives, showing UA defaults: white
+      background, serif body font, 8px body margin. This inline block covers
+      exactly those three so there's no flash, without waiting on the full
+      stylesheet. Values must be kept in sync with body/:root in style.scss
+      and _theme.scss.
+    -->
+    <script>
+      // Sets html[data-theme] before paint so the light-dark() colors below
+      // (and the ones in _theme.scss once it loads) pick the right side
+      // immediately instead of flashing light then switching. Mirrors the
+      // stored-theme logic in App.vue's THEME_STORAGE_KEY.
+      try {
+        var t = localStorage.getItem("ttbuy-dashboard:theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    </script>
+    <style>
+      html { color-scheme: light dark; }
+      html[data-theme="light"] { color-scheme: light; }
+      html[data-theme="dark"] { color-scheme: dark; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: light-dark(#f9f9f7, #0d1014);
+        color: light-dark(#0b0b0b, #ffffff);
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+    </style>
+
     <title>TTBuy Rates | Which Indian bank pays the most on foreign transfers?</title>
     <meta name="description" content="The same $1,000 can net you ₹500+ more at one bank than another. Compare TT Buy rates across 22+ Indian banks for USD, GBP, EUR, and AED. Updated daily at 11 AM IST." />
     <link rel="canonical" href="https://ttbuyrates.rakshithnettar.com/" />
