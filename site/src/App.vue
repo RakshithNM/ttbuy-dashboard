@@ -986,6 +986,10 @@ const stableBank = computed<StableBankResult | null>(() => {
       <p>Yes, for larger transfers. Most banks will consider a rate improvement for transfers equivalent to roughly ₹5 lakh or more if you call the forex desk before the transfer is sent. The published rate here is the standard retail rate. Negotiated rates are not published. It helps to mention you've seen competing rates and are considering your options.</p>
     </details>
     <details class="faq-item">
+      <summary>I've decided to switch — how do I actually do it?</summary>
+      <p>You don't need to close your existing account — just open a new one at the bank with the better rate. For inward remittances, it helps to open at a branch authorized to handle foreign exchange (an Authorized Dealer, or "AD", branch) — for example, if you're going with IOB, ask for an AD branch that handles forex/NRI transactions. Once it's open, give that account's IFSC and SWIFT code to whoever sends you money — your employer, client, or family — for future transfers. Money already sent to your old account doesn't need to change.</p>
+    </details>
+    <details class="faq-item">
       <summary>How is this data collected?</summary>
       <p>An automated scraper fetches each bank's publicly published forex rate page every day at 11 AM IST. The rates are the same ones any customer would see on the bank's website. Banks typically publish by 10 AM IST. This site is not affiliated with any bank and does not have access to live or negotiated rates.</p>
     </details>
