@@ -466,15 +466,6 @@ function formatForeign(amount: number, symbol: string): string {
   tbody tr:last-child td {
     border-bottom: none;
   }
-
-  tbody tr.winner {
-    background: color-mix(in srgb, var(--status-good) 7%, transparent);
-
-    .col-receive {
-      color: var(--status-good);
-      font-weight: 600;
-    }
-  }
 }
 
 .col-num {

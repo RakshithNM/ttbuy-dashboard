@@ -934,13 +934,6 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
   }
 }
 
-.swift-fee-net-note {
-  flex-basis: 100%;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  padding-left: 19px;
-}
-
 .swift-fee-toggle {
   flex-basis: 100%;
   display: flex;

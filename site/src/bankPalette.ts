@@ -36,18 +36,6 @@ export function brandColor(name: string): string {
   return BRAND_COLORS[name] ?? BRAND_COLOR_FALLBACK;
 }
 
-// Legacy slot system — kept for reference but no longer used for rendering.
-export const CATEGORICAL_SLOTS = [
-  "--series-1", // blue
-  "--series-2", // orange
-  "--series-3", // aqua
-  "--series-4", // yellow
-  "--series-5", // magenta
-  "--series-6", // green
-  "--series-7", // violet
-  "--series-8", // red
-] as const;
-
 // Source URLs for each bank/platform's published forex rate card or page.
 export const SOURCE_URLS: Record<string, string> = {
   "Axis Bank": "https://application.axis.bank.in/webforms/corporatecardrate/index.aspx",
@@ -79,10 +67,6 @@ export const SOURCE_URLS: Record<string, string> = {
 export function sourceUrl(name: string): string | null {
   return SOURCE_URLS[name] ?? null;
 }
-
-// Remittance platform names. These appear in rates.json alongside banks but
-// are displayed in a separate section in the UI.
-export const PLATFORM_NAMES = new Set(["Skydo", "Remitly"]);
 
 export function isPlatform(name: string): boolean {
   return ["Skydo", "Remitly", "Wise", "Payoneer"].includes(name);
@@ -130,17 +114,6 @@ export const BANK_ORDER = [
 // slots (see dataviz skill palette.md) — past that, hue alone can't carry
 // identity. A 9th+ bank reuses a hue but is drawn dashed (see LineChart.vue)
 // so it's never visually confused with the hue's first owner.
-export function isWrappedSlot(bank: string): boolean {
-  const index = BANK_ORDER.indexOf(bank);
-  return index === -1 || index >= CATEGORICAL_SLOTS.length;
-}
-
-export function slotForBank(bank: string): string {
-  let index = BANK_ORDER.indexOf(bank);
-  if (index === -1) index = BANK_ORDER.length; // unknown bank -> append after known ones
-  return CATEGORICAL_SLOTS[index % CATEGORICAL_SLOTS.length];
-}
-
 // Short display names for banks whose full name is unwieldy in tight spaces
 // (table headers, dense legends). Falls back to the full name otherwise.
 const SHORT_NAMES: Record<string, string> = {

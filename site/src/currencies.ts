@@ -9,19 +9,8 @@ const SYMBOLS: Record<CurrencyCode, string> = {
   AED: "AED ",
 };
 
-const NAMES: Record<CurrencyCode, string> = {
-  USD: "US Dollar",
-  GBP: "British Pound",
-  EUR: "Euro",
-  AED: "UAE Dirham",
-};
-
 export function currencySymbol(code: string): string {
   return SYMBOLS[code as CurrencyCode] ?? code;
-}
-
-export function currencyName(code: string): string {
-  return NAMES[code as CurrencyCode] ?? code;
 }
 
 export function sortByCurrencyOrder(codes: string[]): string[] {
