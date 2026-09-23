@@ -40,3 +40,14 @@ button {
     transform: scale(0.97);
   }
 }
+
+// The View Transitions API doesn't disable itself for reduced motion — the
+// transition still runs (so the DOM swap it wraps still happens), only its
+// default cross-fade animation is turned off.
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

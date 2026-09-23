@@ -66,14 +66,29 @@ function setThemeColor(dark: boolean) {
 }
 setThemeColor(isDark.value);
 
-function toggleTheme() {
-  isDark.value = !isDark.value;
-  const t = isDark.value ? "dark" : "light";
-  if (typeof document !== "undefined") {
-    document.documentElement.setAttribute("data-theme", t);
+// Wraps a state change in a View Transition when the browser supports it
+// (Firefox doesn't yet) — falls back to applying the change directly.
+// prefers-reduced-motion is handled in style.scss, not here, since the
+// transition still needs to run to swap the DOM; only its animation is
+// disabled for that preference.
+function withViewTransition(apply: () => void) {
+  if (typeof document !== "undefined" && "startViewTransition" in document) {
+    document.startViewTransition(apply);
+  } else {
+    apply();
   }
-  setThemeColor(isDark.value);
-  try { localStorage.setItem(THEME_STORAGE_KEY, t); } catch {}
+}
+
+function toggleTheme() {
+  withViewTransition(() => {
+    isDark.value = !isDark.value;
+    const t = isDark.value ? "dark" : "light";
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("data-theme", t);
+    }
+    setThemeColor(isDark.value);
+    try { localStorage.setItem(THEME_STORAGE_KEY, t); } catch {}
+  });
 }
 
 interface StoredView {
@@ -127,6 +142,14 @@ const showTable = ref(
 );
 const currency = ref<string>(queryView.currency ?? storedView.currency ?? "USD");
 const amount = ref<number>(queryView.amount ?? storedView.amount ?? 1000);
+
+function setCurrency(code: string) {
+  withViewTransition(() => { currency.value = code; });
+}
+
+function toggleTableView() {
+  withViewTransition(() => { showTable.value = !showTable.value; });
+}
 
 // Not persisted — this panel's own range toggle, rendered here so it can
 // share a row with the panel title.
@@ -351,6 +374,16 @@ function enterCompareMode() {
 function exitCompareMode() {
   compareMode.value = false;
   compareSelected.value = new Set();
+}
+
+// Only the direct user click gets a transition — enterCompareMode/
+// exitCompareMode are also called from the currency-change watch below,
+// which already runs inside setCurrency's own transition; nesting a second
+// startViewTransition into that would fight the first one.
+function toggleCompareMode() {
+  withViewTransition(() => {
+    if (compareMode.value) exitCompareMode(); else enterCompareMode();
+  });
 }
 
 function toggleCompareBank(name: string) {
@@ -752,7 +785,7 @@ const stableBank = computed<StableBankResult | null>(() => {
           class="currency-btn"
           :class="{ active: currency === code }"
           :aria-pressed="currency === code"
-          @click="currency = code"
+          @click="setCurrency(code)"
         >
           {{ code }}
         </button>
@@ -843,7 +876,7 @@ const stableBank = computed<StableBankResult | null>(() => {
             type="button"
             class="compare-btn"
             :class="{ active: compareMode }"
-            @click="compareMode ? exitCompareMode() : enterCompareMode()"
+            @click="toggleCompareMode"
           >
             <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
               <path d="M2 12l3-5 3 3 4-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -851,7 +884,7 @@ const stableBank = computed<StableBankResult | null>(() => {
             </svg>
             {{ compareMode ? "Exit compare" : "Compare" }}
           </button>
-          <button type="button" class="table-toggle" @click="showTable = !showTable">
+          <button type="button" class="table-toggle" @click="toggleTableView">
             {{ showTable ? "Chart view" : "Table view" }}
           </button>
         </div>
