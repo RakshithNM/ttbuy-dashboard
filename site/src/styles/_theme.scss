@@ -13,7 +13,10 @@
   --page-plane: light-dark(#f9f9f7, #0d1014);
   --text-primary: light-dark(#0b0b0b, #ffffff);
   --text-secondary: light-dark(#52514e, #c3c2b7);
-  --text-muted: #898781;
+  // Was a flat #898781: 3.5:1 against the light surface and 4.3:1 against
+  // the dark one, both under the 4.5:1 WCAG AA text minimum. Darker for
+  // light mode, lighter for dark mode so each side clears 4.5:1.
+  --text-muted: light-dark(#6b6a65, #9a978f);
   --gridline: light-dark(#e1e0d9, #252830);
   --baseline: light-dark(#c3c2b7, #343740);
   --border: light-dark(rgba(11, 11, 11, 0.10), rgba(255, 255, 255, 0.10));
@@ -33,7 +36,9 @@
   --status-good: #0ca30c;
   --status-warning: #fab219;
   --status-serious: #ec835a;
-  --status-critical: #c0392b;
+  // Flat #c0392b only cleared 3.2:1 against dark surfaces (needs 4.5:1);
+  // it's fine against light ones, so only the dark-mode value moves.
+  --status-critical: light-dark(#c0392b, #e2574a);
 }
 
 :root[data-theme="light"] {

@@ -849,13 +849,13 @@ const stableBank = computed<StableBankResult | null>(() => {
     </div>
     <p v-if="bankQuery && searchedSeries.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 2000px">
       <h2>Best value today</h2>
       <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :benchmarks="benchmarks" :credit-times="CREDIT_TIMES" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
       <p class="panel-footnote">Published retail TT Buy rates. Corporate and HNI rates are negotiated separately and may differ.</p>
     </section>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 550px">
       <div class="panel-header">
         <h2>Historical TT Buy rate</h2>
         <div class="chart-controls">
@@ -918,19 +918,19 @@ const stableBank = computed<StableBankResult | null>(() => {
       <LineChart v-model:show-table="showTable" :series="chartSeries" :hidden="chartHidden" :currency="currency" :compare-mode="compareMode" @toggle="toggleBank" />
     </section>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 1000px">
       <h2>Rate percentile signal</h2>
       <p class="panel-sub">Where each bank's rate today sits in its own recent history — spot who's unusually high or low right now</p>
       <RatePercentileTable :series="allSeries" :currency="currency" />
     </section>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 1000px">
       <h2>All-time leaderboard</h2>
       <p class="panel-sub">Ranked by wins — which {{ currency }} bank has had the best rate most often, and by how much</p>
       <AllTimeLeaderboard :series="allSeries" :currency="currency" />
     </section>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 750px">
       <div class="panel-header">
         <div style="display: flex; flex-direction: column; justify-content: center;">
           <h2>Bank ranking over time</h2>
@@ -954,46 +954,46 @@ const stableBank = computed<StableBankResult | null>(() => {
       <RankBumpChart v-model:range="rankRange" :series="allSeries" :currency="currency" />
     </section>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 500px">
       <h2>Best bank per day</h2>
       <p class="panel-sub">Which bank had the highest {{ currency }} TT Buy rate each day</p>
       <CalendarHeatmap :series="allSeries" :currency="currency" :holidays="holidayMap" />
     </section>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 450px">
       <h2>Cost of not shopping around</h2>
       <p class="panel-sub">Fee-adjusted spread between the best and worst bank on {{ currency }} transfers each day</p>
       <OpportunityCostChart :series="allSeries" :currency="currency" :fees="fees" :amount="amount" />
     </section>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 750px">
       <h2>Markup below mid-market</h2>
       <p class="panel-sub">How much each {{ currency }} bank's TT Buy rate falls below mid-market — lower gap means a more competitive rate</p>
       <MarkupTrendChart :series="allSeries" :currency="currency" />
     </section>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 400px">
       <h2>Best day to send</h2>
       <p class="panel-sub">Average {{ currency }} TT Buy rate by day of the week — deviation from the weekly mean across all available banks</p>
       <DayOfWeekChart :series="allSeries" :currency="currency" />
     </section>
 
-    <section class="panel">
+    <section class="panel" style="--cv-size: 1100px">
       <h2>What if?</h2>
       <p class="panel-sub">Pick any past date to replay the rates and see what you'd have received</p>
       <WhatIfMachine :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
     </section>
 
-    <section v-if="availableCurrencies.length > 1" class="panel">
+    <section v-if="availableCurrencies.length > 1" class="panel" style="--cv-size: 400px">
       <CurrencyOptimizer :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
     </section>
 
-    <section v-if="availableCurrencies.length > 1" class="panel">
+    <section v-if="availableCurrencies.length > 1" class="panel" style="--cv-size: 500px">
       <h2>Bank head-to-head</h2>
       <p class="panel-sub">Pick two banks and see which one gives you more across all currencies</p>
       <BankHeadToHead :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
     </section>
-    <section class="panel">
+    <section class="panel" style="--cv-size: 650px">
       <h2>Cumulative savings calculator</h2>
       <p class="panel-sub">How much more you'd have received if you'd used a different bank every day</p>
       <CumulativeSavingsCalc :series="allSeries" :fees="fees" :currency="currency" :amount="amount" :my-bank="myBank" />
@@ -1004,7 +1004,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   <p v-else-if="loadError" class="error">Couldn't load rate data: {{ loadError }}</p>
   <p v-else class="loading">Loading rates…</p>
 
-  <section class="panel faq-panel">
+  <section class="panel faq-panel" style="--cv-size: 300px">
     <h2>Common questions</h2>
     <details class="faq-item">
       <summary>My bank isn't the best rate today. What should I do?</summary>
@@ -1240,8 +1240,14 @@ const stableBank = computed<StableBankResult | null>(() => {
   // every scroll frame even while fully off-screen. "auto" instead of a
   // fixed intrinsic size means the browser remembers each panel's real
   // height after its first visit instead of relying on the estimate below.
+  //
+  // A single flat guess here caused a big CLS regression: sections range
+  // from ~300px to ~2000px tall, so a 600px estimate was wildly wrong for
+  // most of them, and swapping in the true height as each one scrolled
+  // into view produced large, visible jumps. Each <section> below sets
+  // --cv-size to its own measured height so this fallback is rarely used.
   content-visibility: auto;
-  contain-intrinsic-size: auto 600px;
+  contain-intrinsic-size: auto var(--cv-size, 600px);
 
   h2 {
     font-size: 18px;
