@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import type { BankSeries } from "../types";
 import { shortName } from "../bankPalette";
-import { bisectNearest, createLinearScale, createTimeScale, linePathFor, ticksAtStep } from "../chartScales";
+import { MAX_CONNECTED_GAP_DAYS, bisectNearest, createLinearScale, createTimeScale, daysBetween, linePathFor, splitByGap, ticksAtStep } from "../chartScales";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -166,33 +166,6 @@ function yScale(value: number): number {
   const [v0, v1] = yDomain.value;
   if (v1 === v0) return MARGIN.top + plotH / 2;
   return yScaleD3.value(value);
-}
-
-// Beyond a normal weekend (3 days) plus a little slack for a weekday holiday
-// next to it (4 days), a gap this wide likely means missing/failed scrapes
-// rather than an expected closure — connecting straight across it would
-// draw a smooth transition through days we actually know nothing about.
-const MAX_CONNECTED_GAP_DAYS = 4;
-const MS_PER_DAY = 86_400_000;
-
-function daysBetween(a: string, b: string): number {
-  return Math.round((new Date(b).getTime() - new Date(a).getTime()) / MS_PER_DAY);
-}
-
-// Splits a date-sorted array into runs with no gap wider than maxGapDays —
-// used to break the line (and skip spike detection) across genuine gaps
-// while still connecting normal weekend/holiday closures.
-function splitByGap<T extends { date: string }>(sorted: T[], maxGapDays: number): T[][] {
-  const segments: T[][] = [];
-  for (const p of sorted) {
-    const current = segments[segments.length - 1];
-    if (current && daysBetween(current[current.length - 1].date, p.date) <= maxGapDays) {
-      current.push(p);
-    } else {
-      segments.push([p]);
-    }
-  }
-  return segments;
 }
 
 function linePath(points: { date: string; ttbuy: number }[]): string {

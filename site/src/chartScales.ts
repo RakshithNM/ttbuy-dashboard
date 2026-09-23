@@ -56,3 +56,31 @@ export function bisectNearest<T>(items: T[], time: (d: T) => number, targetTime:
   if (after === undefined) return before;
   return Math.abs(time(before) - targetTime) <= Math.abs(time(after) - targetTime) ? before : after;
 }
+
+// Beyond a normal weekend (3 days) plus a little slack for a weekday holiday
+// next to it (4 days), a gap this wide likely means missing/failed scrapes
+// rather than an expected closure — connecting a line straight across it, or
+// counting it as a single-day move, would treat days we know nothing about
+// as if they were a smooth/instant transition.
+export const MAX_CONNECTED_GAP_DAYS = 4;
+const MS_PER_DAY = 86_400_000;
+
+export function daysBetween(a: string, b: string): number {
+  return Math.round((new Date(b).getTime() - new Date(a).getTime()) / MS_PER_DAY);
+}
+
+// Splits a date-sorted array into runs with no gap wider than maxGapDays —
+// used to break a line (and skip spike/delta detection) across genuine gaps
+// while still connecting normal weekend/holiday closures.
+export function splitByGap<T extends { date: string }>(sorted: T[], maxGapDays = MAX_CONNECTED_GAP_DAYS): T[][] {
+  const segments: T[][] = [];
+  for (const p of sorted) {
+    const current = segments[segments.length - 1];
+    if (current && daysBetween(current[current.length - 1].date, p.date) <= maxGapDays) {
+      current.push(p);
+    } else {
+      segments.push([p]);
+    }
+  }
+  return segments;
+}

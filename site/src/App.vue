@@ -11,6 +11,7 @@ const OpportunityCostChart = defineAsyncComponent(() => import("./components/Opp
 const CumulativeSavingsCalc = defineAsyncComponent(() => import("./components/CumulativeSavingsCalc.vue"));
 const RatePercentileTable = defineAsyncComponent(() => import("./components/RatePercentileTable.vue"));
 const AllTimeLeaderboard = defineAsyncComponent(() => import("./components/AllTimeLeaderboard.vue"));
+const RankBumpChart = defineAsyncComponent(() => import("./components/RankBumpChart.vue"));
 const MarkupTrendChart = defineAsyncComponent(() => import("./components/MarkupTrendChart.vue"));
 const DayOfWeekChart = defineAsyncComponent(() => import("./components/DayOfWeekChart.vue"));
 import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from "./bankPalette";
@@ -126,6 +127,10 @@ const showTable = ref(
 );
 const currency = ref<string>(queryView.currency ?? storedView.currency ?? "USD");
 const amount = ref<number>(queryView.amount ?? storedView.amount ?? 1000);
+
+// Not persisted — this panel's own range toggle, rendered here so it can
+// share a row with the panel title.
+const rankRange = ref<"30d" | "90d">("30d");
 
 const MY_BANK_KEY = "ttbuy-dashboard:mybank";
 const myBank = ref<string>((() => { try { return localStorage.getItem(MY_BANK_KEY) ?? ""; } catch { return ""; } })());
@@ -890,6 +895,30 @@ const stableBank = computed<StableBankResult | null>(() => {
       <h2>All-time leaderboard</h2>
       <p class="panel-sub">Ranked by wins — which {{ currency }} bank has had the best rate most often, and by how much</p>
       <AllTimeLeaderboard :series="allSeries" :currency="currency" />
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+          <h2>Bank ranking over time</h2>
+          <p class="panel-sub">How each bank's daily rank has moved — #1 is the best {{ currency }} rate that day</p>
+        </div>
+        <div class="range-filter" role="group" aria-label="Date range">
+          <button
+            type="button"
+            class="range-btn"
+            :class="{ active: rankRange === '30d' }"
+            @click="rankRange = '30d'"
+          >30 days</button>
+          <button
+            type="button"
+            class="range-btn"
+            :class="{ active: rankRange === '90d' }"
+            @click="rankRange = '90d'"
+          >90 days</button>
+        </div>
+      </div>
+      <RankBumpChart v-model:range="rankRange" :series="allSeries" :currency="currency" />
     </section>
 
     <section class="panel">
