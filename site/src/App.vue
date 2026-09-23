@@ -1234,6 +1234,15 @@ const stableBank = computed<StableBankResult | null>(() => {
   padding: 20px;
   margin-bottom: 24px;
 
+  // This page is a long stack of independently-heavy sections (charts,
+  // tables) that all stay live in the DOM regardless of scroll position —
+  // without this, every panel keeps getting laid out/painted/composited on
+  // every scroll frame even while fully off-screen. "auto" instead of a
+  // fixed intrinsic size means the browser remembers each panel's real
+  // height after its first visit instead of relying on the estimate below.
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+
   h2 {
     font-size: 18px;
     margin: 0 0 4px;
