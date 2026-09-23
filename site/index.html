@@ -25,12 +25,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!--
-      The stylesheet is loaded async (preload + onload swap, see
-      vite.config.ts's asyncCssPlugin) so it doesn't block first paint. That
-      means the browser paints before it arrives, showing UA defaults: white
-      background, serif body font, 8px body margin. This inline block covers
-      exactly those three so there's no flash, without waiting on the full
-      stylesheet. Values must be kept in sync with body/:root in style.scss
+      The stylesheet below is a normal render-blocking <link> (see
+      vite.config.ts — it used to load async via a preload+onload swap, but
+      that let the full layout, not just paint, reflow once CSS arrived,
+      which measured as a large layout shift on slow connections; render-
+      blocking a single ~11KB gzipped file back-of-envelopes to well under a
+      second even on Slow 3G, which is worth it to avoid that). Browsers
+      won't paint until the stylesheet is applied, so this inline block
+      shouldn't normally be visible at all — it's a fallback for the case
+      where the stylesheet request itself errors out, so a failed CSS load
+      still shows the right background/font/margin instead of stark UA
+      defaults. Values must be kept in sync with body/:root in style.scss
       and _theme.scss.
     -->
     <script>
