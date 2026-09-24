@@ -973,7 +973,7 @@ const stableBank = computed<StableBankResult | null>(() => {
     </section>
 
     <section class="panel" style="--cv-size: 400px">
-      <h2>Best day to send</h2>
+      <h2>Best day to receive</h2>
       <p class="panel-sub">Average {{ currency }} TT Buy rate by day of the week — deviation from the weekly mean across all available banks</p>
       <DayOfWeekChart :series="allSeries" :currency="currency" />
     </section>
