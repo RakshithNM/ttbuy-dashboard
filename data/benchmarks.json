@@ -1,17 +1,17 @@
 {
   "USD": {
     "midMarket": 95.96,
-    "rbiReference": 95.8855
+    "rbiReference": 95.791
   },
   "GBP": {
     "midMarket": 126.86,
-    "rbiReference": 128.4083
+    "rbiReference": 128.0882
   },
   "EUR": {
     "midMarket": 109.0775,
-    "rbiReference": 110.0452
+    "rbiReference": 109.9885
   },
   "AED": {
-    "rbiReference": 26.1066
+    "rbiReference": 26.0805
   }
 }
