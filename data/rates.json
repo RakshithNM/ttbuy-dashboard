@@ -1316,6 +1316,11 @@
         "date": "2026-09-25",
         "publishedAt": null,
         "ttbuy": 25.8575
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": null,
+        "ttbuy": 25.87
       }
     ],
     "Citibank": [
@@ -3621,6 +3626,11 @@
         "date": "2026-09-25",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.91
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 25.92
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -4023,6 +4033,11 @@
       },
       {
         "date": "2026-09-25",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.77
+      },
+      {
+        "date": "2026-09-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 25.77
       }
@@ -5200,6 +5215,11 @@
         "date": "2026-09-27",
         "publishedAt": "09:33 AM",
         "ttbuy": 25.46
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "09:04 AM",
+        "ttbuy": 25.49
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -6859,6 +6879,11 @@
         "date": "2026-09-25",
         "publishedAt": null,
         "ttbuy": 108.255
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": null,
+        "ttbuy": 108.475
       }
     ],
     "Citibank": [
@@ -9194,6 +9219,11 @@
         "date": "2026-09-25",
         "publishedAt": "10:00 AM",
         "ttbuy": 108.57
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 108.7
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -9598,6 +9628,11 @@
         "date": "2026-09-25",
         "publishedAt": "09:00 AM",
         "ttbuy": 107.63
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 107.81
       }
     ],
     "Kotak Mahindra Bank": [
@@ -12302,6 +12337,11 @@
         "date": "2026-09-27",
         "publishedAt": "09:33 AM",
         "ttbuy": 107.81
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "09:04 AM",
+        "ttbuy": 107.91
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -13961,6 +14001,11 @@
         "date": "2026-09-25",
         "publishedAt": null,
         "ttbuy": 125.755
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": null,
+        "ttbuy": 126.1025
       }
     ],
     "Citibank": [
@@ -16296,6 +16341,11 @@
         "date": "2026-09-25",
         "publishedAt": "10:00 AM",
         "ttbuy": 126.13
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 126.45
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -16700,6 +16750,11 @@
         "date": "2026-09-25",
         "publishedAt": "09:00 AM",
         "ttbuy": 125.06
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 125.36
       }
     ],
     "Kotak Mahindra Bank": [
@@ -19404,6 +19459,11 @@
         "date": "2026-09-27",
         "publishedAt": "09:33 AM",
         "ttbuy": 125.55
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "09:04 AM",
+        "ttbuy": 125.62
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -21103,6 +21163,11 @@
         "date": "2026-09-25",
         "publishedAt": null,
         "ttbuy": 95.5475
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": null,
+        "ttbuy": 95.5725
       }
     ],
     "Citibank": [
@@ -23603,6 +23668,11 @@
         "date": "2026-09-25",
         "publishedAt": "10:00 AM",
         "ttbuy": 95.64
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 95.67
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -24017,6 +24087,11 @@
         "date": "2026-09-25",
         "publishedAt": "09:00 AM",
         "ttbuy": 95.15
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 95.16
       }
     ],
     "Kotak Mahindra Bank": [
@@ -26731,6 +26806,11 @@
         "date": "2026-09-27",
         "publishedAt": "09:33 AM",
         "ttbuy": 95.4
+      },
+      {
+        "date": "2026-09-28",
+        "publishedAt": "09:04 AM",
+        "ttbuy": 95.5
       }
     ],
     "Ujjivan Small Finance Bank": [
