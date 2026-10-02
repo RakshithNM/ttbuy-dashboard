@@ -53,14 +53,16 @@ interface BankSnap {
   feeUnknown: boolean;
 }
 
-// All banks with today's data, ranked by net receive
+// Every bank's latest known rate, ranked by net receive. This matches the
+// "Best value today" table, which also ranks each bank's last reading — on a
+// holiday most banks are a day old, and filtering to only today's date made
+// this panel name a different "best" bank than the table right below it.
 const rankedBanks = computed<BankSnap[]>(() => {
   if (!safeAmount.value || !latestDate.value) return [];
   const out: BankSnap[] = [];
   for (const s of props.series) {
     if (s.category !== "bank" || !s.points.length) continue;
     const last = s.points.at(-1)!;
-    if (last.date !== latestDate.value) continue;
     const gross = last.ttbuy * safeAmount.value;
     const fee = props.fees[s.name];
     const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
@@ -331,7 +333,7 @@ async function downloadNegotiationCard() {
           <span class="stat-arr">→</span>
           <span class="stat-recv" :title="mySnap.feeUnknown ? 'Fee not confirmed — showing gross conversion; real amount may be lower' : undefined">{{ mySnap.feeUnknown ? '≈' : '' }}₹{{ formatInr(mySnap.netInr) }}</span>
           <span class="stat-for">on {{ currencySymbol(currency) }}{{ formatInr(safeAmount) }}</span>
-          <span v-if="bestSnap" class="stat-gap">· today's best is {{ shortName(bestSnap.name) }} at ₹{{ bestSnap.ttbuy.toFixed(2) }}</span>
+          <span v-if="bestSnap && bestSnap.name !== mySnap.name" class="stat-gap">· current best is {{ shortName(bestSnap.name) }} at ₹{{ bestSnap.ttbuy.toFixed(2) }}</span>
         </div>
       </template>
 
@@ -342,7 +344,7 @@ async function downloadNegotiationCard() {
           <span>No rate data for <strong>{{ shortName(myBank) }}</strong> today</span>
         </div>
         <div v-if="bestSnap" class="mbp-sub">
-          Today's best is {{ shortName(bestSnap.name) }} at ₹{{ bestSnap.ttbuy.toFixed(2) }}
+          Current best is {{ shortName(bestSnap.name) }} at ₹{{ bestSnap.ttbuy.toFixed(2) }}
         </div>
       </template>
     </div>

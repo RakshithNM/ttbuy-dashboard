@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, onMounted, ref, watch } from "vue";
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import BestRateTable from "./components/BestRateTable.vue";
 import MyBankPanel from "./components/MyBankPanel.vue";
 const LineChart = defineAsyncComponent(() => import("./components/LineChart.vue"));
@@ -16,7 +16,7 @@ const MarkupTrendChart = defineAsyncComponent(() => import("./components/MarkupT
 const DayOfWeekChart = defineAsyncComponent(() => import("./components/DayOfWeekChart.vue"));
 import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
-import { sortByCurrencyOrder } from "./currencies";
+import { currencySymbol, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
 
 import rawRatesData from "../public/data/rates.json";
@@ -569,28 +569,23 @@ const stalenessReason = computed(() => {
   return null;
 });
 
-// Net receive spread (best minus worst, fee-adjusted) on the most recent day
-// with majority bank coverage — powers the stakes line in the hero.
-// Returns total rupee difference for the current amount so it matches the
-// table's receiveGap calculation.
-const bestVsWorstToday = computed<number | null>(() => {
-  const bankSeries = allSeries.value.filter(s => s.category === "bank");
-  if (!bankSeries.length) return null;
-  const dateCount = new Map<string, number>();
-  for (const s of bankSeries) {
-    for (const p of s.points) dateCount.set(p.date, (dateCount.get(p.date) ?? 0) + 1);
-  }
-  const majority = Math.floor(bankSeries.length / 2) + 1;
-  const latest = [...dateCount.entries()]
-    .filter(([, n]) => n >= majority)
-    .map(([d]) => d)
-    .sort()
-    .at(-1);
-  if (!latest) return null;
-  const netReceives = bankSeries
+// Hero summary: best bank by net receive, using each bank's latest reading
+// (the same ranking as the "Best value today" table), compared against the
+// user's own bank when set, otherwise against the average bank.
+interface HeroSummary {
+  best: { name: string; color: string; ttbuy: number; net: number; date: string };
+  compare:
+    | { kind: "mine"; name: string; gain: number }
+    | { kind: "is-mine" }
+    | { kind: "average"; gain: number };
+  isStale: boolean;
+}
+
+const heroSummary = computed<HeroSummary | null>(() => {
+  const rows = allSeries.value
+    .filter(s => s.category === "bank" && s.points.length > 0)
     .map(s => {
-      const pt = s.points.find(p => p.date === latest);
-      if (!pt) return null;
+      const pt = s.points.at(-1)!;
       const gross = pt.ttbuy * amount.value;
       const fee = fees.value[s.name];
       let feeInr = 0;
@@ -601,13 +596,119 @@ const bestVsWorstToday = computed<number | null>(() => {
       } else {
         feeInr = fee?.fee_inr ?? 0;
       }
-      return gross - feeInr;
-    })
-    .filter((r): r is number => r !== null);
-  if (netReceives.length < 2) return null;
-  const spread = Math.max(...netReceives) - Math.min(...netReceives);
-  return spread >= 1 ? spread : null;
+      return { name: s.name, color: brandColor(s.name), ttbuy: pt.ttbuy, net: gross - feeInr, date: pt.date };
+    });
+  if (rows.length < 2 || !(amount.value > 0)) return null;
+  rows.sort((a, b) => b.net - a.net);
+  const best = rows[0];
+  const latest = rows.reduce((d, r) => (r.date > d ? r.date : d), "");
+
+  let compare: HeroSummary["compare"];
+  const mine = myBank.value ? rows.find(r => r.name === myBank.value) : undefined;
+  if (mine && mine.name === best.name) {
+    compare = { kind: "is-mine" };
+  } else if (mine) {
+    compare = { kind: "mine", name: mine.name, gain: best.net - mine.net };
+  } else {
+    const avg = rows.reduce((sum, r) => sum + r.net, 0) / rows.length;
+    compare = { kind: "average", gain: best.net - avg };
+  }
+
+  return { best, compare, isStale: best.date < latest };
 });
+
+// Short reason shown in the hero's stale badge, e.g. "Oct 1 rate · Gandhi Jayanti".
+const heroStaleReason = computed<string | null>(() => {
+  const r = stalenessReason.value;
+  if (!r) return null;
+  if (r.type === "holiday") return r.name;
+  if (r.type === "sunday") return "Sunday";
+  return "Bank holiday";
+});
+
+// When the hero badge already explains the holiday, the separate line below
+// the hero would repeat it.
+const heroCoversStaleness = computed(() =>
+  !!heroSummary.value?.isStale && !!heroStaleReason.value
+);
+
+// Bank name in the hero jumps to (and briefly highlights) that bank's row.
+function goToBankRow(name: string) {
+  const row = document.querySelector<HTMLElement>(`tr[data-bank="${CSS.escape(name)}"]`);
+  if (!row) return;
+  const panel = row.closest<HTMLElement>(".panel");
+  if (panel) { panel.style.opacity = ""; panel.style.transform = ""; }
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  row.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  row.classList.remove("row-flash");
+  void row.offsetWidth;
+  row.classList.add("row-flash");
+  window.setTimeout(() => row.classList.remove("row-flash"), 1800);
+}
+
+// Whole units in the headline: "$2,524", not "$2,524.3".
+const heroAmount = computed(() => Math.round(amount.value).toLocaleString("en-IN"));
+
+function fmtShortDate(iso: string): string {
+  const [, m, d] = iso.split("-").map(Number);
+  return `${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1]} ${d}`;
+}
+
+// Sticky section nav: one link per group of panels. The active link is the
+// last group whose anchor has scrolled past the nav bar.
+const SECTION_GROUPS = [
+  { id: "today", label: "Today" },
+  { id: "history", label: "History" },
+  { id: "rankings", label: "Rankings" },
+  { id: "trends", label: "Trends" },
+  { id: "tools", label: "Tools" },
+  { id: "faq", label: "FAQ" },
+] as const;
+
+const activeSection = ref<string>("today");
+const NAV_OFFSET = 72;
+
+function updateActiveSection() {
+  let current: string = SECTION_GROUPS[0].id;
+  for (const g of SECTION_GROUPS) {
+    const el = document.getElementById(g.id);
+    if (el && el.getBoundingClientRect().top - NAV_OFFSET <= 1) current = g.id;
+  }
+  // At the very bottom the last short group can never reach the top.
+  if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+    current = SECTION_GROUPS[SECTION_GROUPS.length - 1].id;
+  }
+  activeSection.value = current;
+}
+
+function goToSection(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  // Below-fold panels are faded in by an observer; clear that so a jump
+  // never lands on an invisible panel.
+  el.style.opacity = "";
+  el.style.transform = "";
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  history.replaceState(null, "", `${location.pathname}${location.search}#${id}`);
+}
+
+let navTicking = false;
+function onScrollNav() {
+  if (navTicking) return;
+  navTicking = true;
+  requestAnimationFrame(() => {
+    navTicking = false;
+    updateActiveSection();
+  });
+}
+
+onMounted(() => {
+  window.addEventListener("scroll", onScrollNav, { passive: true });
+  updateActiveSection();
+});
+
+onBeforeUnmount(() => window.removeEventListener("scroll", onScrollNav));
 
 interface ConsistencyResult { bank: string; count: number; total: number; since: string | null }
 
@@ -752,11 +853,49 @@ const stableBank = computed<StableBankResult | null>(() => {
       rate varies by hundreds of rupees per $1,000 across banks. We track 22+ Indian
       banks daily so you can see who pays you the most, right now and over time.
     </p>
-    <p v-if="!loading && bestVsWorstToday !== null" class="stakes-line">
-      Today on {{ currency }} {{ amount.toLocaleString('en-IN') }}: the best bank pays
-      ₹{{ Math.round(bestVsWorstToday).toLocaleString('en-IN') }} more than the worst.
-    </p>
-    <p v-if="lastUpdated" class="updated" :class="{ 'updated--holiday': stalenessReason?.type === 'holiday' }">
+    <div v-if="!loading && heroSummary" class="hero-card">
+      <div class="hero-top">
+        <span class="hero-label">Best bank right now</span>
+        <span v-if="heroSummary.isStale" class="hero-stale">
+          {{ fmtShortDate(heroSummary.best.date) }} rate<template v-if="heroStaleReason"> · {{ heroStaleReason }}</template>
+        </span>
+      </div>
+      <div class="hero-body">
+        <div class="hero-main">
+          <button
+            type="button"
+            class="hero-bank"
+            :title="`Show ${shortName(heroSummary.best.name)} in the table`"
+            @click="goToBankRow(heroSummary.best.name)"
+          >
+            <span class="hero-dot" :style="{ background: heroSummary.best.color }" aria-hidden="true"></span>
+            {{ shortName(heroSummary.best.name) }}
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <span class="hero-rate">₹{{ heroSummary.best.ttbuy.toFixed(2) }} per {{ currency }}</span>
+        </div>
+        <div class="hero-figures">
+          <div class="hero-figure">
+            <span class="hero-figure-label">On {{ currencySymbol(currency) }}{{ heroAmount }} you get</span>
+            <span class="hero-figure-value">₹{{ Math.round(heroSummary.best.net).toLocaleString('en-IN') }}</span>
+          </div>
+          <div v-if="heroSummary.compare.kind === 'is-mine'" class="hero-figure hero-figure--gain">
+            <span class="hero-figure-label">Your bank</span>
+            <span class="hero-figure-value">Best today</span>
+          </div>
+          <div v-else-if="heroSummary.compare.gain >= 1" class="hero-figure hero-figure--gain">
+            <span class="hero-figure-label">
+              <template v-if="heroSummary.compare.kind === 'mine'">vs your bank ({{ shortName(heroSummary.compare.name) }})</template>
+              <template v-else>vs the average bank</template>
+            </span>
+            <span class="hero-figure-value">+₹{{ Math.round(heroSummary.compare.gain).toLocaleString('en-IN') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p v-if="lastUpdated && !heroCoversStaleness" class="updated" :class="{ 'updated--holiday': stalenessReason?.type === 'holiday' }">
       <template v-if="stalenessReason?.type === 'holiday'">
         Today is a bank holiday ({{ stalenessReason.name }}) —
         {{ stalenessReason.partial ? 'some banks may not publish rates today.' : 'rates were last updated ' + lastUpdatedFormatted + '.' }}
@@ -772,6 +911,18 @@ const stableBank = computed<StableBankResult | null>(() => {
       </template>
     </p>
   </header>
+
+  <nav v-if="!loading && !loadError" class="section-nav" aria-label="Page sections">
+    <a
+      v-for="g in SECTION_GROUPS"
+      :key="g.id"
+      :href="`#${g.id}`"
+      class="section-nav-link"
+      :class="{ active: activeSection === g.id }"
+      :aria-current="activeSection === g.id ? 'true' : undefined"
+      @click.prevent="goToSection(g.id)"
+    >{{ g.label }}</a>
+  </nav>
 
   <main v-if="!loading && !loadError">
     <MyBankPanel v-model:my-bank="myBank" :series="allSeries" :fees="fees" :currency="currency" :amount="amount" />
@@ -849,13 +1000,13 @@ const stableBank = computed<StableBankResult | null>(() => {
     </div>
     <p v-if="bankQuery && searchedSeries.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
 
-    <section class="panel" style="--cv-size: 2000px">
+    <section id="today" class="panel" style="--cv-size: 2000px">
       <h2>Best value today</h2>
       <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :benchmarks="benchmarks" :credit-times="CREDIT_TIMES" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
       <p class="panel-footnote">Published retail TT Buy rates. Corporate and HNI rates are negotiated separately and may differ.</p>
     </section>
 
-    <section class="panel" style="--cv-size: 550px">
+    <section id="history" class="panel" style="--cv-size: 550px">
       <div class="panel-header">
         <h2>Historical TT Buy rate</h2>
         <div class="chart-controls">
@@ -924,7 +1075,7 @@ const stableBank = computed<StableBankResult | null>(() => {
       <RatePercentileTable :series="allSeries" :currency="currency" />
     </section>
 
-    <section class="panel" style="--cv-size: 1000px">
+    <section id="rankings" class="panel" style="--cv-size: 1000px">
       <h2>All-time leaderboard</h2>
       <p class="panel-sub">Ranked by wins — which {{ currency }} bank has had the best rate most often, and by how much</p>
       <AllTimeLeaderboard :series="allSeries" :currency="currency" />
@@ -960,7 +1111,7 @@ const stableBank = computed<StableBankResult | null>(() => {
       <CalendarHeatmap :series="allSeries" :currency="currency" :holidays="holidayMap" />
     </section>
 
-    <section class="panel" style="--cv-size: 450px">
+    <section id="trends" class="panel" style="--cv-size: 450px">
       <h2>Cost of not shopping around</h2>
       <p class="panel-sub">Fee-adjusted spread between the best and worst bank on {{ currency }} transfers each day</p>
       <OpportunityCostChart :series="allSeries" :currency="currency" :fees="fees" :amount="amount" />
@@ -978,7 +1129,7 @@ const stableBank = computed<StableBankResult | null>(() => {
       <DayOfWeekChart :series="allSeries" :currency="currency" />
     </section>
 
-    <section class="panel" style="--cv-size: 1100px">
+    <section id="tools" class="panel" style="--cv-size: 1100px">
       <h2>What if?</h2>
       <p class="panel-sub">Pick any past date to replay the rates and see what you'd have received</p>
       <WhatIfMachine :raw-rates="rawRates" :fees="fees" :currencies="availableCurrencies" />
@@ -1004,7 +1155,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   <p v-else-if="loadError" class="error">Couldn't load rate data: {{ loadError }}</p>
   <p v-else class="loading">Loading rates…</p>
 
-  <section class="panel faq-panel" style="--cv-size: 300px">
+  <section id="faq" class="panel faq-panel" style="--cv-size: 300px">
     <h2>Common questions</h2>
     <details class="faq-item">
       <summary>My bank isn't the best rate today. What should I do?</summary>
@@ -1063,11 +1214,119 @@ const stableBank = computed<StableBankResult | null>(() => {
     margin: 0 0 8px;
   }
 
-  .stakes-line {
-    margin: 8px 0;
+  .hero-card {
+    margin: 20px 0 12px;
+    padding: 16px 20px 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .hero-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .hero-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .hero-stale {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--warning-text);
+    background: color-mix(in srgb, var(--warning-text) 12%, transparent);
+  }
+
+  .hero-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 40px;
+  }
+
+  .hero-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .hero-bank {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+
+    svg { color: var(--text-muted); transition: transform 0.15s; }
+    &:hover svg { transform: translateX(2px); color: var(--text-primary); }
+    &:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  }
+
+  .hero-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .hero-rate {
     font-size: 14px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-figures {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px 32px;
+  }
+
+  .hero-figure {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .hero-figure-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .hero-figure-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-figure--gain .hero-figure-value {
+    font-size: 18px;
     font-weight: 600;
     color: var(--success-text);
+  }
+
+  @media (max-width: 600px) {
+    .hero-card { padding: 14px 16px 16px; }
+    .hero-bank { font-size: 19px; }
+    .hero-figure-value { font-size: 24px; }
+    .hero-figures { gap: 12px 20px; }
   }
 
   .updated {
@@ -1079,6 +1338,47 @@ const stableBank = computed<StableBankResult | null>(() => {
       color: var(--status-warning);
     }
   }
+}
+
+.section-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 4px;
+  margin: 0 -8px 20px;
+  padding: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: color-mix(in srgb, var(--page-plane) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.section-nav-link {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover { color: var(--text-primary); background: color-mix(in srgb, var(--text-primary) 6%, transparent); }
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  &.active {
+    color: var(--text-primary);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+}
+
+.panel[id] {
+  scroll-margin-top: 64px;
 }
 
 .toolbar {

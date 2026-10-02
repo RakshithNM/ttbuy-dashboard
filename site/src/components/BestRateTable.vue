@@ -56,6 +56,37 @@ const safeAmount = computed(() => {
 
 const SWIFT_FEE_USD = 15;
 const includeSwiftFee = ref(false);
+
+// The secondary insights (trend, best weekday, most-often-best, volatility,
+// split, time-of-credit) render as a compact chip row; clicking expands the
+// full sentences. Keeps the ranked table near the top of the page.
+const showInsights = ref(false);
+
+interface InsightChip { key: string; label: string; tone: "good" | "bad" | "neutral" }
+
+const insightChips = computed<InsightChip[]>(() => {
+  const out: InsightChip[] = [];
+  const t = props.todaySignal;
+  if (t) {
+    const label = t.direction === "above" ? `↑ Above ${t.daysCount}-day avg`
+      : t.direction === "below" ? `↓ Below ${t.daysCount}-day avg`
+      : `Near ${t.daysCount}-day avg`;
+    out.push({ key: "today", label, tone: t.direction === "above" ? "good" : t.direction === "below" ? "bad" : "neutral" });
+  }
+  if (props.dowInsight) out.push({ key: "dow", label: `Peaks on ${props.dowInsight.day}s`, tone: "neutral" });
+  if (props.weekInsight) {
+    const wk = ["1st", "2nd", "3rd", "last"][props.weekInsight.week - 1];
+    out.push({ key: "week", label: `Peaks in ${wk} week`, tone: "neutral" });
+  }
+  if (props.consistency) {
+    const c = props.consistency;
+    out.push({ key: "consistency", label: `${shortName(c.bank)} best ${c.count}/${c.total} days`, tone: "neutral" });
+  }
+  if (props.stableBank) out.push({ key: "stable", label: `${shortName(props.stableBank.bank)} most stable`, tone: "neutral" });
+  if (splitSuggestion.value) out.push({ key: "split", label: `Split saves ₹${formatInr(splitSuggestion.value.savings)}`, tone: "good" });
+  out.push({ key: "credit", label: "Rate set at time of credit", tone: "neutral" });
+  return out;
+});
 const effectiveAmount = computed(() =>
   safeAmount.value > 0 ? Math.max(0, safeAmount.value - (includeSwiftFee.value ? SWIFT_FEE_USD : 0)) : 0
 );
@@ -136,6 +167,15 @@ function computeMomentum(points: { ttbuy: number }[]): "up" | "down" | "flat" | 
   if (totalChange > 0.05) return "up";
   if (totalChange < -0.05) return "down";
   return "flat";
+}
+
+// markupPct is "% below mid-market": positive = worse than mid, negative =
+// better than mid (platforms sometimes beat it). Round first so a tiny value
+// never renders as "−0.0%".
+function formatMarkup(pct: number): string {
+  const r = Math.round(pct * 10) / 10;
+  if (r === 0) return "0.0%";
+  return r > 0 ? `−${r.toFixed(1)}%` : `+${Math.abs(r).toFixed(1)}%`;
 }
 
 function isPreviousCalendarDay(earlierDate: string, laterDate: string): boolean {
@@ -527,21 +567,6 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
       </button>
     </div>
 
-    <div v-if="todaySignal" class="today-callout" :class="todaySignal.direction" role="note">
-      <svg class="today-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-        <polyline v-if="todaySignal.direction === 'above'" points="1,12 5,7 9,9 15,3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        <polyline v-else-if="todaySignal.direction === 'below'" points="1,4 5,9 9,7 15,13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        <polyline v-else points="1,8 5,6 9,10 15,8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span>
-        Today's best {{ currency }} rate
-        <strong>₹{{ todaySignal.todayBest.toFixed(2) }}</strong>
-        is {{ todaySignal.direction === 'above' ? 'above' : todaySignal.direction === 'below' ? 'below' : 'near' }}
-        the {{ todaySignal.daysCount }}-day average
-        <strong>₹{{ todaySignal.avgBest.toFixed(2) }}</strong><template v-if="todaySignal.trend === 'up'">. Rates have been rising.</template><template v-else-if="todaySignal.trend === 'down'"> Rates have been falling.</template>
-      </span>
-    </div>
-
     <div v-if="staleBanks.length" class="stale-callout" role="alert">
       <svg class="stale-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
         <path d="M8 1.5L1.5 13h13L8 1.5z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
@@ -555,84 +580,127 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
       </span>
     </div>
 
-    <div v-if="dowInsight" class="dow-callout" role="note">
-      <svg class="dow-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-        <rect x="1.5" y="2.5" width="13" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/>
-        <line x1="5" y1="1" x2="5" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-        <line x1="11" y1="1" x2="11" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-        <line x1="1.5" y1="6.5" x2="14.5" y2="6.5" stroke="currentColor" stroke-width="1.3"/>
-        <circle cx="8" cy="10.5" r="1.2" fill="currentColor"/>
-      </svg>
-      <span>
-        Based on history, <strong>{{ currency }} rates tend to peak on {{ dowInsight.day }}s</strong>,
-        averaging ₹{{ (dowInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the weekly mean
-      </span>
+    <div v-if="insightChips.length" class="insight-bar">
+      <button
+        v-for="chip in insightChips"
+        :key="chip.key"
+        type="button"
+        class="insight-chip"
+        :class="`insight-chip--${chip.tone}`"
+        :aria-expanded="showInsights"
+        aria-controls="insight-details"
+        @click="showInsights = !showInsights"
+      >{{ chip.label }}</button>
+      <button
+        type="button"
+        class="insight-toggle"
+        :aria-expanded="showInsights"
+        aria-controls="insight-details"
+        @click="showInsights = !showInsights"
+      >
+        {{ showInsights ? 'Hide details' : 'Details' }}
+        <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" :class="{ flipped: showInsights }">
+          <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </div>
 
-    <div v-if="weekInsight" class="week-callout" role="note">
-      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-        <rect x="1.5" y="2.5" width="13" height="12" rx="2" stroke-linejoin="round"/>
-        <line x1="5" y1="1" x2="5" y2="4"/>
-        <line x1="11" y1="1" x2="11" y2="4"/>
-        <line x1="1.5" y1="6.5" x2="14.5" y2="6.5"/>
-        <rect x="3.5" y="8.5" width="3" height="3" rx="0.5" fill="currentColor" stroke="none"/>
-      </svg>
-      <span>
-        Based on history, <strong>{{ currency }} rates tend to peak in
-        {{ ['the first', 'the second', 'the third', 'the last'][weekInsight.week - 1] }} week of the month</strong>,
-        averaging ₹{{ (weekInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the monthly mean
-      </span>
-    </div>
+    <div v-show="showInsights" id="insight-details" class="insight-details">
+      <div v-if="todaySignal" class="today-callout" :class="todaySignal.direction" role="note">
+        <svg class="today-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <polyline v-if="todaySignal.direction === 'above'" points="1,12 5,7 9,9 15,3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline v-else-if="todaySignal.direction === 'below'" points="1,4 5,9 9,7 15,13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline v-else points="1,8 5,6 9,10 15,8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>
+          Today's best {{ currency }} rate
+          <strong>₹{{ todaySignal.todayBest.toFixed(2) }}</strong>
+          is {{ todaySignal.direction === 'above' ? 'above' : todaySignal.direction === 'below' ? 'below' : 'near' }}
+          the {{ todaySignal.daysCount }}-day average
+          <strong>₹{{ todaySignal.avgBest.toFixed(2) }}</strong><template v-if="todaySignal.trend === 'up'">. Rates have been rising.</template><template v-else-if="todaySignal.trend === 'down'"> Rates have been falling.</template>
+        </span>
+      </div>
 
-    <div v-if="consistency" class="consistency-summary" role="note">
-      <svg class="consistency-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-        <path d="M4.5 2h7v5.5a3.5 3.5 0 01-7 0V2z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M1.5 3h3M11.5 3h3" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
-        <path d="M8 9.5V12" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
-        <path d="M5 14h6" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
-      </svg>
-      <span>
-        <span class="consistency-bank">{{ shortName(consistency.bank) }}</span>
-        had the best {{ currency }} rate most often: {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}<template v-if="sinceLabel"> since {{ sinceLabel }}</template>
-      </span>
-    </div>
+      <div v-if="dowInsight" class="dow-callout" role="note">
+        <svg class="dow-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <rect x="1.5" y="2.5" width="13" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/>
+          <line x1="5" y1="1" x2="5" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="11" y1="1" x2="11" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="1.5" y1="6.5" x2="14.5" y2="6.5" stroke="currentColor" stroke-width="1.3"/>
+          <circle cx="8" cy="10.5" r="1.2" fill="currentColor"/>
+        </svg>
+        <span>
+          Based on history, <strong>{{ currency }} rates tend to peak on {{ dowInsight.day }}s</strong>,
+          averaging ₹{{ (dowInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the weekly mean
+        </span>
+      </div>
 
-    <div v-if="stableBank" class="stable-callout" role="note">
-      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="1,11 5,7 9,9 15,4"/>
-        <line x1="1" y1="13" x2="15" y2="13"/>
-      </svg>
-      <span>
-        <strong>Volatility insight: </strong>
-        <strong>{{ shortName(stableBank.bank) }}</strong>
-        had the lowest rate volatility among the top {{ stableBank.topN }} banks,
-        varying by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
-          vs {{ shortName(stableBank.runner.bank) }}'s ₹{{ stableBank.runner.variation.toFixed(2) }}</template>
-      </span>
-    </div>
+      <div v-if="weekInsight" class="week-callout" role="note">
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+          <rect x="1.5" y="2.5" width="13" height="12" rx="2" stroke-linejoin="round"/>
+          <line x1="5" y1="1" x2="5" y2="4"/>
+          <line x1="11" y1="1" x2="11" y2="4"/>
+          <line x1="1.5" y1="6.5" x2="14.5" y2="6.5"/>
+          <rect x="3.5" y="8.5" width="3" height="3" rx="0.5" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>
+          Based on history, <strong>{{ currency }} rates tend to peak in
+          {{ ['the first', 'the second', 'the third', 'the last'][weekInsight.week - 1] }} week of the month</strong>,
+          averaging ₹{{ (weekInsight.diffPaise / 100).toFixed(2) }}/{{ currency }} above the monthly mean
+        </span>
+      </div>
 
-    <div v-if="splitSuggestion" class="split-callout" role="note">
-      <svg class="split-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 2v5M5 4l3-2 3 2"/>
-        <path d="M5.5 7C3.5 7 2 8.5 2 10.5V14M10.5 7C12.5 7 14 8.5 14 10.5V14"/>
-      </svg>
-      <span>
-        Split saves <strong class="split-save">₹{{ formatInr(splitSuggestion.savings) }}</strong>:
-        send {{ currencySymbol(currency) }}{{ formatInr(Math.round(splitSuggestion.amtA)) }} to {{ shortName(splitSuggestion.bankA) }}
-        + {{ currencySymbol(currency) }}{{ formatInr(Math.round(splitSuggestion.amtB)) }} to {{ shortName(splitSuggestion.bankB) }}
-      </span>
-    </div>
+      <div v-if="consistency" class="consistency-summary" role="note">
+        <svg class="consistency-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <path d="M4.5 2h7v5.5a3.5 3.5 0 01-7 0V2z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M1.5 3h3M11.5 3h3" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+          <path d="M8 9.5V12" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+          <path d="M5 14h6" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+        </svg>
+        <span>
+          <span class="consistency-bank">{{ shortName(consistency.bank) }}</span>
+          had the best {{ currency }} rate most often: {{ consistency.count }} of {{ consistency.total }} {{ consistency.total === 1 ? 'day' : 'days' }}<template v-if="sinceLabel"> since {{ sinceLabel }}</template>
+        </span>
+      </div>
 
-    <div class="rate-lock-callout" role="note">
-      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="8" cy="8" r="6.5"/>
-        <line x1="8" y1="7" x2="8" y2="10.5"/>
-        <circle cx="8" cy="5" r="0.8" fill="currentColor" stroke="none"/>
-      </svg>
-      <span>
-        Banks apply the exchange rate at <strong>time of credit</strong>, not when the sender initiates the SWIFT transfer.
-        A Friday wire may credit on Monday at a different rate.
-      </span>
+      <div v-if="stableBank" class="stable-callout" role="note">
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1,11 5,7 9,9 15,4"/>
+          <line x1="1" y1="13" x2="15" y2="13"/>
+        </svg>
+        <span>
+          <strong>Volatility insight: </strong>
+          <strong>{{ shortName(stableBank.bank) }}</strong>
+          had the lowest rate volatility among the top {{ stableBank.topN }} banks,
+          varying by only ₹{{ stableBank.variation.toFixed(2) }}<template v-if="stableBank.runner">
+            vs {{ shortName(stableBank.runner.bank) }}'s ₹{{ stableBank.runner.variation.toFixed(2) }}</template>
+        </span>
+      </div>
+
+      <div v-if="splitSuggestion" class="split-callout" role="note">
+        <svg class="split-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 2v5M5 4l3-2 3 2"/>
+          <path d="M5.5 7C3.5 7 2 8.5 2 10.5V14M10.5 7C12.5 7 14 8.5 14 10.5V14"/>
+        </svg>
+        <span>
+          Split saves <strong class="split-save">₹{{ formatInr(splitSuggestion.savings) }}</strong>:
+          send {{ currencySymbol(currency) }}{{ formatInr(Math.round(splitSuggestion.amtA)) }} to {{ shortName(splitSuggestion.bankA) }}
+          + {{ currencySymbol(currency) }}{{ formatInr(Math.round(splitSuggestion.amtB)) }} to {{ shortName(splitSuggestion.bankB) }}
+        </span>
+      </div>
+
+      <div class="rate-lock-callout" role="note">
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="8" r="6.5"/>
+          <line x1="8" y1="7" x2="8" y2="10.5"/>
+          <circle cx="8" cy="5" r="0.8" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>
+          Banks apply the exchange rate at <strong>time of credit</strong>, not when the sender initiates the SWIFT transfer.
+          A Friday wire may credit on Monday at a different rate.
+        </span>
+      </div>
+
     </div>
 
     <div class="table-wrap">
@@ -683,7 +751,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                 <span class="platform-section-note">Rate applied to your transfer, no deduction on recipient side</span>
               </td>
             </tr>
-            <tr :class="{ best: row.bank === bestBank, expanded: expandedBank === row.bank, clickable: true }" :style="{ '--row-accent': row.color }" @click="toggleExpand(row.bank, $event)">
+            <tr :data-bank="row.bank" :class="{ best: row.bank === bestBank, expanded: expandedBank === row.bank, clickable: true }" :style="{ '--row-accent': row.color }" @click="toggleExpand(row.bank, $event)">
               <th scope="row">
                 <span class="row-header">
                   <button
@@ -789,9 +857,11 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                   <span
                     v-if="row.markupPct !== null"
                     class="markup-pct"
-                    :class="row.markupPct <= 0.75 ? 'markup-low' : row.markupPct <= 1.5 ? 'markup-mid' : 'markup-high'"
-                    :title="`${row.markupPct.toFixed(2)}% below the interbank mid-market rate`"
-                  >−{{ row.markupPct.toFixed(1) }}%</span>
+                    :class="row.markupPct < 0 ? 'markup-above' : row.markupPct <= 0.75 ? 'markup-low' : row.markupPct <= 1.5 ? 'markup-mid' : 'markup-high'"
+                    :title="row.markupPct < 0
+                      ? `${Math.abs(row.markupPct).toFixed(2)}% above the interbank mid-market rate`
+                      : `${row.markupPct.toFixed(2)}% below the interbank mid-market rate`"
+                  >{{ formatMarkup(row.markupPct) }}</span>
                   <span v-else class="markup-na">—</span>
                 </td>
                 <td class="num receive">
@@ -916,6 +986,74 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
 </template>
 
 <style scoped lang="scss">
+.insight-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.insight-chip {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+
+  &:hover { border-color: var(--text-muted); color: var(--text-primary); }
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  &--good {
+    color: var(--success-text);
+    border-color: color-mix(in srgb, var(--success-text) 40%, var(--border));
+  }
+
+  &--bad {
+    color: var(--status-critical);
+    border-color: color-mix(in srgb, var(--status-critical) 40%, var(--border));
+  }
+}
+
+.insight-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+
+  svg { transition: transform 0.15s; }
+  svg.flipped { transform: rotate(180deg); }
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+}
+
+.insight-details {
+  margin-bottom: 4px;
+}
+
+// Flash when the hero card jumps to a row.
+tr.row-flash > td {
+  animation: row-flash 1.8s ease-out;
+}
+
+@keyframes row-flash {
+  0%, 25% { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+  100% { background: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  tr.row-flash > td { animation: none; outline: 2px solid var(--accent); outline-offset: -2px; }
+}
 .amount-control {
   display: flex;
   align-items: center;
@@ -1529,6 +1667,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
     font-weight: 600;
     letter-spacing: -0.01em;
 
+    &.markup-above { color: #22a36b; font-weight: 600; }
     &.markup-low  { color: #22a36b; }
     &.markup-mid  { color: #d08b00; }
     &.markup-high { color: #d84040; }
