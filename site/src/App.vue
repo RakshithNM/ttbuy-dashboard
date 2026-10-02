@@ -681,6 +681,34 @@ function updateActiveSection() {
   activeSection.value = current;
 }
 
+// After a jump, panels above the target finish rendering (content-visibility
+// placeholders, lazy components) and push it down; scroll anchoring doesn't
+// catch this. Re-align for a short window, and stop as soon as the user
+// takes over the scroll.
+let stopHolding: (() => void) | null = null;
+
+function holdSectionInPlace(el: HTMLElement) {
+  stopHolding?.();
+  const STOP_EVENTS = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+  const timers: number[] = [];
+  const stop = () => {
+    timers.forEach(clearTimeout);
+    STOP_EVENTS.forEach(e => window.removeEventListener(e, stop));
+    if (stopHolding === stop) stopHolding = null;
+  };
+  stopHolding = stop;
+  STOP_EVENTS.forEach(e => window.addEventListener(e, stop, { passive: true }));
+  const target = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+  for (const ms of [100, 300, 600, 1000, 1500]) {
+    timers.push(window.setTimeout(() => {
+      if (Math.abs(el.getBoundingClientRect().top - target) > 2) {
+        el.scrollIntoView({ block: "start" });
+      }
+      if (ms === 1500) stop();
+    }, ms));
+  }
+}
+
 function goToSection(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -688,8 +716,17 @@ function goToSection(id: string) {
   // never lands on an invisible panel.
   el.style.opacity = "";
   el.style.transform = "";
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  // Instant jump inside a View Transition (cross-fade) instead of a smooth
+  // scroll: jumps can span ~8000px, and content-visibility:auto panels only
+  // have estimated heights, so a long smooth scroll can land off-target.
+  // Reduced motion is handled by the ::view-transition rule in style.scss.
+  // Set the active link inside the same update so the transition's "new"
+  // snapshot already shows it, instead of waiting for the scroll handler.
+  withViewTransition(() => {
+    el.scrollIntoView({ block: "start" });
+    activeSection.value = id;
+  });
+  holdSectionInPlace(el);
   history.replaceState(null, "", `${location.pathname}${location.search}#${id}`);
 }
 
