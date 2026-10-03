@@ -5253,6 +5253,11 @@
         "date": "2026-10-02",
         "publishedAt": "11:10 AM",
         "ttbuy": 26.2148
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "11:14 AM",
+        "ttbuy": 26.1912
       }
     ],
     "State Bank of India": [
@@ -5545,6 +5550,11 @@
         "date": "2026-10-01",
         "publishedAt": "09:08 AM",
         "ttbuy": 25.49
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "09:14 AM",
+        "ttbuy": 25.56
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -10469,11 +10479,6 @@
     ],
     "Mid-market": [
       {
-        "date": "2025-10-02",
-        "publishedAt": null,
-        "ttbuy": 104.2798
-      },
-      {
         "date": "2025-10-03",
         "publishedAt": null,
         "ttbuy": 104.183
@@ -11742,6 +11747,11 @@
         "date": "2026-10-01",
         "publishedAt": null,
         "ttbuy": 108.832
+      },
+      {
+        "date": "2026-10-02",
+        "publishedAt": null,
+        "ttbuy": 108.1245
       }
     ],
     "Punjab National Bank": [
@@ -12428,6 +12438,11 @@
         "date": "2026-10-02",
         "publishedAt": "05:40 AM",
         "ttbuy": 108.89
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "05:45 AM",
+        "ttbuy": 108.93
       }
     ],
     "Skydo": [
@@ -12745,6 +12760,11 @@
         "date": "2026-10-02",
         "publishedAt": "11:10 AM",
         "ttbuy": 108.3063
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "11:14 AM",
+        "ttbuy": 108.2431
       }
     ],
     "State Bank of India": [
@@ -13037,6 +13057,11 @@
         "date": "2026-10-01",
         "publishedAt": "09:08 AM",
         "ttbuy": 107.27
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "09:14 AM",
+        "ttbuy": 106.95
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -17961,11 +17986,6 @@
     ],
     "Mid-market": [
       {
-        "date": "2025-10-02",
-        "publishedAt": null,
-        "ttbuy": 119.57
-      },
-      {
         "date": "2025-10-03",
         "publishedAt": null,
         "ttbuy": 119.39
@@ -19234,6 +19254,11 @@
         "date": "2026-10-01",
         "publishedAt": null,
         "ttbuy": 127.48
+      },
+      {
+        "date": "2026-10-02",
+        "publishedAt": null,
+        "ttbuy": 127.15
       }
     ],
     "Punjab National Bank": [
@@ -19920,6 +19945,11 @@
         "date": "2026-10-02",
         "publishedAt": "05:40 AM",
         "ttbuy": 127.68
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "05:45 AM",
+        "ttbuy": 127.98
       }
     ],
     "Skydo": [
@@ -20237,6 +20267,11 @@
         "date": "2026-10-02",
         "publishedAt": "11:10 AM",
         "ttbuy": 127.1786
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "11:14 AM",
+        "ttbuy": 127.3424
       }
     ],
     "State Bank of India": [
@@ -20529,6 +20564,11 @@
         "date": "2026-10-01",
         "publishedAt": "09:08 AM",
         "ttbuy": 125.69
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "09:14 AM",
+        "ttbuy": 125.93
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -25673,11 +25713,6 @@
     ],
     "Mid-market": [
       {
-        "date": "2025-10-02",
-        "publishedAt": null,
-        "ttbuy": 88.72
-      },
-      {
         "date": "2025-10-03",
         "publishedAt": null,
         "ttbuy": 88.78
@@ -26946,6 +26981,11 @@
         "date": "2026-10-01",
         "publishedAt": null,
         "ttbuy": 96.33
+      },
+      {
+        "date": "2026-10-02",
+        "publishedAt": null,
+        "ttbuy": 96.32
       }
     ],
     "Punjab National Bank": [
@@ -27939,6 +27979,11 @@
         "date": "2026-10-02",
         "publishedAt": "11:10 AM",
         "ttbuy": 96.2736
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "11:14 AM",
+        "ttbuy": 96.1872
       }
     ],
     "State Bank of India": [
@@ -28246,6 +28291,11 @@
         "date": "2026-10-01",
         "publishedAt": "09:08 AM",
         "ttbuy": 95.5
+      },
+      {
+        "date": "2026-10-03",
+        "publishedAt": "09:14 AM",
+        "ttbuy": 95.75
       }
     ],
     "Ujjivan Small Finance Bank": [
