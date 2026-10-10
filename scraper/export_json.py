@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 import pandas as pd
 
@@ -10,7 +11,14 @@ def normalize_time(val):
         return None
     val = str(val).replace("IST", "").replace("ist", "").strip()
     try:
-        return pd.to_datetime(val).strftime("%I:%M %p")
+        # Ujjivan, IOB and J&K Bank write the time with dots ("9.45 am",
+        # "09.24.44"); pandas reads those as a decimal hour or a date and
+        # drops the minutes.
+        clock = re.sub(r"(?<=\d)\.(?=\d)", ":", val)
+        # IOB has published a 24-hour time with a suffix ("16.36 PM").
+        if re.match(r"(1[3-9]|2[0-3]):", clock):
+            clock = re.sub(r"\s*[ap]m$", "", clock, flags=re.I)
+        return pd.to_datetime(clock).strftime("%I:%M %p")
     except Exception:
         return val
 
