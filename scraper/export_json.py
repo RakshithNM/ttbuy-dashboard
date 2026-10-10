@@ -15,6 +15,10 @@ def normalize_time(val):
         # "09.24.44"); pandas reads those as a decimal hour or a date and
         # drops the minutes.
         clock = re.sub(r"(?<=\d)\.(?=\d)", ":", val)
+        # Typos seen in bank pages: a doubled separator (Citibank "9::05 AM")
+        # and a stray third minute digit (IOB "10.397AM", read as 10:39).
+        clock = re.sub(r":+", ":", clock)
+        clock = re.sub(r"^(\d{1,2}:\d{2})\d+(?=\s*[ap]m$)", r"\1", clock, flags=re.I)
         # IOB has published a 24-hour time with a suffix ("16.36 PM").
         if re.match(r"(1[3-9]|2[0-3]):", clock):
             clock = re.sub(r"\s*[ap]m$", "", clock, flags=re.I)
