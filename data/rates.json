@@ -1571,6 +1571,11 @@
         "date": "2026-10-15",
         "publishedAt": null,
         "ttbuy": 25.58
+      },
+      {
+        "date": "2026-10-16",
+        "publishedAt": null,
+        "ttbuy": 25.5325
       }
     ],
     "Citibank": [
@@ -6600,6 +6605,11 @@
         "date": "2026-10-15",
         "publishedAt": "09:15 AM",
         "ttbuy": 25.25
+      },
+      {
+        "date": "2026-10-16",
+        "publishedAt": "01:15 PM",
+        "ttbuy": 25.23
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -8619,6 +8629,11 @@
         "date": "2026-10-15",
         "publishedAt": null,
         "ttbuy": 105.6525
+      },
+      {
+        "date": "2026-10-16",
+        "publishedAt": null,
+        "ttbuy": 105.445
       }
     ],
     "Citibank": [
@@ -15287,6 +15302,11 @@
         "date": "2026-10-15",
         "publishedAt": "09:15 AM",
         "ttbuy": 105.36
+      },
+      {
+        "date": "2026-10-16",
+        "publishedAt": "01:15 PM",
+        "ttbuy": 105.44
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -17301,6 +17321,11 @@
         "date": "2026-10-15",
         "publishedAt": null,
         "ttbuy": 124.695
+      },
+      {
+        "date": "2026-10-16",
+        "publishedAt": null,
+        "ttbuy": 124.815
       }
     ],
     "Citibank": [
@@ -23969,6 +23994,11 @@
         "date": "2026-10-15",
         "publishedAt": "09:15 AM",
         "ttbuy": 124.5
+      },
+      {
+        "date": "2026-10-16",
+        "publishedAt": "01:15 PM",
+        "ttbuy": 125.08
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -26023,6 +26053,11 @@
         "date": "2026-10-15",
         "publishedAt": null,
         "ttbuy": 94.515
+      },
+      {
+        "date": "2026-10-16",
+        "publishedAt": null,
+        "ttbuy": 94.32
       }
     ],
     "Citibank": [
@@ -32871,6 +32906,11 @@
         "date": "2026-10-15",
         "publishedAt": "09:15 AM",
         "ttbuy": 94.6
+      },
+      {
+        "date": "2026-10-16",
+        "publishedAt": "01:15 PM",
+        "ttbuy": 94.55
       }
     ],
     "Ujjivan Small Finance Bank": [
