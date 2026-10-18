@@ -1387,10 +1387,15 @@ const stableBank = computed<StableBankResult | null>(() => {
   padding: 8px;
   overflow-x: auto;
   scrollbar-width: none;
-  background: color-mix(in srgb, var(--page-plane) 88%, transparent);
+  // The links stay in the content column, but the backdrop and bottom line run
+  // to the screen edges. A border-image outset paints outside the box without
+  // adding scrollable overflow (unlike width: 100vw, which counts the scrollbar).
+  border-bottom: 1px solid transparent;
+  border-image:
+    linear-gradient(to top, var(--border) 1px, color-mix(in srgb, var(--page-plane) 88%, transparent) 1px)
+    fill 0 / 0 / 0 100vmax;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
 
   &::-webkit-scrollbar { display: none; }
 }
