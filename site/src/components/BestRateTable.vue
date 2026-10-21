@@ -713,7 +713,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
           <tr>
             <th scope="col">Bank</th>
             <th scope="col" class="num">TT Buy (₹ / {{ currency }})</th>
-            <th scope="col" class="num mid-col" title="How far the bank's rate is below the interbank mid-market rate (XE / Frankfurter). Lower % = more competitive.">vs mid-market ⓘ</th>
+            <th scope="col" class="num mid-col" title="How far the bank's rate is below the interbank mid-market rate (ECB, via Frankfurter). Lower % = more competitive.">vs mid-market ⓘ</th>
             <th scope="col" class="num">You receive (₹)</th>
             <th scope="col" class="num">vs best</th>
             <th scope="col">As of</th>
@@ -723,14 +723,14 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
           <tr v-if="currentBenchmarks?.midMarket" class="benchmark-row">
             <th scope="row">
               <span class="row-header">
-                <span class="bank-name">Mid-market rate (XE / Google)</span>
+                <span class="bank-name">Mid-market rate (ECB)</span>
               </span>
             </th>
             <td class="num"><span class="tt-val">₹{{ currentBenchmarks.midMarket.toFixed(4) }}</span></td>
             <td class="num benchmark-ref-cell">reference</td>
             <td class="num">n/a</td>
             <td class="num">n/a</td>
-            <td class="td-date">Live</td>
+            <td class="td-date">Prev. day</td>
           </tr>
           <tr v-if="currentBenchmarks?.rbiReference" class="benchmark-row">
             <th scope="row">
