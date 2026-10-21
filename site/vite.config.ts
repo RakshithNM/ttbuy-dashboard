@@ -35,7 +35,16 @@ export default defineConfig({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules/vue')) return 'vue';
+          // The data JSON is imported (not fetched) so the prerender includes
+          // it. Its own chunk keeps the app chunk's hash stable when the
+          // daily scrape changes only the data.
+          if (id.includes('/public/data/')) return 'data';
         },
+        // A hashed data file name would end up inside the app chunk's import
+        // and change its hash every day anyway. A fixed name breaks that
+        // chain; _headers makes browsers revalidate it on every visit.
+        chunkFileNames: (chunk) =>
+          chunk.name === 'data' ? 'app-data/data.js' : 'assets/[name]-[hash].js',
       },
     },
   },
