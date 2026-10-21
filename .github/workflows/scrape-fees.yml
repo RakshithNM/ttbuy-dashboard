@@ -5,6 +5,12 @@ on:
     - cron: "0 6 1 * *" # 11:30 IST on the 1st of every month — fee schedules barely ever change
   workflow_dispatch: {}
 
+# Both scrape workflows commit to main. One shared group stops two runs from
+# pushing at the same time. A second run waits for the first to finish.
+concurrency:
+  group: data-commit
+  cancel-in-progress: false
+
 jobs:
   scrape-fees:
     runs-on: ubuntu-latest
@@ -35,4 +41,6 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add data/fees.json site/public/data/fees.json
           git diff --cached --quiet || git commit -m "Update inward remittance fee schedules $(date -u +%F)"
+          # Pick up any commit pushed while this run was scraping.
+          git pull --rebase origin "$GITHUB_REF_NAME"
           git push
