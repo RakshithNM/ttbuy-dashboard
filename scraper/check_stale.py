@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from datetime import datetime
@@ -18,6 +19,10 @@ STALE_DAYS = int(os.environ.get("STALE_DAYS", "2"))
 # holiday calendar to fetch, so the data decides: a date is a publishing day
 # when at least this share of the banks have a rate for it.
 PUBLISHING_DAY_SHARE = 0.5
+
+# The site marks bank holidays from this file. Nothing fetches it, so a year
+# the RBI list was never copied into would silently show no holidays.
+HOLIDAYS_PATH = os.environ.get("TTBUY_HOLIDAYS_PATH", "site/public/data/holidays.json")
 
 # If no date at all qualifies for this many calendar days, the scraper itself
 # is down (or every bank broke at once) and the per-bank check would stay silent.
@@ -80,22 +85,41 @@ def find_stale(today):
     return messages
 
 
+def find_missing_holidays(today):
+    """Return a message when this year's holiday list was not copied from the RBI."""
+    with open(HOLIDAYS_PATH) as f:
+        verified_years = json.load(f).get("verifiedYears", [])
+    if today.year in verified_years:
+        return None
+    return (
+        f"{HOLIDAYS_PATH} has no verified {today.year} list. Copy the Mumbai holidays from "
+        "rbi.org.in/Scripts/HolidayMatrixDisplay.aspx?regoff=Mumbai and add the year to verifiedYears."
+    )
+
+
 def main():
     today = datetime.now(ZoneInfo("Asia/Kolkata")).date()
     messages = find_stale(today)
+    holiday_message = find_missing_holidays(today)
     if not messages:
         print(f"No bank has missed more than {STALE_DAYS} publishing days.")
+    if not messages and not holiday_message:
         return
 
     for message in messages:
         # ::error:: makes the line an annotation on the GitHub Actions run page.
         print(f"::error title=Stale TT Buy rate::{message}")
+    if holiday_message:
+        print(f"::error title=Holiday list out of date::{holiday_message}")
 
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_path:
         with open(summary_path, "a") as summary:
-            summary.write(f"### Stale TT Buy rates (more than {STALE_DAYS} publishing days missed)\n\n")
-            summary.writelines(f"- {message}\n" for message in messages)
+            if messages:
+                summary.write(f"### Stale TT Buy rates (more than {STALE_DAYS} publishing days missed)\n\n")
+                summary.writelines(f"- {message}\n" for message in messages)
+            if holiday_message:
+                summary.write(f"### Holiday list out of date\n\n- {holiday_message}\n")
 
     sys.exit(1)
 

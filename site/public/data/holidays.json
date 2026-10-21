@@ -1,6 +1,6 @@
 {
-  "year": 2026,
-  "note": "Mumbai/Maharashtra bank holidays. Update annually from RBI holiday matrix at rbi.org.in/Scripts/HolidayMatrixDisplay.aspx",
+  "verifiedYears": [2026],
+  "note": "Mumbai/Maharashtra bank holidays. Update annually from RBI holiday matrix at rbi.org.in/Scripts/HolidayMatrixDisplay.aspx?regoff=Mumbai, then add the year to verifiedYears. A year not in verifiedYears holds only fixed-date holidays until the RBI publishes its list (usually in December).",
   "holidays": [
     { "date": "2026-01-26", "name": "Republic Day" },
     { "date": "2026-02-15", "name": "Maha Shivratri" },
@@ -21,6 +21,12 @@
     { "date": "2026-10-20", "name": "Dussehra (Vijayadashami)" },
     { "date": "2026-11-08", "name": "Diwali (Lakshmi Puja)" },
     { "date": "2026-11-24", "name": "Guru Nanak Jayanti" },
-    { "date": "2026-12-25", "name": "Christmas Day" }
+    { "date": "2026-12-25", "name": "Christmas Day" },
+    { "date": "2027-01-26", "name": "Republic Day" },
+    { "date": "2027-04-14", "name": "Dr. B.R. Ambedkar Jayanti" },
+    { "date": "2027-05-01", "name": "Maharashtra Day" },
+    { "date": "2027-08-15", "name": "Independence Day" },
+    { "date": "2027-10-02", "name": "Gandhi Jayanti" },
+    { "date": "2027-12-25", "name": "Christmas Day" }
   ]
 }
