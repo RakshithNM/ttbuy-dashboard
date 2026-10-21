@@ -8,6 +8,7 @@ const props = defineProps<{
   fees: FeesByBank;
   currency: string;
   amount: number;
+  deduction?: number;
 }>();
 
 const myBank = defineModel<string>("myBank", { default: "" });
@@ -23,6 +24,9 @@ const safeAmount = computed(() => {
   const n = Number(props.amount);
   return Number.isFinite(n) && n > 0 ? n : 0;
 });
+
+// What reaches the bank after sending/intermediary bank fees.
+const bankAmount = computed(() => Math.max(0, safeAmount.value - (Number(props.deduction) || 0)));
 
 function formatInr(n: number): string {
   return Math.round(n).toLocaleString("en-IN");
@@ -63,7 +67,7 @@ const rankedBanks = computed<BankSnap[]>(() => {
   for (const s of props.series) {
     if (s.category !== "bank" || !s.points.length) continue;
     const last = s.points.at(-1)!;
-    const gross = last.ttbuy * safeAmount.value;
+    const gross = last.ttbuy * bankAmount.value;
     const fee = props.fees[s.name];
     const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
     const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, gross) : (fee?.fee_inr ?? 0);
@@ -78,7 +82,7 @@ const mySnap = computed<BankSnap | null>(() => {
   const s = props.series.find(s => s.name === myBank.value);
   if (!s || !s.points.length) return null;
   const last = s.points.at(-1)!;
-  const gross = last.ttbuy * safeAmount.value;
+  const gross = last.ttbuy * bankAmount.value;
   const fee = props.fees[myBank.value];
   const feeUnknown = !fee?.fee_slabs && fee?.fee_inr == null;
   const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, gross) : (fee?.fee_inr ?? 0);

@@ -54,8 +54,18 @@ const safeAmount = computed(() => {
   return Number.isFinite(n) && n > 0 ? n : 0;
 });
 
-const SWIFT_FEE_USD = 15;
-const includeSwiftFee = ref(false);
+// Flat amount the sending bank and SWIFT intermediaries take before the money
+// reaches India, in the selected currency. No public fee chart exists, so the
+// user enters what their FIRC or SWIFT tracker shows (or picks a typical one).
+const deduction = defineModel<number>("deduction", { default: 0 });
+const safeDeduction = computed(() => {
+  const n = Number(deduction.value);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+});
+const DEDUCTION_PRESETS = [0, 15, 25];
+const hasInvalidDeduction = computed(() =>
+  safeAmount.value > 0 && safeDeduction.value >= safeAmount.value
+);
 
 // The secondary insights (trend, best weekday, most-often-best, volatility,
 // split, time-of-credit) render as a compact chip row; clicking expands the
@@ -87,8 +97,10 @@ const insightChips = computed<InsightChip[]>(() => {
   out.push({ key: "credit", label: "Rate set at time of credit", tone: "neutral" });
   return out;
 });
-const effectiveAmount = computed(() =>
-  safeAmount.value > 0 ? Math.max(0, safeAmount.value - (includeSwiftFee.value ? SWIFT_FEE_USD : 0)) : 0
+// What reaches an Indian bank after the deduction. Platforms skip the SWIFT
+// chain, so they convert the full safeAmount.
+const bankAmount = computed(() =>
+  safeAmount.value > 0 ? Math.max(0, safeAmount.value - safeDeduction.value) : 0
 );
 
 interface DataRow {
@@ -204,9 +216,10 @@ const rows = computed<Row[]>(() => {
     const prev = s.points.length >= 2 ? s.points[s.points.length - 2] : null;
     const showDelta = prev !== null && isPreviousCalendarDay(prev.date, last.date);
     // Platforms credit the full converted amount to the recipient (sender pays
-    // the platform fee on their side), so feeInr=0 and feeUnknown=false.
+    // the platform fee on their side), so feeInr=0 and feeUnknown=false, and
+    // no intermediary deduction applies.
     const fee = isPlatformRow ? null : props.fees[s.name];
-    const grossReceive = last.ttbuy * effectiveAmount.value;
+    const grossReceive = last.ttbuy * (isPlatformRow ? safeAmount.value : bankAmount.value);
     const feeUnknown = isPlatformRow ? false : (!fee?.fee_slabs && fee?.fee_inr == null);
     const feeInr = isPlatformRow ? 0 : (
       fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, grossReceive) : (fee?.fee_inr ?? 0)
@@ -289,11 +302,11 @@ const rateSpread = computed(() => {
   const rateGap = best.ttbuy - worst.ttbuy;
   if (rateGap <= 0.004) return null;
   // Always express the gap at the full safeAmount so the spread message stays
-  // stable regardless of the SWIFT fee toggle (the $15 fee applies equally to
-  // all banks and cancels out in the difference; the ₹30 artifact comes from
-  // the rate-gap × $15 conversion — add it back when the toggle is on).
+  // stable regardless of the deduction (it applies equally to all banks and
+  // cancels out in the difference, apart from rate-gap × deduction — add
+  // that back).
   const receiveGap = safeAmount.value > 0
-    ? (best.netReceive - worst.netReceive) + (includeSwiftFee.value ? SWIFT_FEE_USD * rateGap : 0)
+    ? (best.netReceive - worst.netReceive) + safeDeduction.value * rateGap
     : null;
   return { rateGap, receiveGap };
 });
@@ -465,8 +478,9 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
 
   const bestSingleNet = bankRows[0].netReceive;
 
+  // Each half of a split is its own wire, so each pays the deduction.
   function netInr(rate: number, bank: string, fxAmt: number): number {
-    const gross = rate * fxAmt;
+    const gross = rate * Math.max(0, fxAmt - safeDeduction.value);
     const fee = props.fees[bank];
     const feeInr = fee?.fee_slabs ? feeFromSlabs(fee.fee_slabs, gross) : (fee?.fee_inr ?? 0);
     return gross - feeInr;
@@ -531,15 +545,28 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
         <input id="remit-amount" v-model.number="amount" type="number" min="1" step="1" inputmode="decimal" class="amount-input" :aria-invalid="hasInvalidAmount ? 'true' : undefined" />
       </div>
       <span class="suffix">{{ currency }}, here's what each bank credits you after fees (where known)</span>
-      <label
-        for="swift-fee"
-        class="swift-fee-toggle"
-        title="Sending banks and intermediate SWIFT correspondents typically deduct $10–20 before the money reaches India. Check your bank's outward wire fee."
-        @click.prevent="includeSwiftFee = !includeSwiftFee"
-      >
-        <input id="swift-fee" type="checkbox" :checked="includeSwiftFee" @click.stop="includeSwiftFee = !includeSwiftFee" />
-        <span>Deduct ~${{ SWIFT_FEE_USD }} sending bank fee</span><span v-show="includeSwiftFee && safeAmount > SWIFT_FEE_USD">(showing net on ${{ safeAmount - SWIFT_FEE_USD }})</span>
-      </label>
+      <div class="deduction-control">
+        <label for="deduction-amount">Deducted before arrival</label>
+        <div class="amount-field" :class="{ invalid: hasInvalidDeduction }">
+          <span class="prefix">{{ currencySymbol(currency) }}</span>
+          <input id="deduction-amount" v-model.number="deduction" type="number" min="0" step="0.01" inputmode="decimal" class="amount-input deduction-input" aria-describedby="deduction-note" :aria-invalid="hasInvalidDeduction ? 'true' : undefined" />
+        </div>
+        <div class="deduction-presets" role="group" aria-label="Typical deductions">
+          <button
+            v-for="p in DEDUCTION_PRESETS"
+            :key="p"
+            type="button"
+            class="deduction-chip"
+            :class="{ active: safeDeduction === p }"
+            :aria-pressed="safeDeduction === p"
+            @click="deduction = p"
+          >{{ currencySymbol(currency) }}{{ p }}</button>
+        </div>
+        <span id="deduction-note" class="deduction-note">
+          <template v-if="safeDeduction > 0 && !hasInvalidDeduction">Bank rows convert {{ currencySymbol(currency) }}{{ formatInr(bankAmount) }}. </template>
+          Sending and intermediary banks often take a flat fee on the way. Check your FIRC or the SWIFT tracker for the exact value. Remittance platforms skip this chain, so it does not apply to them.
+        </span>
+      </div>
     </div>
 
     <div v-if="rateSpread" class="spread-callout" role="note">
@@ -1072,29 +1099,50 @@ tr.row-flash > td {
   }
 }
 
-.swift-fee-toggle {
+.deduction-control {
   flex-basis: 100%;
   display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  font-size: 0.78rem;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .deduction-input {
+    width: 64px;
+  }
+}
+
+.deduction-presets {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.deduction-chip {
+  padding: 4px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-1);
   color: var(--text-secondary);
+  font: inherit;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
   cursor: pointer;
-  user-select: none;
 
-  input[type="checkbox"] {
-    width: 13px;
-    height: 13px;
-    accent-color: var(--accent);
-    cursor: pointer;
-    flex-shrink: 0;
-    margin-top: 1px;
+  &:hover {
+    color: var(--text-primary);
   }
 
-  span {
-    min-width: 0;
-    white-space: normal;
+  &.active {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--text-primary);
   }
+}
+
+.deduction-note {
+  flex-basis: 100%;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-muted);
 }
 
 .amount-field {

@@ -96,6 +96,7 @@ interface StoredView {
   showTable?: boolean;
   currency?: string;
   amount?: number;
+  deduction?: number;
 }
 
 function loadStoredView(): StoredView {
@@ -127,6 +128,9 @@ function loadQueryView(): StoredView {
   const amount = params.get("amount");
   if (amount !== null && Number.isFinite(Number(amount)) && Number(amount) >= 0) view.amount = Number(amount);
 
+  const deduct = params.get("deduct");
+  if (deduct !== null && Number.isFinite(Number(deduct)) && Number(deduct) >= 0) view.deduction = Number(deduct);
+
   return view;
 }
 
@@ -142,6 +146,13 @@ const showTable = ref(
 );
 const currency = ref<string>(queryView.currency ?? storedView.currency ?? "USD");
 const amount = ref<number>(queryView.amount ?? storedView.amount ?? 1000);
+// A link that carries an amount but no deduct= means "no deduction", not the
+// visitor's own saved one.
+const deduction = ref<number>(
+  queryView.deduction ?? (queryView.amount !== undefined ? 0 : storedView.deduction ?? 0)
+);
+// What reaches an Indian bank after sending/intermediary bank fees.
+const bankAmount = computed(() => Math.max(0, amount.value - (Number(deduction.value) || 0)));
 
 function setCurrency(code: string) {
   withViewTransition(() => { currency.value = code; });
@@ -165,9 +176,9 @@ watch(currency, (c) => {
   }
 }, { immediate: true });
 
-watch([range, showTable, currency, amount], ([r, t, c, a]) => {
+watch([range, showTable, currency, amount, deduction], ([r, t, c, a, d]) => {
   try {
-    localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ range: r, showTable: t, currency: c, amount: a }));
+    localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ range: r, showTable: t, currency: c, amount: a, deduction: d }));
   } catch {
     // Persistence is best-effort; nothing to do if storage is unavailable.
   }
@@ -180,6 +191,7 @@ watch([range, showTable, currency, amount], ([r, t, c, a]) => {
     params.set("range", r);
     params.set("view", t ? "table" : "chart");
     params.set("amount", String(a));
+    if (Number(d) > 0) params.set("deduct", String(d));
     history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
   }
 }, { immediate: true });
@@ -586,7 +598,7 @@ const heroSummary = computed<HeroSummary | null>(() => {
     .filter(s => s.category === "bank" && s.points.length > 0)
     .map(s => {
       const pt = s.points.at(-1)!;
-      const gross = pt.ttbuy * amount.value;
+      const gross = pt.ttbuy * bankAmount.value;
       const fee = fees.value[s.name];
       let feeInr = 0;
       if (fee?.fee_slabs) {
@@ -962,7 +974,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   </nav>
 
   <main v-if="!loading && !loadError">
-    <MyBankPanel v-model:my-bank="myBank" :series="allSeries" :fees="fees" :currency="currency" :amount="amount" />
+    <MyBankPanel v-model:my-bank="myBank" :series="allSeries" :fees="fees" :currency="currency" :amount="amount" :deduction="deduction" />
 
     <div class="toolbar">
       <div v-if="availableCurrencies.length > 1" class="currency-filter" role="group" aria-label="Currency">
@@ -1039,7 +1051,7 @@ const stableBank = computed<StableBankResult | null>(() => {
 
     <section id="today" class="panel" style="--cv-size: 2000px">
       <h2>Best value today</h2>
-      <BestRateTable v-model:amount="amount" :series="filteredSeries" :currency="currency" :fees="fees" :benchmarks="benchmarks" :credit-times="CREDIT_TIMES" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
+      <BestRateTable v-model:amount="amount" v-model:deduction="deduction" :series="filteredSeries" :currency="currency" :fees="fees" :benchmarks="benchmarks" :credit-times="CREDIT_TIMES" :consistency="consistencyBadge" :dow-insight="dowInsight" :week-insight="weekInsight" :range="range" :today-signal="todaySignal" :stable-bank="stableBank" />
       <p class="panel-footnote">Published retail TT Buy rates. Corporate and HNI rates are negotiated separately and may differ.</p>
     </section>
 
