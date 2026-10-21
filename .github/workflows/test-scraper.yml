@@ -1,0 +1,32 @@
+name: Test scraper
+
+# Run every bank's parser on its saved page, so a change that breaks one
+# fails here instead of silently in the daily cron.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scraper/**"
+      - ".github/workflows/test-scraper.yml"
+  pull_request:
+    paths:
+      - "scraper/**"
+      - ".github/workflows/test-scraper.yml"
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # No Playwright browser: parse() only reads saved pages.
+      - name: Install scraper dependencies
+        run: pip install -r scraper/requirements.txt
+
+      - name: Run parser tests
+        run: python3 -m unittest discover -s scraper/tests -t . -v

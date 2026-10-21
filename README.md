@@ -172,6 +172,25 @@ This walks ~14 months of history per bank against the Wayback CDX API, so it
 takes a while and can hit transient timeouts — that's normal, just re-run the
 same command again afterward to pick up whatever got skipped.
 
+## Testing the parsers
+
+`scraper/tests/fixtures/` holds one saved (gzipped) page or PDF per plugin,
+and `expected.json` the rates each `parse()` read from it. The test runs every
+parser on its saved page, offline:
+
+```bash
+.venv/bin/python3 -m unittest discover -s scraper/tests -t .
+```
+
+The fixtures are frozen, so this catches a code change that breaks a parser,
+not a bank changing its live page (the stale check in the daily cron catches
+that). After you fix a parser for a new page format, save a fresh copy and
+check the printed rates against the bank's page before committing:
+
+```bash
+.venv/bin/python3 -m scraper.tests.save_fixtures sbi
+```
+
 ## Running the fee scraper
 
 Fee schedules change far less often than daily rates (this is what the

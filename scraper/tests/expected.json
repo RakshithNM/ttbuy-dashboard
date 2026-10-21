@@ -1,0 +1,430 @@
+{
+  "axis": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.00"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "104.02"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "123.35"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "93.11"
+    }
+  },
+  "bandhan": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.16"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "105.09"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "125.31"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "93.96"
+    }
+  },
+  "bob": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.48"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "105.20"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "125.79"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "94.04"
+    }
+  },
+  "canara": {
+    "AED": {
+      "Rate_Date": "2026-10-19",
+      "TT_Buy": "25.5575"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-19",
+      "TT_Buy": "105.6725"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-19",
+      "TT_Buy": "125.3650"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-19",
+      "TT_Buy": "94.4150"
+    }
+  },
+  "citibank": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.2835"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "104.2856"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "124.2213"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "92.9187"
+    }
+  },
+  "cityunion": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.55"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "105.35"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "125.50"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "93.85"
+    }
+  },
+  "dbs": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.2164"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "103.9735"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "123.8620"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "92.8442"
+    }
+  },
+  "dcb": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "24.76"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "104.22"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "124.55"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "92.8"
+    }
+  },
+  "hdfc": {
+    "AED": {
+      "Rate_Date": null,
+      "TT_Buy": "24.94"
+    },
+    "EUR": {
+      "Rate_Date": null,
+      "TT_Buy": "103.88"
+    },
+    "GBP": {
+      "Rate_Date": null,
+      "TT_Buy": "122.95"
+    },
+    "USD": {
+      "Rate_Date": null,
+      "TT_Buy": "92.85"
+    }
+  },
+  "hsbc": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.08"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "103.71"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "123.55"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "92.93"
+    }
+  },
+  "icici": {
+    "AED": {
+      "Rate_Date": null,
+      "TT_Buy": "25.15"
+    },
+    "EUR": {
+      "Rate_Date": null,
+      "TT_Buy": "104.15"
+    },
+    "GBP": {
+      "Rate_Date": null,
+      "TT_Buy": "123.56"
+    },
+    "USD": {
+      "Rate_Date": null,
+      "TT_Buy": "93.19"
+    }
+  },
+  "idbi": {
+    "AED": {
+      "Rate_Date": "2026-10-19",
+      "TT_Buy": "25.00"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-19",
+      "TT_Buy": "104.14"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-19",
+      "TT_Buy": "123.62"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-19",
+      "TT_Buy": "93.37"
+    }
+  },
+  "idfcfirst": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "24.83"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "104.02"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "124.05"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "93.1"
+    }
+  },
+  "iob": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.54"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "105.60"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "125.83"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "94.27"
+    }
+  },
+  "jkbank": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "23.99"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "105.650000"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "125.950000"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "94.250000"
+    }
+  },
+  "kotak": {
+    "AED": {
+      "Rate_Date": null,
+      "TT_Buy": "24.82"
+    },
+    "EUR": {
+      "Rate_Date": null,
+      "TT_Buy": "104.01"
+    },
+    "GBP": {
+      "Rate_Date": null,
+      "TT_Buy": "124.04"
+    },
+    "USD": {
+      "Rate_Date": null,
+      "TT_Buy": "93.17"
+    }
+  },
+  "kvb": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.43"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "104.88"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "124.91"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "93.90"
+    }
+  },
+  "pnb": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.57"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "105.59"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "126.20"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "94.34"
+    }
+  },
+  "rbl": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "24.62"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "103.67"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "123.51"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "92.34"
+    }
+  },
+  "remitly": {
+    "EUR": {
+      "Rate_Date": null,
+      "TT_Buy": "106.74"
+    },
+    "GBP": {
+      "Rate_Date": null,
+      "TT_Buy": "127.24"
+    },
+    "USD": {
+      "Rate_Date": null,
+      "TT_Buy": "95.06"
+    }
+  },
+  "sbi": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.14"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "104.88"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "125.14"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "94.2"
+    }
+  },
+  "skydo": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.7625"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "106.171"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "126.7519"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "94.6127"
+    }
+  },
+  "ujjivan": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "24.94"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "104.75"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "124.77"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "93.31"
+    }
+  },
+  "unionbank": {
+    "AED": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "25.66"
+    },
+    "EUR": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "105.59"
+    },
+    "GBP": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "125.85"
+    },
+    "USD": {
+      "Rate_Date": "2026-10-21",
+      "TT_Buy": "94.30"
+    }
+  }
+}
