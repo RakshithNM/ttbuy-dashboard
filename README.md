@@ -14,7 +14,8 @@ its own format, with no history — so there's no single place to check "who's
 paying the most today" or "how has this bank's rate moved over time."
 
 This project scrapes that rate directly from ~22 major Indian banks' public
-forex pages every day, keeps the history, and puts it all in one place so
+forex pages every day (plus two remittance platforms, Skydo and Remitly, for
+comparison), keeps the history, and puts it all in one place so
 anyone receiving foreign money can quickly see who pays the best rate — today
 and over time.
 
@@ -141,14 +142,12 @@ python3 -m venv .venv && .venv/bin/pip install -r scraper/requirements.txt
 .venv/bin/playwright install chromium
 ```
 
-Day-to-day: fetch today's live rate for every bank (this is what the daily
-cron runs) and refresh the site's data:
+Day-to-day: fetch today's live rate for every bank and platform, plus the
+benchmark rates, and refresh the site's data (the same steps the daily cron
+runs):
 
 ```bash
-BANKS=axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi,bandhan,cityunion,hsbc,jkbank,kvb,citibank,ujjivan,dcb,idfcfirst,dbs,pnb,rbl,unionbank \
-  MAX_SNAPSHOTS=0 .venv/bin/python3 -m scraper.main
-.venv/bin/python3 -m scraper.export_json
-cp data/rates.json site/public/data/rates.json
+./scrape.sh
 ```
 
 Env vars: `BANKS` (comma-separated slugs), `START_DATE`/`END_DATE` (Wayback
@@ -194,7 +193,7 @@ npm run dev
 
 ## Banks
 
-22 banks scraped:
+22 banks and 2 remittance platforms scraped:
 
 | Bank | Status |
 |---|---|
@@ -203,12 +202,12 @@ npm run dev
 | Ujjivan Small Finance Bank | Scraped — PDF filename rotates behind an opaque hash; a stable landing page (`/forex-rates`) always links to the current one, so this is a two-step fetch (`kind="pdf_discover"`) |
 | RBL Bank | Scraped — `/fxadmin_getfx` endpoint returns the current PDF filename; a second fetch retrieves the PDF from the CDN. `kind="pdf_discover"` |
 | Kotak Mahindra Bank, DCB Bank, IDFC FIRST Bank, DBS Bank India | Scraped — rates load via client-side JS, rendered with Playwright. No Wayback backfill (archived HTML wouldn't contain the rendered data), so history only starts accumulating from whenever the daily cron first ran. |
+| Skydo, Remitly (platforms, not banks) | Scraped — plain HTML (`category="platform"`). Skydo's rate comes from the page's `__NEXT_DATA__` JSON; Remitly's is the "as low as" effective rate on each corridor page (USD, GBP, EUR; no AED corridor). The sender pays the platform fee, so nothing is deducted from the credited amount. No Wayback backfill; history starts 2026-08-01. |
 | Central Bank of India, Bank of Maharashtra | Rate is on a PDF whose URL/filename changes daily behind an opaque token or dated path, with no stable landing page found linking to it during research — needs a human to click through the site and find the current link |
 | Karnataka Bank | PDF-only; the landing page also has a hidden decoy HTML table with fake data — do not scrape that table if this gets implemented |
-| Union Bank of India | PDF is image-based (no extractable text) — would need OCR |
 | Federal Bank, Indian Bank, Dhanlaxmi Bank, Tamilnad Mercantile Bank | PDF-only or no accessible rate page found |
 | South Indian Bank, Bank of India, Equitas Small Finance Bank, ESAF Small Finance Bank | Blocked by Cloudflare/Akamai bot-challenge on plain HTTP GET |
-| IndusInd Bank, RBL Bank | JS/AJAX-rendered; IndusInd's widget doesn't appear to expose a public rate without a booking flow, RBL calls an internal `/fxadmin_getfx` endpoint that's undocumented and might be worth trying directly |
+| IndusInd Bank | JS/AJAX-rendered; the widget doesn't appear to expose a public rate without a booking flow |
 | AU Small Finance Bank | JS-rendered widget returns "Authentication failed" without a browser session/token we don't have |
 | CSB Bank | Rate page is an image (JPG), no extractable text — would need OCR |
 | UCO Bank | Rate is an Excel (.xlsx) download, not HTML/PDF |
