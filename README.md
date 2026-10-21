@@ -123,12 +123,12 @@ The scraper runs automatically every day at 11 AM IST (with a 16:00 IST retry). 
   retry — harmless no-op for banks that already got today's rate, since
   `add_live_row` dedups per date) that re-scrapes live bank rates, fetches
   benchmark rates (`scraper/benchmarks.py`), regenerates `rates.json` and
-  `benchmarks.json`, and commits the update (Netlify auto-deploys on push
-  once connected to this repo).
+  `benchmarks.json`, and commits the update (Cloudflare Pages auto-deploys
+  on push).
 - `.github/workflows/scrape-fees.yml` — monthly cron (1st of the month) that
   re-scrapes fee schedules. Separate from the daily rate cron since fee
   schedules barely ever change, unlike rates.
-- `netlify.toml` — base `site/`, publishes `dist/`.
+- `site/public/_headers` — Cloudflare Pages cache headers.
 
 ## Running the scraper
 
