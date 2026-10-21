@@ -1,5 +1,7 @@
-requests
-pandas
-beautifulsoup4
-pdfplumber
-playwright
+# Pinned so a new release cannot break the daily cron without a change here.
+# To upgrade: bump a version, run ./scrape.sh locally, then commit.
+requests==2.34.2
+pandas==3.0.5
+beautifulsoup4==4.15.0
+pdfplumber==0.11.10
+playwright==1.61.0
