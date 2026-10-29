@@ -725,6 +725,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:18 AM",
         "ttbuy": 25.07
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:25 AM",
+        "ttbuy": 25.12
       }
     ],
     "Bandhan Bank": [
@@ -1062,6 +1067,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:15 AM",
         "ttbuy": 25.28
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 25.34
       }
     ],
     "Bank of Baroda": [
@@ -1384,6 +1394,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 25.62
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.66
       }
     ],
     "Canara Bank": [
@@ -1704,6 +1719,11 @@
       },
       {
         "date": "2026-10-27",
+        "publishedAt": null,
+        "ttbuy": 25.6775
+      },
+      {
+        "date": "2026-10-29",
         "publishedAt": null,
         "ttbuy": 25.6775
       }
@@ -2028,6 +2048,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:05 AM",
         "ttbuy": 25.3483
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 25.3938
       }
     ],
     "City Union Bank": [
@@ -2325,6 +2350,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.6
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 25.65
       }
     ],
     "DBS Bank India": [
@@ -2652,6 +2682,11 @@
         "date": "2026-10-28",
         "publishedAt": "11:45 AM",
         "ttbuy": 25.2936
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 25.3411
       }
     ],
     "DCB Bank": [
@@ -2959,6 +2994,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:24 AM",
         "ttbuy": 24.89
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:27 AM",
+        "ttbuy": 24.93
       }
     ],
     "HDFC Bank": [
@@ -3296,6 +3336,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:28 AM",
         "ttbuy": 25.06
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:25 AM",
+        "ttbuy": 25.1
       }
     ],
     "HSBC": [
@@ -3678,6 +3723,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:00 AM",
         "ttbuy": 25.17
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:30 AM",
+        "ttbuy": 25.21
       }
     ],
     "ICICI Bank": [
@@ -4190,6 +4240,11 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 25.21
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 25.26
       }
     ],
     "IDBI Bank": [
@@ -4729,6 +4784,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:08 AM",
         "ttbuy": 24.89
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:07 AM",
+        "ttbuy": 24.94
       }
     ],
     "Indian Overseas Bank": [
@@ -5030,6 +5090,11 @@
       {
         "date": "2026-10-27",
         "publishedAt": "10:19 AM",
+        "ttbuy": 25.72
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:17 AM",
         "ttbuy": 25.72
       }
     ],
@@ -5333,6 +5398,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:16 AM",
         "ttbuy": 24.07
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:13 AM",
+        "ttbuy": 24.1
       }
     ],
     "Karur Vysya Bank": [
@@ -5640,6 +5710,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 25.55
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.58
       }
     ],
     "Kotak Mahindra Bank": [
@@ -5967,6 +6042,11 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 24.88
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 24.92
       }
     ],
     "Punjab National Bank": [
@@ -6254,6 +6334,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 25.67
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 25.72
       }
     ],
     "RBL Bank": [
@@ -6546,6 +6631,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 24.7
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 24.75
       }
     ],
     "Skydo": [
@@ -6993,6 +7083,11 @@
         "date": "2026-10-28",
         "publishedAt": "11:06 AM",
         "ttbuy": 25.9189
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "11:04 AM",
+        "ttbuy": 25.9465
       }
     ],
     "State Bank of India": [
@@ -7385,6 +7480,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:19 AM",
         "ttbuy": 25.29
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:07 AM",
+        "ttbuy": 25.31
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -7657,6 +7757,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:45 AM",
         "ttbuy": 25.06
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:45 AM",
+        "ttbuy": 25.1
       }
     ],
     "Union Bank of India": [
@@ -8623,6 +8728,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:18 AM",
         "ttbuy": 103.33
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:25 AM",
+        "ttbuy": 103.78
       }
     ],
     "Bandhan Bank": [
@@ -8960,6 +9070,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:15 AM",
         "ttbuy": 104.62
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 105.06
       }
     ],
     "Bank of Baroda": [
@@ -9282,6 +9397,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 104.79
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 105.21
       }
     ],
     "Canara Bank": [
@@ -9604,6 +9724,11 @@
         "date": "2026-10-27",
         "publishedAt": null,
         "ttbuy": 105.6225
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 105.395
       }
     ],
     "Citibank": [
@@ -9926,6 +10051,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:05 AM",
         "ttbuy": 103.5626
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 103.9922
       }
     ],
     "City Union Bank": [
@@ -10223,6 +10353,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:00 AM",
         "ttbuy": 104.65
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 105.05
       }
     ],
     "DBS Bank India": [
@@ -10550,6 +10685,11 @@
         "date": "2026-10-28",
         "publishedAt": "11:45 AM",
         "ttbuy": 103.3215
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 103.7356
       }
     ],
     "DCB Bank": [
@@ -10857,6 +10997,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:24 AM",
         "ttbuy": 103.75
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:27 AM",
+        "ttbuy": 104.18
       }
     ],
     "HDFC Bank": [
@@ -11194,6 +11339,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:28 AM",
         "ttbuy": 103.39
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:25 AM",
+        "ttbuy": 103.81
       }
     ],
     "HSBC": [
@@ -11576,6 +11726,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:00 AM",
         "ttbuy": 103.12
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:30 AM",
+        "ttbuy": 103.51
       }
     ],
     "ICICI Bank": [
@@ -12088,6 +12243,11 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 103.44
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 103.86
       }
     ],
     "IDBI Bank": [
@@ -12627,6 +12787,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:08 AM",
         "ttbuy": 103.29
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:07 AM",
+        "ttbuy": 103.72
       }
     ],
     "Indian Overseas Bank": [
@@ -12959,6 +13124,11 @@
         "date": "2026-10-27",
         "publishedAt": "10:19 AM",
         "ttbuy": 105.8
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:17 AM",
+        "ttbuy": 105.61
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -13261,6 +13431,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:16 AM",
         "ttbuy": 104.92
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:13 AM",
+        "ttbuy": 105.34
       }
     ],
     "Karur Vysya Bank": [
@@ -13568,6 +13743,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 104.39
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 104.73
       }
     ],
     "Kotak Mahindra Bank": [
@@ -13895,14 +14075,14 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 103.25
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 103.69
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-10-28",
-        "publishedAt": null,
-        "ttbuy": 102.7108
-      },
       {
         "date": "2025-10-29",
         "publishedAt": null,
@@ -15172,6 +15352,11 @@
         "date": "2026-10-27",
         "publishedAt": null,
         "ttbuy": 106.0635
+      },
+      {
+        "date": "2026-10-28",
+        "publishedAt": null,
+        "ttbuy": 106.0095
       }
     ],
     "Punjab National Bank": [
@@ -15459,6 +15644,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 105.08
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 105.54
       }
     ],
     "RBL Bank": [
@@ -15751,6 +15941,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 103.03
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 103.48
       }
     ],
     "Remitly": [
@@ -16128,6 +16323,11 @@
         "date": "2026-10-28",
         "publishedAt": "05:38 AM",
         "ttbuy": 106.37
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "05:36 AM",
+        "ttbuy": 106.68
       }
     ],
     "Skydo": [
@@ -16575,6 +16775,11 @@
         "date": "2026-10-28",
         "publishedAt": "11:06 AM",
         "ttbuy": 105.8299
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "11:04 AM",
+        "ttbuy": 106.1684
       }
     ],
     "State Bank of India": [
@@ -16967,6 +17172,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:19 AM",
         "ttbuy": 104.53
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:07 AM",
+        "ttbuy": 104.87
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -17234,6 +17444,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:45 AM",
         "ttbuy": 104.11
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:45 AM",
+        "ttbuy": 104.53
       }
     ],
     "Union Bank of India": [
@@ -18200,6 +18415,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:18 AM",
         "ttbuy": 123.01
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:25 AM",
+        "ttbuy": 123.5
       }
     ],
     "Bandhan Bank": [
@@ -18537,6 +18757,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:15 AM",
         "ttbuy": 125.2
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 125.71
       }
     ],
     "Bank of Baroda": [
@@ -18859,6 +19084,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 125.72
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 126.13
       }
     ],
     "Canara Bank": [
@@ -19181,6 +19411,11 @@
         "date": "2026-10-27",
         "publishedAt": null,
         "ttbuy": 126.1175
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 125.9625
       }
     ],
     "Citibank": [
@@ -19503,6 +19738,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:05 AM",
         "ttbuy": 123.8355
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 124.2925
       }
     ],
     "City Union Bank": [
@@ -19800,6 +20040,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:00 AM",
         "ttbuy": 125.1
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 125.55
       }
     ],
     "DBS Bank India": [
@@ -20127,6 +20372,11 @@
         "date": "2026-10-28",
         "publishedAt": "11:45 AM",
         "ttbuy": 123.5525
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 124.0038
       }
     ],
     "DCB Bank": [
@@ -20434,6 +20684,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:24 AM",
         "ttbuy": 124.45
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:27 AM",
+        "ttbuy": 124.91
       }
     ],
     "HDFC Bank": [
@@ -20771,6 +21026,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:28 AM",
         "ttbuy": 122.85
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:25 AM",
+        "ttbuy": 123.26
       }
     ],
     "HSBC": [
@@ -21153,6 +21413,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:00 AM",
         "ttbuy": 123.3
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:30 AM",
+        "ttbuy": 123.73
       }
     ],
     "ICICI Bank": [
@@ -21665,6 +21930,11 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 123.2
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 123.64
       }
     ],
     "IDBI Bank": [
@@ -22204,6 +22474,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:08 AM",
         "ttbuy": 123.66
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:07 AM",
+        "ttbuy": 124.11
       }
     ],
     "Indian Overseas Bank": [
@@ -22536,6 +22811,11 @@
         "date": "2026-10-27",
         "publishedAt": "10:19 AM",
         "ttbuy": 126.36
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:17 AM",
+        "ttbuy": 126.17
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -22838,6 +23118,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:16 AM",
         "ttbuy": 125.5
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:13 AM",
+        "ttbuy": 126.01
       }
     ],
     "Karur Vysya Bank": [
@@ -23145,6 +23430,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 124.79
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 125.19
       }
     ],
     "Kotak Mahindra Bank": [
@@ -23472,14 +23762,14 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 123.62
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 124.09
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-10-28",
-        "publishedAt": null,
-        "ttbuy": 117.25
-      },
       {
         "date": "2025-10-29",
         "publishedAt": null,
@@ -24749,6 +25039,11 @@
         "date": "2026-10-27",
         "publishedAt": null,
         "ttbuy": 126.78
+      },
+      {
+        "date": "2026-10-28",
+        "publishedAt": null,
+        "ttbuy": 126.53
       }
     ],
     "Punjab National Bank": [
@@ -25036,6 +25331,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 125.85
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 126.33
       }
     ],
     "RBL Bank": [
@@ -25328,6 +25628,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 123.2
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 123.69
       }
     ],
     "Remitly": [
@@ -25710,6 +26015,11 @@
         "date": "2026-10-28",
         "publishedAt": "05:38 AM",
         "ttbuy": 127.0
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "05:36 AM",
+        "ttbuy": 127.39
       }
     ],
     "Skydo": [
@@ -26157,6 +26467,11 @@
         "date": "2026-10-28",
         "publishedAt": "11:06 AM",
         "ttbuy": 126.5074
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "11:04 AM",
+        "ttbuy": 126.9025
       }
     ],
     "State Bank of India": [
@@ -26549,6 +26864,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:19 AM",
         "ttbuy": 125.12
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:07 AM",
+        "ttbuy": 125.5
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -26816,6 +27136,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:45 AM",
         "ttbuy": 124.47
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:45 AM",
+        "ttbuy": 124.95
       }
     ],
     "Union Bank of India": [
@@ -27792,6 +28117,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:18 AM",
         "ttbuy": 93.37
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:25 AM",
+        "ttbuy": 93.58
       }
     ],
     "Bandhan Bank": [
@@ -28139,6 +28469,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:15 AM",
         "ttbuy": 94.42
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 94.61
       }
     ],
     "Bank of Baroda": [
@@ -28471,6 +28806,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 94.54
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 94.7
       }
     ],
     "Canara Bank": [
@@ -28803,6 +29143,11 @@
         "date": "2026-10-27",
         "publishedAt": null,
         "ttbuy": 94.8625
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 94.88
       }
     ],
     "Citibank": [
@@ -29130,6 +29475,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:05 AM",
         "ttbuy": 93.124
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:05 AM",
+        "ttbuy": 93.2844
       }
     ],
     "City Union Bank": [
@@ -29432,6 +29782,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:00 AM",
         "ttbuy": 94.05
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:00 AM",
+        "ttbuy": 94.2
       }
     ],
     "DBS Bank India": [
@@ -29764,6 +30119,11 @@
         "date": "2026-10-28",
         "publishedAt": "11:45 AM",
         "ttbuy": 93.1309
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 93.3133
       }
     ],
     "DCB Bank": [
@@ -30076,6 +30436,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:24 AM",
         "ttbuy": 93.27
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:27 AM",
+        "ttbuy": 93.45
       }
     ],
     "HDFC Bank": [
@@ -30433,6 +30798,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:28 AM",
         "ttbuy": 93.3
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:25 AM",
+        "ttbuy": 93.43
       }
     ],
     "HSBC": [
@@ -30830,6 +31200,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:00 AM",
         "ttbuy": 93.26
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:30 AM",
+        "ttbuy": 93.41
       }
     ],
     "ICICI Bank": [
@@ -31367,6 +31742,11 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 93.43
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 93.59
       }
     ],
     "IDBI Bank": [
@@ -31921,6 +32301,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:08 AM",
         "ttbuy": 93.32
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:07 AM",
+        "ttbuy": 93.49
       }
     ],
     "Indian Overseas Bank": [
@@ -32323,6 +32708,11 @@
         "date": "2026-10-27",
         "publishedAt": "10:19 AM",
         "ttbuy": 94.95
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "10:17 AM",
+        "ttbuy": 94.95
       }
     ],
     "Jammu & Kashmir Bank": [
@@ -32630,6 +33020,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:16 AM",
         "ttbuy": 94.45
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:13 AM",
+        "ttbuy": 94.65
       }
     ],
     "Karur Vysya Bank": [
@@ -32942,6 +33337,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 94.32
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 94.44
       }
     ],
     "Kotak Mahindra Bank": [
@@ -33274,14 +33674,14 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 93.39
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 93.57
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-10-28",
-        "publishedAt": null,
-        "ttbuy": 88.31
-      },
       {
         "date": "2025-10-29",
         "publishedAt": null,
@@ -34551,6 +34951,11 @@
         "date": "2026-10-27",
         "publishedAt": null,
         "ttbuy": 95.12
+      },
+      {
+        "date": "2026-10-28",
+        "publishedAt": null,
+        "ttbuy": 95.22
       }
     ],
     "Punjab National Bank": [
@@ -34838,6 +35243,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 94.73
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 94.91
       }
     ],
     "RBL Bank": [
@@ -35130,6 +35540,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:00 AM",
         "ttbuy": 92.63
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:00 AM",
+        "ttbuy": 92.83
       }
     ],
     "Remitly": [
@@ -35497,6 +35912,11 @@
         "date": "2026-10-28",
         "publishedAt": "05:38 AM",
         "ttbuy": 95.59
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "05:36 AM",
+        "ttbuy": 95.71
       }
     ],
     "Skydo": [
@@ -35944,6 +36364,11 @@
         "date": "2026-10-28",
         "publishedAt": "11:06 AM",
         "ttbuy": 95.187
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "11:04 AM",
+        "ttbuy": 95.2884
       }
     ],
     "State Bank of India": [
@@ -36351,6 +36776,11 @@
         "date": "2026-10-28",
         "publishedAt": "10:19 AM",
         "ttbuy": 94.75
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:07 AM",
+        "ttbuy": 94.82
       }
     ],
     "Ujjivan Small Finance Bank": [
@@ -36623,6 +37053,11 @@
         "date": "2026-10-28",
         "publishedAt": "09:45 AM",
         "ttbuy": 93.6
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": "09:45 AM",
+        "ttbuy": 93.79
       }
     ],
     "Union Bank of India": [
