@@ -20,7 +20,7 @@ function writeSitemap() {
     for (const points of Object.values(byBank))
       for (const p of points) if (p.date > lastmod) lastmod = p.date
 
-  const paths = ['/', ...BANK_PAGES.map((b) => bankPagePath(b.slug))]
+  const paths = ['/', '/about', ...BANK_PAGES.map((b) => bankPagePath(b.slug))]
   const urls = paths
     .map((p) => `  <url>\n    <loc>${SITE_URL}${p}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`)
     .join('\n')
@@ -34,6 +34,13 @@ function writeSitemap() {
 export default defineConfig({
   plugins: [vue()],
   ssgOptions: {
+    // index.html carries the FAQPage JSON-LD for the dashboard's FAQ. The
+    // about page has no FAQ, and Google treats structured data for content
+    // that isn't on the page as a guideline violation, so drop it there.
+    onPageRendered: (route, html) =>
+      route === '/about'
+        ? html.replace(/<script type="application\/ld\+json">\s*\{\s*"@context": "https:\/\/schema\.org",\s*"@type": "FAQPage"[\s\S]*?<\/script>\s*/, '')
+        : html,
     onFinished: writeSitemap,
   },
   css: {

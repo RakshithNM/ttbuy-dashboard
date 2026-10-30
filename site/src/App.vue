@@ -1458,7 +1458,9 @@ const stableBank = computed<StableBankResult | null>(() => {
       </template>
     </nav>
     <div class="footer-credits">
-      <span>Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a></span>
+      <span>Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Nettar</a></span>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a href="/about">About and data sources</a>
       <span class="footer-sep" aria-hidden="true">·</span>
       <a href="https://bellare.gumroad.com/l/tiffp" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
       <span class="footer-sep" aria-hidden="true">·</span>
