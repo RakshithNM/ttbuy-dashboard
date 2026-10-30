@@ -701,6 +701,47 @@ const bankRateFacts = computed<BankRateFact[]>(() => {
   return facts;
 });
 
+// Plain-text summary of the market for each currency, for the homepage's
+// "in brief" section. Like bankRateFacts, built from the raw data so it
+// covers every currency, and compares only banks that published on the
+// latest date.
+interface MarketFact {
+  code: string;
+  date: string;
+  best: { name: string; ttbuy: number };
+  worst: { name: string; ttbuy: number };
+  sbi: number | null;
+  count: number;
+}
+
+const SBI = "State Bank of India";
+
+const marketFacts = computed<MarketFact[]>(() => {
+  const facts: MarketFact[] = [];
+  for (const code of availableCurrencies.value) {
+    const banks = Object.entries(rawRates.value[code] ?? {})
+      .filter(([name]) => !isPlatform(name) && !isBenchmark(name));
+    const date = banks.reduce((d, [, pts]) => {
+      const last = pts.at(-1)?.date ?? "";
+      return last > d ? last : d;
+    }, "");
+    const today = banks
+      .map(([name, pts]) => ({ name, ttbuy: pts.find(p => p.date === date)?.ttbuy }))
+      .filter((r): r is { name: string; ttbuy: number } => r.ttbuy !== undefined)
+      .sort((a, b) => b.ttbuy - a.ttbuy);
+    if (today.length < 2) continue;
+    facts.push({
+      code,
+      date,
+      best: today[0],
+      worst: today.at(-1)!,
+      sbi: today.find(r => r.name === SBI)?.ttbuy ?? null,
+      count: today.length,
+    });
+  }
+  return facts;
+});
+
 const bankFee = computed(() => (props.bank ? fees.value[props.bank] : undefined));
 
 function fmtLongDate(iso: string): string {
@@ -1336,6 +1377,21 @@ const stableBank = computed<StableBankResult | null>(() => {
   <p v-else-if="loadError" class="error">Couldn't load rate data: {{ loadError }}</p>
   <p v-else class="loading">Loading rates…</p>
 
+  <section v-if="!bank && marketFacts.length" class="panel brief-panel">
+    <h2>Today's TT Buy rates in brief</h2>
+    <p v-for="f in marketFacts" :key="f.code">
+      <strong>{{ f.code }}:</strong>
+      On {{ fmtLongDate(f.date) }}, {{ shortName(f.best.name) }} paid the most of {{ f.count }} banks,
+      at ₹{{ f.best.ttbuy.toFixed(2) }} per {{ f.code }}.
+      <template v-if="f.sbi !== null && f.best.name !== SBI">
+        That is ₹{{ (f.best.ttbuy - f.sbi).toFixed(2) }} more than SBI (₹{{ f.sbi.toFixed(2) }}).
+      </template>
+      {{ shortName(f.worst.name) }} paid the least, at ₹{{ f.worst.ttbuy.toFixed(2) }}.
+      On {{ currencySymbol(f.code) }}1,000, the best bank gives you
+      ₹{{ Math.round((f.best.ttbuy - f.worst.ttbuy) * 1000).toLocaleString('en-IN') }} more than the worst.
+    </p>
+  </section>
+
   <section id="faq" class="panel faq-panel" style="--cv-size: 300px">
     <h2>Common questions</h2>
     <template v-if="bank && bankRateFacts.length">
@@ -1803,6 +1859,22 @@ const stableBank = computed<StableBankResult | null>(() => {
   margin: 12px 0 0;
   font-size: 11px;
   color: var(--text-secondary);
+}
+
+.brief-panel {
+  h2 { margin-bottom: 12px; }
+
+  p {
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 640px;
+
+    &:last-child { margin-bottom: 0; }
+  }
+
+  strong { color: var(--text-primary); font-weight: 500; }
 }
 
 .faq-panel {
