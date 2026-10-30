@@ -37,10 +37,13 @@ export default defineConfig({
     // index.html carries the FAQPage JSON-LD for the dashboard's FAQ. The
     // about page has no FAQ, and Google treats structured data for content
     // that isn't on the page as a guideline violation, so drop it there.
-    onPageRendered: (route, html) =>
-      route === '/about'
-        ? html.replace(/<script type="application\/ld\+json">\s*\{\s*"@context": "https:\/\/schema\.org",\s*"@type": "FAQPage"[\s\S]*?<\/script>\s*/, '')
-        : html,
+    // The 404 page also drops index.html's canonical, which points at "/".
+    onPageRendered: (route, html) => {
+      if (route !== '/about' && route !== '/404') return html
+      html = html.replace(/<script type="application\/ld\+json">\s*\{\s*"@context": "https:\/\/schema\.org",\s*"@type": "FAQPage"[\s\S]*?<\/script>\s*/, '')
+      if (route === '/404') html = html.replace(/<link rel="canonical"[^>]*>\s*/, '')
+      return html
+    },
     onFinished: writeSitemap,
   },
   css: {
