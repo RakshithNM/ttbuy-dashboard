@@ -1741,6 +1741,11 @@
         "date": "2026-10-29",
         "publishedAt": null,
         "ttbuy": 25.6775
+      },
+      {
+        "date": "2026-10-30",
+        "publishedAt": null,
+        "ttbuy": 25.685
       }
     ],
     "Citibank": [
@@ -4527,6 +4532,11 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 25.04
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 25.08
       },
       {
         "date": "2026-10-30",
@@ -9849,6 +9859,11 @@
         "date": "2026-10-29",
         "publishedAt": null,
         "ttbuy": 105.395
+      },
+      {
+        "date": "2026-10-30",
+        "publishedAt": null,
+        "ttbuy": 105.8225
       }
     ],
     "Citibank": [
@@ -12635,6 +12650,11 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 103.33
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 103.79
       },
       {
         "date": "2026-10-30",
@@ -19646,6 +19666,11 @@
         "date": "2026-10-29",
         "publishedAt": null,
         "ttbuy": 125.9625
+      },
+      {
+        "date": "2026-10-30",
+        "publishedAt": null,
+        "ttbuy": 126.6
       }
     ],
     "Citibank": [
@@ -22432,6 +22457,11 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 123.56
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 124.05
       },
       {
         "date": "2026-10-30",
@@ -29488,6 +29518,11 @@
         "date": "2026-10-29",
         "publishedAt": null,
         "ttbuy": 94.88
+      },
+      {
+        "date": "2026-10-30",
+        "publishedAt": null,
+        "ttbuy": 94.89
       }
     ],
     "Citibank": [
@@ -32364,6 +32399,11 @@
         "date": "2026-10-28",
         "publishedAt": null,
         "ttbuy": 93.52
+      },
+      {
+        "date": "2026-10-29",
+        "publishedAt": null,
+        "ttbuy": 93.7
       },
       {
         "date": "2026-10-30",
