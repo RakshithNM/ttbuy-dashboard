@@ -18,6 +18,12 @@ import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from 
 import { CREDIT_TIMES } from "./creditTime";
 import { currencySymbol, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
+import { useHead } from "@unhead/vue";
+import { BANK_PAGES, SITE_URL, bankPagePath } from "./bankPages";
+
+// Set on a bank's own page (see bankPages.ts): the same dashboard, with the
+// header, hero and FAQ about this bank instead of the market as a whole.
+const props = defineProps<{ bank?: string }>();
 
 import rawRatesData from "../public/data/rates.json";
 import holidaysData from "../public/data/holidays.json";
@@ -171,10 +177,31 @@ const myBank = ref<string>((() => { try { return localStorage.getItem(MY_BANK_KE
 watch(myBank, (b) => { try { if (b) localStorage.setItem(MY_BANK_KEY, b); else localStorage.removeItem(MY_BANK_KEY); } catch {} });
 
 watch(currency, (c) => {
+  // A bank page's title is owned by useHead below.
+  if (props.bank) return;
   if (typeof document !== "undefined") {
     document.title = `${c} TT Buy Rate | TTBuy Rates`;
   }
 }, { immediate: true });
+
+if (props.bank) {
+  const short = shortName(props.bank);
+  const url = SITE_URL + bankPagePath(BANK_PAGES.find(b => b.name === props.bank)!.slug);
+  const title = `${short} TT Buy Rate Today (USD, GBP, EUR, AED) | TTBuy Rates`;
+  const description = `Today's ${props.bank} TT Buy rate for USD, GBP, EUR and AED inward remittances, its fee, and how it ranks against 22+ Indian banks. Updated daily at 11 AM IST.`;
+  useHead({
+    title,
+    link: [{ rel: "canonical", href: url }],
+    meta: [
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:url", content: url },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+    ],
+  });
+}
 
 watch([range, showTable, currency, amount, deduction], ([r, t, c, a, d]) => {
   try {
@@ -593,8 +620,11 @@ interface HeroSummary {
   isStale: boolean;
 }
 
-const heroSummary = computed<HeroSummary | null>(() => {
-  const rows = allSeries.value
+interface NetRow { name: string; color: string; ttbuy: number; net: number; date: string }
+
+// Every bank's latest reading, ranked by net receive (best first).
+const netRows = computed<NetRow[]>(() => {
+  return allSeries.value
     .filter(s => s.category === "bank" && s.points.length > 0)
     .map(s => {
       const pt = s.points.at(-1)!;
@@ -609,9 +639,13 @@ const heroSummary = computed<HeroSummary | null>(() => {
         feeInr = fee?.fee_inr ?? 0;
       }
       return { name: s.name, color: brandColor(s.name), ttbuy: pt.ttbuy, net: gross - feeInr, date: pt.date };
-    });
+    })
+    .sort((a, b) => b.net - a.net);
+});
+
+const heroSummary = computed<HeroSummary | null>(() => {
+  const rows = netRows.value;
   if (rows.length < 2 || !(amount.value > 0)) return null;
-  rows.sort((a, b) => b.net - a.net);
   const best = rows[0];
   const latest = rows.reduce((d, r) => (r.date > d ? r.date : d), "");
 
@@ -629,6 +663,52 @@ const heroSummary = computed<HeroSummary | null>(() => {
   return { best, compare, isStale: best.date < latest };
 });
 
+// Hero on a bank page: this bank's latest reading, its rank, and the gap to
+// the best bank.
+interface BankHero { me: NetRow; rank: number; total: number; best: NetRow; isStale: boolean }
+
+const bankHero = computed<BankHero | null>(() => {
+  if (!props.bank || !(amount.value > 0)) return null;
+  const rows = netRows.value;
+  const i = rows.findIndex(r => r.name === props.bank);
+  if (i < 0 || rows.length < 2) return null;
+  const latest = rows.reduce((d, r) => (r.date > d ? r.date : d), "");
+  return { me: rows[i], rank: i + 1, total: rows.length, best: rows[0], isStale: rows[i].date < latest };
+});
+
+// Plain-text answers about this bank across all currencies, for the FAQ.
+// Built from the raw data so they don't follow the currency toggle.
+interface BankRateFact { code: string; ttbuy: number; date: string; best: { name: string; ttbuy: number } | null }
+
+const bankRateFacts = computed<BankRateFact[]>(() => {
+  const bank = props.bank;
+  if (!bank) return [];
+  const facts: BankRateFact[] = [];
+  for (const code of availableCurrencies.value) {
+    const byBank = rawRates.value[code] ?? {};
+    const pt = byBank[bank]?.at(-1);
+    if (!pt) continue;
+    // Best bank on the same date, so a stale reading isn't compared with a
+    // fresher one.
+    let best: BankRateFact["best"] = null;
+    for (const [name, points] of Object.entries(byBank)) {
+      if (isPlatform(name) || isBenchmark(name)) continue;
+      const same = points.find(p => p.date === pt.date);
+      if (same && (!best || same.ttbuy > best.ttbuy)) best = { name, ttbuy: same.ttbuy };
+    }
+    facts.push({ code, ttbuy: pt.ttbuy, date: pt.date, best });
+  }
+  return facts;
+});
+
+const bankFee = computed(() => (props.bank ? fees.value[props.bank] : undefined));
+
+function fmtLongDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return `${MONTHS[m - 1]} ${d}, ${y}`;
+}
+
 // Short reason shown in the hero's stale badge, e.g. "Oct 1 rate · Gandhi Jayanti".
 const heroStaleReason = computed<string | null>(() => {
   const r = stalenessReason.value;
@@ -641,7 +721,7 @@ const heroStaleReason = computed<string | null>(() => {
 // When the hero badge already explains the holiday, the separate line below
 // the hero would repeat it.
 const heroCoversStaleness = computed(() =>
-  !!heroSummary.value?.isStale && !!heroStaleReason.value
+  !!(props.bank ? bankHero.value?.isStale : heroSummary.value?.isStale) && !!heroStaleReason.value
 );
 
 // Bank name in the hero jumps to (and briefly highlights) that bank's row.
@@ -895,14 +975,66 @@ const stableBank = computed<StableBankResult | null>(() => {
 
 <template>
   <header class="page-header">
-    <p class="eyebrow">Foreign earnings in India</p>
-    <h1>Which Indian bank pays you the most for your {{ currency }} transfer?</h1>
-    <p class="lede">
-      Your bank sets its own rate when foreign currency arrives in your account. That
-      rate varies by hundreds of rupees per $1,000 across banks. We track 22+ Indian
-      banks daily so you can see who pays you the most, right now and over time.
+    <p class="eyebrow">
+      <template v-if="bank"><a href="/" class="eyebrow-link">All banks</a> / {{ shortName(bank) }}</template>
+      <template v-else>Foreign earnings in India</template>
     </p>
-    <div v-if="!loading && heroSummary" class="hero-card">
+    <template v-if="bank">
+      <h1>{{ shortName(bank) }} TT Buy rate today</h1>
+      <p class="lede">
+        {{ bank }} sets its own TT Buy rate when foreign currency arrives in your
+        account. See today's {{ shortName(bank) }} rate for {{ currency }}, how it
+        ranks against 22+ Indian banks, and how it has moved over time.
+      </p>
+    </template>
+    <template v-else>
+      <h1>Which Indian bank pays you the most for your {{ currency }} transfer?</h1>
+      <p class="lede">
+        Your bank sets its own rate when foreign currency arrives in your account. That
+        rate varies by hundreds of rupees per $1,000 across banks. We track 22+ Indian
+        banks daily so you can see who pays you the most, right now and over time.
+      </p>
+    </template>
+    <div v-if="!loading && bank && bankHero" class="hero-card">
+      <div class="hero-top">
+        <span class="hero-label">{{ shortName(bank) }} right now · #{{ bankHero.rank }} of {{ bankHero.total }} banks</span>
+        <span v-if="bankHero.isStale" class="hero-stale">
+          {{ fmtShortDate(bankHero.me.date) }} rate<template v-if="heroStaleReason"> · {{ heroStaleReason }}</template>
+        </span>
+      </div>
+      <div class="hero-body">
+        <div class="hero-main">
+          <button
+            type="button"
+            class="hero-bank"
+            :title="`Show ${shortName(bank)} in the table`"
+            @click="goToBankRow(bank)"
+          >
+            <span class="hero-dot" :style="{ background: bankHero.me.color }" aria-hidden="true"></span>
+            {{ shortName(bank) }}
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <span class="hero-rate">₹{{ bankHero.me.ttbuy.toFixed(2) }} per {{ currency }}</span>
+        </div>
+        <div class="hero-figures">
+          <div class="hero-figure">
+            <span class="hero-figure-label">On {{ currencySymbol(currency) }}{{ heroAmount }} you get</span>
+            <span class="hero-figure-value">₹{{ Math.round(bankHero.me.net).toLocaleString('en-IN') }}</span>
+          </div>
+          <div v-if="bankHero.rank === 1" class="hero-figure hero-figure--gain">
+            <span class="hero-figure-label">Among all banks</span>
+            <span class="hero-figure-value">Best today</span>
+          </div>
+          <div v-else-if="bankHero.best.net - bankHero.me.net >= 1" class="hero-figure hero-figure--loss">
+            <span class="hero-figure-label">vs best bank ({{ shortName(bankHero.best.name) }})</span>
+            <span class="hero-figure-value">−₹{{ Math.round(bankHero.best.net - bankHero.me.net).toLocaleString('en-IN') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else-if="!loading && !bank && heroSummary" class="hero-card">
       <div class="hero-top">
         <span class="hero-label">Best bank right now</span>
         <span v-if="heroSummary.isStale" class="hero-stale">
@@ -1206,6 +1338,35 @@ const stableBank = computed<StableBankResult | null>(() => {
 
   <section id="faq" class="panel faq-panel" style="--cv-size: 300px">
     <h2>Common questions</h2>
+    <template v-if="bank && bankRateFacts.length">
+      <details class="faq-item">
+        <summary>What is {{ shortName(bank) }}'s TT Buy rate today?</summary>
+        <p>
+          {{ bank }}'s latest published TT Buy rates are
+          <template v-for="(f, i) in bankRateFacts" :key="f.code">₹{{ f.ttbuy.toFixed(2) }} per {{ f.code }} ({{ fmtLongDate(f.date) }}){{ i < bankRateFacts.length - 1 ? ", " : "." }}</template>
+          {{ shortName(bank) }} applies this rate when foreign currency arrives in your account as a wire transfer.
+        </p>
+      </details>
+      <details class="faq-item">
+        <summary>How does {{ shortName(bank) }}'s rate compare with other banks?</summary>
+        <p>
+          <template v-for="f in bankRateFacts" :key="f.code">
+            <template v-if="!f.best || f.best.name === bank">{{ shortName(bank) }} had the best {{ f.code }} rate of all tracked banks. </template>
+            <template v-else>For {{ f.code }}, {{ shortName(f.best.name) }} paid ₹{{ f.best.ttbuy.toFixed(2) }}, ₹{{ (f.best.ttbuy - f.ttbuy).toFixed(2) }} more per {{ f.code }} than {{ shortName(bank) }}. </template>
+          </template>
+          Use the history chart and the leaderboard above to see if the gap is usual or a one-day change.
+        </p>
+      </details>
+      <details class="faq-item">
+        <summary>Does {{ shortName(bank) }} charge a fee to receive money from abroad?</summary>
+        <p v-if="bankFee">
+          <template v-for="r in bankFee.rules" :key="r.label">{{ r.label }}: {{ r.charge }}. </template>
+          <template v-if="bankFee.note">{{ bankFee.note }} </template>
+          Source: <a :href="bankFee.source_url" target="_blank" rel="noopener noreferrer">{{ shortName(bank) }} fee schedule</a>, checked {{ fmtLongDate(bankFee.checked_at) }}.
+        </p>
+        <p v-else>We could not find a published inward remittance fee schedule for {{ shortName(bank) }}. Ask your branch before the transfer.</p>
+      </details>
+    </template>
     <details class="faq-item">
       <summary>My bank isn't the best rate today. What should I do?</summary>
       <p>Check the historical chart to see if it's consistently low. A one-day dip is normal; a persistent gap of ₹500+ per $1,000 over weeks is worth acting on. For large one-off transfers, call your bank's forex desk before the sender initiates the transfer. Many banks will offer a better rate on request. For regular transfers, switching to a consistently higher-rated bank is the more reliable fix.</p>
@@ -1229,6 +1390,17 @@ const stableBank = computed<StableBankResult | null>(() => {
   </section>
 
   <footer class="site-footer">
+    <nav class="footer-banks" aria-label="Bank pages">
+      <span>TT Buy rate by bank:</span>
+      <template v-for="(b, i) in BANK_PAGES" :key="b.slug">
+        <span v-if="i > 0" class="footer-sep" aria-hidden="true">·</span>
+        <a :href="bankPagePath(b.slug)" :aria-current="bank === b.name ? 'page' : undefined">{{ shortName(b.name) }}</a>
+      </template>
+      <template v-if="bank">
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <a href="/">All banks</a>
+      </template>
+    </nav>
     <div class="footer-credits">
       <span>Built by <a href="https://rakshithnettar.com" target="_blank" rel="noopener noreferrer">Rakshith Bellare</a></span>
       <span class="footer-sep" aria-hidden="true">·</span>
@@ -1249,6 +1421,10 @@ const stableBank = computed<StableBankResult | null>(() => {
     text-transform: uppercase;
     letter-spacing: 0.04em;
     margin: 0 0 6px;
+  }
+  .eyebrow-link {
+    color: inherit;
+    &:hover { color: var(--text-primary); }
   }
 
   h1 {
@@ -1365,10 +1541,14 @@ const stableBank = computed<StableBankResult | null>(() => {
     font-variant-numeric: tabular-nums;
   }
 
-  .hero-figure--gain .hero-figure-value {
+  .hero-figure--gain .hero-figure-value,
+  .hero-figure--loss .hero-figure-value {
     font-size: 18px;
     font-weight: 600;
     color: var(--success-text);
+  }
+  .hero-figure--loss .hero-figure-value {
+    color: var(--status-critical);
   }
 
   @media (max-width: 600px) {
@@ -1958,6 +2138,7 @@ const stableBank = computed<StableBankResult | null>(() => {
   }
 }
 
+.footer-banks,
 .footer-credits {
   display: flex;
   align-items: center;
@@ -1965,8 +2146,6 @@ const stableBank = computed<StableBankResult | null>(() => {
   gap: 4px 10px;
   font-size: 12px;
   color: var(--text-muted);
-  padding-top: 16px;
-  border-top: 1px solid var(--gridline);
 
   a {
     color: var(--text-muted);
@@ -1975,6 +2154,16 @@ const stableBank = computed<StableBankResult | null>(() => {
     &:hover {
       color: var(--text-secondary);
     }
+  }
+}
+
+.footer-banks {
+  padding: 16px 0 8px;
+  border-top: 1px solid var(--gridline);
+
+  a[aria-current="page"] {
+    color: var(--text-primary);
+    font-weight: 600;
   }
 }
 

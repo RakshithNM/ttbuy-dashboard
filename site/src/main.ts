@@ -1,5 +1,13 @@
-import { ViteSSG } from 'vite-ssg/single-page'
+import { ViteSSG } from 'vite-ssg'
+import type { RouteRecordRaw } from 'vue-router'
 import './style.scss'
+import Root from './Root.vue'
 import App from './App.vue'
+import { BANK_PAGES, bankPagePath } from './bankPages'
 
-export const createApp = ViteSSG(App)
+const routes: RouteRecordRaw[] = [
+  { path: '/', component: App },
+  ...BANK_PAGES.map((b) => ({ path: bankPagePath(b.slug), component: App, props: { bank: b.name } })),
+]
+
+export const createApp = ViteSSG(Root, { routes })

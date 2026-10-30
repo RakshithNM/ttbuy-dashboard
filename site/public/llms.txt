@@ -11,3 +11,11 @@
 ## Main Site
 
 - [TTBuy Rates](https://ttbuyrates.rakshithnettar.com/): Compare today's TT Buy rates across 22+ Indian banks for USD, GBP, EUR, and AED.
+
+## Bank Pages
+
+- [SBI TT Buy rate](https://ttbuyrates.rakshithnettar.com/sbi-tt-buy-rate): Today's SBI TT Buy rate for USD, GBP, EUR and AED, its fee, and its rank against other banks.
+- [HDFC Bank TT Buy rate](https://ttbuyrates.rakshithnettar.com/hdfc-tt-buy-rate): Today's HDFC Bank TT Buy rate for USD, GBP, EUR and AED, its fee, and its rank against other banks.
+- [ICICI Bank TT Buy rate](https://ttbuyrates.rakshithnettar.com/icici-tt-buy-rate): Today's ICICI Bank TT Buy rate for USD, GBP, EUR and AED, its fee, and its rank against other banks.
+- [Axis Bank TT Buy rate](https://ttbuyrates.rakshithnettar.com/axis-tt-buy-rate): Today's Axis Bank TT Buy rate for USD, GBP, EUR and AED, its fee, and its rank against other banks.
+- [Kotak Mahindra Bank TT Buy rate](https://ttbuyrates.rakshithnettar.com/kotak-tt-buy-rate): Today's Kotak Mahindra Bank TT Buy rate for USD, GBP, EUR and AED, its fee, and its rank against other banks.
