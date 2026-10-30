@@ -1,10 +1,41 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { Features } from 'lightningcss'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import type {} from 'vite-ssg/node'
+import { BANK_PAGES, SITE_URL, bankPagePath } from './src/bankPages.ts'
+
+const root = fileURLToPath(new URL('.', import.meta.url))
+
+// Writes dist/sitemap.xml after the prerender. <lastmod> is the newest rate
+// date in rates.json, so each daily scrape gives Google a new date to act on
+// (Google ignores changefreq and priority, but uses an accurate lastmod to
+// decide when to recrawl).
+function writeSitemap() {
+  const rates = JSON.parse(readFileSync(`${root}public/data/rates.json`, 'utf8')) as
+    Record<string, Record<string, { date: string }[]>>
+  let lastmod = ''
+  for (const byBank of Object.values(rates))
+    for (const points of Object.values(byBank))
+      for (const p of points) if (p.date > lastmod) lastmod = p.date
+
+  const paths = ['/', ...BANK_PAGES.map((b) => bankPagePath(b.slug))]
+  const urls = paths
+    .map((p) => `  <url>\n    <loc>${SITE_URL}${p}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`)
+    .join('\n')
+  writeFileSync(
+    `${root}dist/sitemap.xml`,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+  )
+}
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  ssgOptions: {
+    onFinished: writeSitemap,
+  },
   css: {
     lightningcss: {
       // Without this, Lightning CSS's minify step down-levels light-dark()
