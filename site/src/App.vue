@@ -16,7 +16,7 @@ const MarkupTrendChart = defineAsyncComponent(() => import("./components/MarkupT
 const DayOfWeekChart = defineAsyncComponent(() => import("./components/DayOfWeekChart.vue"));
 import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
-import { currencySymbol, sortByCurrencyOrder } from "./currencies";
+import { currencySymbol, onCurrencyRadioKeydown, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
 import { useHead } from "@unhead/vue";
 import { BANK_PAGES, SITE_URL, bankPagePath } from "./bankPages";
@@ -162,6 +162,10 @@ const bankAmount = computed(() => Math.max(0, amount.value - (Number(deduction.v
 
 function setCurrency(code: string) {
   withViewTransition(() => { currency.value = code; });
+}
+
+function onCurrencyKeydown(e: KeyboardEvent) {
+  onCurrencyRadioKeydown(e, availableCurrencies.value, currency.value, setCurrency);
 }
 
 function toggleTableView() {
@@ -1150,14 +1154,23 @@ const stableBank = computed<StableBankResult | null>(() => {
     <MyBankPanel v-model:my-bank="myBank" :series="allSeries" :fees="fees" :currency="currency" :amount="amount" :deduction="deduction" />
 
     <div class="toolbar">
-      <div v-if="availableCurrencies.length > 1" class="currency-filter" role="group" aria-label="Currency">
+      <div
+        v-if="availableCurrencies.length > 1"
+        class="currency-filter"
+        role="radiogroup"
+        aria-label="Currency"
+        @keydown="onCurrencyKeydown"
+      >
         <button
           v-for="code in availableCurrencies"
           :key="code"
           type="button"
+          role="radio"
           class="currency-btn"
           :class="{ active: currency === code }"
-          :aria-pressed="currency === code"
+          :aria-checked="currency === code"
+          :tabindex="currency === code ? 0 : -1"
+          :data-currency="code"
           @click="setCurrency(code)"
         >
           {{ code }}

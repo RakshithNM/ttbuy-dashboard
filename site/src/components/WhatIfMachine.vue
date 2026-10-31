@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import type { RatesByCurrency, FeesByBank, FeeSlab } from "../types";
 import { brandColor, isPlatform, shortName } from "../bankPalette";
-import { currencySymbol } from "../currencies";
+import { currencySymbol, onCurrencyRadioKeydown } from "../currencies";
 
 const props = defineProps<{
   rawRates: RatesByCurrency;
@@ -22,6 +22,10 @@ const MONTHS = [
 const currency = ref(props.currencies[0] ?? "USD");
 const amountStr = ref(String(DEFAULT_AMOUNTS[currency.value] ?? 1000));
 const selectedDate = ref("");
+
+function onCurrencyKeydown(e: KeyboardEvent) {
+  onCurrencyRadioKeydown(e, props.currencies, currency.value, (c) => { currency.value = c; });
+}
 
 function feeFromSlabs(slabs: FeeSlab[], grossInr: number): number {
   for (const s of slabs) {
@@ -145,14 +149,23 @@ function daysAgo(dateStr: string): string {
         class="date-input"
         aria-label="Select date"
       />
-      <div v-if="currencies.length > 1" class="cur-tabs" role="group" aria-label="Currency">
+      <div
+        v-if="currencies.length > 1"
+        class="cur-tabs"
+        role="radiogroup"
+        aria-label="What-if currency"
+        @keydown="onCurrencyKeydown"
+      >
         <button
           v-for="c in currencies"
           :key="c"
           type="button"
+          role="radio"
           class="cur-btn"
           :class="{ active: currency === c }"
-          :aria-pressed="currency === c"
+          :aria-checked="currency === c"
+          :tabindex="currency === c ? 0 : -1"
+          :data-currency="c"
           @click="currency = c"
         >{{ c }}</button>
       </div>
