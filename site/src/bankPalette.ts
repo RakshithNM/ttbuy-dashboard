@@ -61,7 +61,7 @@ export const SOURCE_URLS: Record<string, string> = {
   "Skydo": "https://www.skydo.com/convert-usd-to-inr?amount=1000",
   "State Bank of India": "https://sbi.bank.in/web/personal-banking/forex-cards",
   "Ujjivan Small Finance Bank": "https://www.ujjivansfb.bank.in/forex-rates",
-  "Union Bank of India": "https://www.unionbankofindia.co.in/english/ibd-other-exchangerate.aspx",
+  "Union Bank of India": "https://www.unionbankofindia.bank.in/pdf/foreign-exchange-card-rates-applicable-to-various-forex-transactions.pdf",
 };
 
 export function sourceUrl(name: string): string | null {

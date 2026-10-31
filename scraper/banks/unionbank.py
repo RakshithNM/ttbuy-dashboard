@@ -8,7 +8,13 @@ from .base import BankPlugin
 
 # Previously noted as "image-based PDF" in research, but as of 2026 the PDF
 # has real text layers — pdfplumber extracts cleanly.
+# The bank moved from .co.in to .bank.in in Oct 2026; the old host no longer
+# accepts connections. Keep the old URL for archive (Wayback) lookups.
 UNIONBANK_URL = (
+    "https://www.unionbankofindia.bank.in/pdf/"
+    "foreign-exchange-card-rates-applicable-to-various-forex-transactions.pdf"
+)
+UNIONBANK_OLD_URL = (
     "https://www.unionbankofindia.co.in/pdf/"
     "Foreign-Exchange-card-rates-applicable-to-various-forex-transactions.pdf"
 )
@@ -56,7 +62,7 @@ PLUGIN = BankPlugin(
     name="Union Bank of India",
     slug="unionbank",
     live_url=UNIONBANK_URL,
-    wayback_urls=[UNIONBANK_URL],
+    wayback_urls=[UNIONBANK_URL, UNIONBANK_OLD_URL],
     parse=parse,
     kind="pdf",
 )
