@@ -1,5 +1,5 @@
 import { scaleLinear, scaleTime } from "d3-scale";
-import { area as d3Area, line as d3Line } from "d3-shape";
+import { area as d3Area, line as d3Line, curveMonotoneX, type CurveFactory } from "d3-shape";
 import { bisector } from "d3-array";
 
 export function createTimeScale(domain: [number, number], range: [number, number]) {
@@ -10,12 +10,15 @@ export function createLinearScale(domain: [number, number], range: [number, numb
   return scaleLinear().domain(domain).range(range);
 }
 
-export function linePathFor<T>(points: T[], x: (d: T) => number, y: (d: T) => number): string {
-  return d3Line<T>().x(x).y(y)(points) ?? "";
+// Monotone-X smoothing by default: curves read softer than straight
+// segments, but unlike a cardinal/basis curve it never overshoots a data
+// point, so a smoothed line never invents a peak or dip the data lacks.
+export function linePathFor<T>(points: T[], x: (d: T) => number, y: (d: T) => number, curve: CurveFactory = curveMonotoneX): string {
+  return d3Line<T>().x(x).y(y).curve(curve)(points) ?? "";
 }
 
-export function areaPathFor<T>(points: T[], x: (d: T) => number, y: (d: T) => number, y0: number): string {
-  return d3Area<T>().x(x).y1(y).y0(y0)(points) ?? "";
+export function areaPathFor<T>(points: T[], x: (d: T) => number, y: (d: T) => number, y0: number, curve: CurveFactory = curveMonotoneX): string {
+  return d3Area<T>().x(x).y1(y).y0(y0).curve(curve)(points) ?? "";
 }
 
 // Generates tick values at a fixed step across [min, max], rounded to 2

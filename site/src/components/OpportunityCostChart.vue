@@ -76,9 +76,16 @@ const xDomain = computed<[number, number]>(() => {
 const yDomain = computed<[number, number]>(() => {
   if (!chartData.value.length) return [0, 100];
   const max = Math.max(...chartData.value.map(d => d.spread));
-  const step = max <= 200 ? 50 : max <= 500 ? 100 : max <= 1000 ? 200 : 500;
+  const step = spreadStep(max * 1.15);
   return [0, Math.ceil((max * 1.15) / step) * step];
 });
+
+// Smallest "nice" step that keeps the axis at ~5 ticks. A fixed ₹500 step
+// put 18 crowded labels on the axis once spreads passed ₹8,000.
+function spreadStep(max: number): number {
+  const candidates = [50, 100, 200, 250, 500, 1000, 2000, 2500, 5000, 10000, 20000, 25000, 50000];
+  return candidates.find((c) => max / c <= 5) ?? 100000;
+}
 
 const xScaleD3 = computed(() => createTimeScale(xDomain.value, [0, plotW]));
 const yScaleD3 = computed(() => createLinearScale(yDomain.value, [plotH, 0]));
@@ -102,8 +109,7 @@ const areaPath = computed(() => {
 
 const yTicks = computed<number[]>(() => {
   const [min, max] = yDomain.value;
-  const step = max <= 200 ? 50 : max <= 500 ? 100 : max <= 1000 ? 200 : 500;
-  return ticksAtStep(min, max, step);
+  return ticksAtStep(min, max, spreadStep(max));
 });
 
 const xTicks = computed<string[]>(() => downsampleDates(chartData.value, 5).map(d => d.date));
@@ -178,9 +184,18 @@ const TOOLTIP_H = 44;
       >
         <defs>
           <linearGradient id="occ-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--series-2)" stop-opacity="0.3" />
-            <stop offset="100%" stop-color="var(--series-2)" stop-opacity="0.02" />
+            <stop offset="0%" stop-color="var(--series-2)" stop-opacity="0.34" />
+            <stop offset="60%" stop-color="var(--series-2)" stop-opacity="0.1" />
+            <stop offset="100%" stop-color="var(--series-2)" stop-opacity="0" />
           </linearGradient>
+          <filter id="occ-glow" filterUnits="userSpaceOnUse" x="0" y="0" :width="W" :height="H">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feComponentTransfer in="blur" result="soft"><feFuncA type="linear" slope="0.5" /></feComponentTransfer>
+            <feMerge><feMergeNode in="soft" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+          <filter id="occ-shadow" x="-20%" y="-30%" width="140%" height="180%">
+            <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.16" />
+          </filter>
         </defs>
         <g :transform="`translate(${MARGIN.left},${MARGIN.top})`">
           <line
@@ -209,23 +224,27 @@ const TOOLTIP_H = 44;
             :y1="yPos(avgSpread)" :y2="yPos(avgSpread)"
             stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="4 3"
           />
-          <path :d="areaPath" fill="url(#occ-fill)" />
-          <path :d="linePath" fill="none" stroke="var(--series-2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+          <g v-reveal="xTicks.join()">
+            <path :d="areaPath" fill="url(#occ-fill)" />
+            <path :d="linePath" fill="none" stroke="var(--series-2)" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round" filter="url(#occ-glow)" />
+          </g>
           <template v-if="tooltip">
             <line
               :x1="tooltip.x - MARGIN.left" :x2="tooltip.x - MARGIN.left"
               y1="0" :y2="plotH"
-              stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3 2"
+              stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"
             />
             <circle
+              :key="`hm-${tooltip.date}`"
               :cx="tooltip.x - MARGIN.left" :cy="tooltip.y - MARGIN.top"
-              r="4" fill="var(--series-2)" stroke="var(--surface-1)" stroke-width="2"
+              r="5.5" fill="var(--series-2)" stroke="var(--surface-1)" stroke-width="2.5"
+              class="fx-pop" pointer-events="none"
             />
           </template>
         </g>
         <template v-if="tooltip">
           <g :transform="`translate(${tooltip.x + 10 > W - TOOLTIP_W - 4 ? tooltip.x - TOOLTIP_W - 8 : tooltip.x + 10},${Math.max(4, tooltip.y - 26)})`">
-            <rect :width="TOOLTIP_W" :height="TOOLTIP_H" rx="6" fill="var(--surface-1)" stroke="var(--border)" />
+            <rect :width="TOOLTIP_W" :height="TOOLTIP_H" rx="10" fill="var(--surface-1)" stroke="var(--border)" filter="url(#occ-shadow)" />
             <text x="8" y="15" font-size="11" fill="var(--text-muted)">{{ formatDate(tooltip.date) }}</text>
             <text x="8" y="33" font-size="13" font-weight="600" fill="var(--text-primary)">₹{{ Math.round(tooltip.spread).toLocaleString('en-IN') }} spread</text>
           </g>

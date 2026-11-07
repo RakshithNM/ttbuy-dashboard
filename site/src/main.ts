@@ -6,6 +6,7 @@ import App from './App.vue'
 import AboutPage from './AboutPage.vue'
 import NotFoundPage from './NotFoundPage.vue'
 import { BANK_PAGES, bankPagePath } from './bankPages'
+import { vReveal } from './chartFx'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: App },
@@ -17,4 +18,6 @@ const routes: RouteRecordRaw[] = [
   { path: '/:pathMatch(.*)*', component: NotFoundPage },
 ]
 
-export const createApp = ViteSSG(Root, { routes })
+export const createApp = ViteSSG(Root, { routes }, ({ app }) => {
+  app.directive('reveal', vReveal)
+})

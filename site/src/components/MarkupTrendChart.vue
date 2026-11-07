@@ -238,6 +238,16 @@ const TOOLTIP_W = 170;
             @mousemove="e => onMouseMove(e, e.currentTarget as SVGSVGElement)"
             @mouseleave="onMouseLeave"
           >
+            <defs>
+            <filter id="mt-glow" filterUnits="userSpaceOnUse" x="0" y="0" :width="W" :height="H">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feComponentTransfer in="blur" result="soft"><feFuncA type="linear" slope="0.45" /></feComponentTransfer>
+              <feMerge><feMergeNode in="soft" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            <filter id="mt-shadow" x="-20%" y="-30%" width="140%" height="180%">
+              <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.16" />
+            </filter>
+          </defs>
             <g :transform="`translate(${MARGIN.left},${MARGIN.top})`">
               <!-- Gridlines -->
               <line
@@ -274,23 +284,32 @@ const TOOLTIP_W = 170;
                 text-anchor="middle" font-size="11" fill="var(--text-muted)"
               >{{ formatDate(date) }}</text>
               <!-- Bank lines -->
-              <path
-                v-for="b in visibleGaps"
-                :key="b.name"
-                :d="linePath(b)"
-                fill="none"
-                :stroke="b.color"
-                stroke-width="2"
-                stroke-linejoin="round"
-                stroke-linecap="round"
-                opacity="0.85"
-              />
+              <g v-reveal="xTicks.join()">
+                <path
+                  v-for="b in visibleGaps"
+                  :key="b.name"
+                  :d="linePath(b)"
+                  fill="none"
+                  :stroke="b.color"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  :filter="visibleGaps.length <= 8 ? 'url(#mt-glow)' : undefined"
+                />
+              </g>
               <!-- Crosshair -->
               <template v-if="tooltip">
                 <line
                   :x1="tooltip.x - MARGIN.left" :x2="tooltip.x - MARGIN.left"
                   y1="0" :y2="plotH"
-                  stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3 2"
+                  stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"
+                />
+                <circle
+                  v-for="item in tooltip.items"
+                  :key="`hm-${item.name}-${tooltip.date}`"
+                  :cx="xPos(tooltip.date)" :cy="yPos(item.gap)"
+                  r="5" :fill="item.color" stroke="var(--surface-1)" stroke-width="2.5"
+                  class="fx-pop" pointer-events="none"
                 />
               </template>
             </g>
@@ -300,9 +319,10 @@ const TOOLTIP_W = 170;
                 <rect
                   :width="TOOLTIP_W"
                   :height="tooltip.items.length * 18 + 22"
-                  rx="6"
+                  rx="10"
                   fill="var(--surface-1)"
                   stroke="var(--border)"
+                  filter="url(#mt-shadow)"
                 />
                 <text x="8" y="15" font-size="11" fill="var(--text-muted)">{{ formatDate(tooltip.date) }}</text>
                 <g v-for="(item, idx) in tooltip.items" :key="item.name" :transform="`translate(0,${20 + idx * 18})`">

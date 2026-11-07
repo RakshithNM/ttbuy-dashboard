@@ -298,10 +298,6 @@ function sign(n: number): string {
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  &.best .zone--pos .bar--pos {
-    background: var(--status-good);
-  }
 }
 
 .zone {
@@ -318,22 +314,46 @@ function sign(n: number): string {
 }
 
 .bar {
-  width: 80%;
+  width: 72%;
   margin: 0 auto;
-  border-radius: 3px;
-  transition: height 300ms ease;
+  border-radius: 4px;
+  transition: height 300ms ease, filter 160ms ease, box-shadow 160ms ease;
 
+  // Gradient runs from the baseline (faint) to the bar's tip (full), so
+  // each bar visually "grows" out of zero.
   &--pos {
-    background: var(--status-good);
-    opacity: 0.82;
-    border-radius: 3px 3px 0 0;
+    background: linear-gradient(to top, color-mix(in srgb, var(--status-good) 45%, transparent), var(--status-good));
+    border-radius: 6px 6px 0 0;
+    transform-origin: bottom;
   }
 
   &--neg {
-    background: var(--series-2);
-    opacity: 0.72;
-    border-radius: 0 0 3px 3px;
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--series-2) 40%, transparent), var(--series-2));
+    border-radius: 0 0 6px 6px;
+    transform-origin: top;
   }
+}
+
+@keyframes dow-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bar {
+    animation: dow-grow 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @for $i from 1 through 7 {
+    .bar-col:nth-child(#{$i}) .bar { animation-delay: #{($i - 1) * 60}ms; }
+  }
+}
+
+.bar-col:hover .bar {
+  filter: brightness(1.12) saturate(1.1);
+}
+
+.bar-col.best .bar--pos {
+  box-shadow: 0 0 18px -2px color-mix(in srgb, var(--status-good) 60%, transparent);
 }
 
 .bar-baseline {

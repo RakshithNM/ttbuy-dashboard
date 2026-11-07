@@ -2,6 +2,7 @@
 import { computed, ref, watch } from "vue";
 import type { BankSeries, FeesByBank } from "../types";
 import { shortName } from "../bankPalette";
+import { areaPathFor, linePathFor } from "../chartScales";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -144,16 +145,12 @@ function yPos(value: number): number {
 }
 
 const linePath = computed(() =>
-  cumulativeData.value.map((pt, i) => `${i === 0 ? "M" : "L"}${xPos(pt.date).toFixed(1)},${yPos(pt.cumulative).toFixed(1)}`).join(" ")
+  linePathFor(cumulativeData.value, (pt) => xPos(pt.date), (pt) => yPos(pt.cumulative))
 );
 
-const areaPath = computed(() => {
-  const data = cumulativeData.value;
-  if (!data.length) return "";
-  const line = data.map((pt, i) => `${i === 0 ? "M" : "L"}${xPos(pt.date).toFixed(1)},${yPos(pt.cumulative).toFixed(1)}`).join(" ");
-  const z = yPos(0).toFixed(1);
-  return `${line} L${xPos(data[data.length - 1].date).toFixed(1)},${z} L${xPos(data[0].date).toFixed(1)},${z} Z`;
-});
+const areaPath = computed(() =>
+  areaPathFor(cumulativeData.value, (pt) => xPos(pt.date), (pt) => yPos(pt.cumulative), yPos(0))
+);
 
 const lineColor = computed(() => totalGain.value >= 0 ? "var(--status-good)" : "var(--status-critical)");
 
@@ -288,9 +285,18 @@ const bankBLabel = computed(() => {
         >
           <defs>
             <linearGradient id="cum-fill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" :stop-color="lineColor" stop-opacity="0.22" />
-              <stop offset="100%" :stop-color="lineColor" stop-opacity="0.02" />
+              <stop offset="0%" :stop-color="lineColor" stop-opacity="0.3" />
+              <stop offset="60%" :stop-color="lineColor" stop-opacity="0.08" />
+              <stop offset="100%" :stop-color="lineColor" stop-opacity="0" />
             </linearGradient>
+            <filter id="cum-glow" filterUnits="userSpaceOnUse" x="0" y="0" :width="W" :height="H">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+              <feComponentTransfer in="blur" result="soft"><feFuncA type="linear" slope="0.5" /></feComponentTransfer>
+              <feMerge><feMergeNode in="soft" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            <filter id="cum-shadow" x="-20%" y="-30%" width="140%" height="180%">
+              <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.16" />
+            </filter>
           </defs>
           <g :transform="`translate(${MARGIN.left},${MARGIN.top})`">
             <line
@@ -319,23 +325,27 @@ const bankBLabel = computed(() => {
               :x="xPos(date)" :y="plotH + 18"
               text-anchor="middle" font-size="11" fill="var(--text-muted)"
             >{{ formatDate(date) }}</text>
-            <path :d="areaPath" fill="url(#cum-fill)" />
-            <path :d="linePath" fill="none" :stroke="lineColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+            <g v-reveal="xTicks.join()">
+              <path :d="areaPath" fill="url(#cum-fill)" />
+              <path :d="linePath" fill="none" :stroke="lineColor" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round" filter="url(#cum-glow)" />
+            </g>
             <template v-if="tooltip">
               <line
                 :x1="tooltip.x - MARGIN.left" :x2="tooltip.x - MARGIN.left"
                 y1="0" :y2="plotH"
-                stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3 2"
+                stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"
               />
               <circle
+                :key="`hm-${tooltip.date}`"
                 :cx="tooltip.x - MARGIN.left" :cy="tooltip.y - MARGIN.top"
-                r="4" :fill="lineColor" stroke="var(--surface-1)" stroke-width="2"
+                r="5.5" :fill="lineColor" stroke="var(--surface-1)" stroke-width="2.5"
+                class="fx-pop" pointer-events="none"
               />
             </template>
           </g>
           <template v-if="tooltip">
             <g :transform="`translate(${tooltip.x + 10 > W - TOOLTIP_W - 4 ? tooltip.x - TOOLTIP_W - 8 : tooltip.x + 10},${Math.max(4, tooltip.y - 32)})`">
-              <rect :width="TOOLTIP_W" :height="TOOLTIP_H" rx="6" fill="var(--surface-1)" stroke="var(--border)" />
+              <rect :width="TOOLTIP_W" :height="TOOLTIP_H" rx="10" fill="var(--surface-1)" stroke="var(--border)" filter="url(#cum-shadow)" />
               <text x="8" y="16" font-size="11" fill="var(--text-muted)">{{ formatDate(tooltip.date) }}</text>
               <text x="8" y="34" font-size="12" font-weight="600" :fill="lineColor">
                 Cumulative: {{ tooltip.cumulative >= 0 ? "+" : "−" }}{{ formatInr(tooltip.cumulative) }}

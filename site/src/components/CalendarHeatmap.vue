@@ -337,15 +337,21 @@ function formatCalDate(iso: string): string {
   border-radius: 5px;
   position: relative;
   background: transparent;
-  transition: opacity 80ms ease, transform 80ms ease;
+  transition: opacity 120ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease;
 
   &.has-best {
-    background: var(--cell-color);
+    // Top-left sheen over the bank's color: reads as a lit tile, while the
+    // hue (the identity) stays the same.
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 55%),
+      var(--cell-color);
 
     &:hover {
-      opacity: 0.82;
-      transform: scale(1.08);
+      transform: scale(1.14);
       z-index: 1;
+      box-shadow:
+        0 6px 16px -4px color-mix(in srgb, var(--cell-color) 70%, transparent),
+        0 0 0 2px var(--surface-1);
     }
   }
 

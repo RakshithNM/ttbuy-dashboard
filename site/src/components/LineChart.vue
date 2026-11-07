@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import type { BankSeries } from "../types";
 import { shortName } from "../bankPalette";
-import { MAX_CONNECTED_GAP_DAYS, bisectNearest, createLinearScale, createTimeScale, daysBetween, linePathFor, splitByGap, ticksAtStep } from "../chartScales";
+import { MAX_CONNECTED_GAP_DAYS, areaPathFor, bisectNearest, createLinearScale, createTimeScale, daysBetween, linePathFor, splitByGap, ticksAtStep } from "../chartScales";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -181,6 +181,38 @@ function lastPoint(s: BankSeries) {
 
 const showEndLabels = computed(() => visibleSeries.value.length <= 4);
 
+// ── Visual effects ──────────────────────────────────────────────────────────
+// Unique per instance so two charts on one page never share gradient ids.
+const uid = `lc${Math.random().toString(36).slice(2, 8)}`;
+
+// Replays the draw-in when the dataset changes (currency / range), but not
+// when a single bank is toggled on or off.
+const revealKey = computed(() => `${props.currency}|${xDomain.value.join("-")}`);
+
+// Soft gradient wash under each line — only while few lines are shown, so
+// overlapping washes never muddy a busy chart.
+const showAreas = computed(
+  () => visibleSeries.value.filter((s) => s.category !== "benchmark").length <= 3
+);
+// Colored glow under each line; skipped on a crowded chart for the same reason.
+const showGlow = computed(() => visibleSeries.value.length <= 8);
+// One dot per data point reads well on a short range but turns into noise
+// on a long one, where the line alone carries the shape.
+const showPointDots = computed(() => allDates.value.length <= 31);
+
+function areaPath(points: { date: string; ttbuy: number }[]): string {
+  const sorted = [...points].sort((a, b) => a.date.localeCompare(b.date));
+  return splitByGap(sorted, MAX_CONNECTED_GAP_DAYS)
+    .map((seg) => areaPathFor(seg, (p) => xScale(p.date), (p) => yScale(p.ttbuy), MARGIN.top + plotH))
+    .join(" ");
+}
+
+// Legend hover / keyboard focus spotlights one series and fades the rest.
+const focusSeries = ref<string | null>(null);
+function seriesOpacity(name: string): number {
+  return focusSeries.value === null || focusSeries.value === name ? 1 : 0.12;
+}
+
 const weekendBands = computed<{ x: number; width: number; label: "Sat" | "Sun" }[]>(() => {
   const [d0, d1] = xDomain.value;
   if (d0 === d1 || !allDates.value.length) return [];
@@ -307,6 +339,16 @@ const tooltipRows = computed(() => {
 });
 
 const tooltipX = computed(() => (hoverDate.value ? xScale(hoverDate.value) : 0));
+
+// One marker per series where the crosshair crosses its line.
+const hoverMarkers = computed(() => {
+  const d = hoverDate.value;
+  if (!d) return [];
+  return visibleSeries.value.flatMap((s) => {
+    const p = s.points.find((pt) => pt.date === d);
+    return p ? [{ name: s.name, color: s.color, x: xScale(d), y: yScale(p.ttbuy) }] : [];
+  });
+});
 const tooltipSide = computed(() => (tooltipX.value > MARGIN.left + plotW * 0.6 ? "left" : "right"));
 // Positioned relative to .line-chart (outside the scrolling frame, so a tall
 // tooltip — e.g. one row per bank with many banks — is never clipped
@@ -396,6 +438,10 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
             :class="{ dim: hidden.has(s.name) }"
             :aria-pressed="!hidden.has(s.name)"
             @click="emit('toggle', s.name)"
+            @mouseenter="!hidden.has(s.name) && (focusSeries = s.name)"
+            @mouseleave="focusSeries = null"
+            @focus="!hidden.has(s.name) && (focusSeries = s.name)"
+            @blur="focusSeries = null"
           >
             <span
               class="key"
@@ -419,6 +465,31 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
       @pointermove="onPointerMove"
       @pointerleave="onPointerLeave"
     >
+      <defs>
+        <linearGradient
+          v-for="(s, i) in visibleSeries"
+          :id="`${uid}-area-${i}`"
+          :key="`grad-${s.name}`"
+          x1="0" y1="0" x2="0" y2="1"
+        >
+          <stop offset="0%" :stop-color="s.color" stop-opacity="0.22" />
+          <stop offset="55%" :stop-color="s.color" stop-opacity="0.07" />
+          <stop offset="100%" :stop-color="s.color" stop-opacity="0" />
+        </linearGradient>
+        <!-- userSpaceOnUse: a flat line has a zero-height bounding box, which
+             would make an objectBoundingBox filter region empty (line vanishes) -->
+        <filter :id="`${uid}-glow`" filterUnits="userSpaceOnUse" x="0" y="0" :width="W" :height="H">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+          <feComponentTransfer in="blur" result="soft">
+            <feFuncA type="linear" slope="0.45" />
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode in="soft" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
       <!-- weekend lines -->
       <g aria-hidden="true">
         <g v-for="(band, i) in weekendBands" :key="`wknd-${i}`">
@@ -462,25 +533,51 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
       </g>
 
       <!-- series lines -->
-      <g v-for="s in visibleSeries" :key="s.name">
+      <g v-reveal="revealKey">
+      <g
+        v-for="(s, si) in visibleSeries"
+        :key="s.name"
+        class="fx-series"
+        :opacity="seriesOpacity(s.name)"
+      >
+        <path
+          v-if="showAreas && s.category !== 'benchmark'"
+          :d="areaPath(s.points)"
+          :fill="`url(#${uid}-area-${si})`"
+          stroke="none"
+          class="series-area"
+        />
         <path
           :d="linePath(s.points)"
           fill="none"
           :stroke="s.color"
-          stroke-width="2"
+          :stroke-width="focusSeries === s.name ? 3 : 2"
           stroke-linecap="round"
           stroke-linejoin="round"
           :stroke-dasharray="s.category === 'benchmark' ? '4 4' : (s.wrapped ? '6 3' : undefined)"
+          :filter="showGlow && s.category !== 'benchmark' ? `url(#${uid}-glow)` : undefined"
+          class="series-line"
         />
-        <circle
-          v-for="p in s.points"
-          :key="`${s.name}-${p.date}`"
-          :cx="xScale(p.date)"
-          :cy="yScale(p.ttbuy)"
-          r="2.5"
-          :fill="s.color"
-        />
+        <template v-if="showPointDots">
+          <circle
+            v-for="p in s.points"
+            :key="`${s.name}-${p.date}`"
+            :cx="xScale(p.date)"
+            :cy="yScale(p.ttbuy)"
+            r="2.5"
+            :fill="s.color"
+          />
+        </template>
         <template v-if="lastPoint(s)">
+          <circle
+            v-if="s.category !== 'benchmark'"
+            :cx="xScale(lastPoint(s)!.date)"
+            :cy="yScale(lastPoint(s)!.ttbuy)"
+            r="4"
+            :fill="s.color"
+            class="fx-pulse"
+            aria-hidden="true"
+          />
           <circle
             :cx="xScale(lastPoint(s)!.date)"
             :cy="yScale(lastPoint(s)!.ttbuy)"
@@ -500,6 +597,7 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
           </text>
         </template>
       </g>
+      </g>
 
       <!-- spike annotations: big single-day moves >= ₹0.50 -->
       <g aria-hidden="true">
@@ -512,13 +610,30 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
           :fill="spike.color"
           stroke="var(--surface-1)"
           stroke-width="2"
-          class="spike-circle"
+          :opacity="seriesOpacity(spike.bank)"
+          class="spike-circle fx-series"
         />
       </g>
 
-      <!-- crosshair -->
-      <g v-if="hoverDate">
+      <!-- crosshair + markers where it crosses each line -->
+      <g v-if="hoverDate" aria-hidden="true">
         <line :x1="tooltipX" :x2="tooltipX" :y1="MARGIN.top" :y2="H - MARGIN.bottom" class="crosshair" />
+        <circle
+          v-for="m in hoverMarkers"
+          :key="`hm-${m.name}-${hoverDate}`"
+          :cx="m.x"
+          :cy="m.y"
+          r="5"
+          :fill="m.color"
+          stroke="var(--surface-1)"
+          stroke-width="2.5"
+          :opacity="seriesOpacity(m.name)"
+          class="fx-pop hover-marker"
+        />
+        <g :transform="`translate(${tooltipX}, ${H - MARGIN.bottom + 13})`" class="fx-fade">
+          <rect x="-28" y="-10" width="56" height="20" rx="10" class="date-pill" />
+          <text x="0" y="0" class="date-pill-text">{{ formatShortDate(hoverDate) }}</text>
+        </g>
       </g>
     </svg>
     </div>
@@ -533,14 +648,19 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
          one row per bank, and there can be many — is never cut off -->
     <div
       v-if="!showTable && hoverDate && tooltipRows.length"
-      class="tooltip"
+      class="tooltip fx-glass fx-fade"
       :class="tooltipSide"
       :style="{ left: `${tooltipLeft}px` }"
       @pointerenter="onTooltipPointerEnter"
       @pointerleave="onTooltipPointerLeave"
     >
       <div class="tooltip-date">{{ formatShortDate(hoverDate) }}</div>
-      <div v-for="row in tooltipRows" :key="row.name" class="tooltip-row">
+      <div
+        v-for="(row, ri) in tooltipRows"
+        :key="row.name"
+        class="tooltip-row"
+        :class="{ top: ri === 0 && tooltipRows.length > 1 }"
+      >
         <span class="line-key" :style="{ background: row.color }" aria-hidden="true"></span>
         <span class="tooltip-name">{{ row.name }}</span>
         <span v-if="row.delta !== null" class="tooltip-delta" :class="row.delta > 0 ? 'up' : 'down'">
@@ -710,8 +830,34 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
 }
 
 .crosshair {
-  stroke: var(--baseline);
+  stroke: var(--text-muted);
   stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.hover-marker {
+  pointer-events: none;
+}
+
+.date-pill {
+  fill: var(--text-primary);
+}
+
+.date-pill-text {
+  fill: var(--surface-1);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.series-line {
+  transition: stroke-width 180ms ease;
+}
+
+.series-area {
   pointer-events: none;
 }
 
@@ -741,10 +887,11 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
   transform: translate(12px, -50%);
   background: var(--surface-1);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-radius: 12px;
+  padding: 10px 12px;
   font-size: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transition: left 120ms cubic-bezier(0.22, 1, 0.36, 1);
   // Accepts pointer events (unlike most tooltips) so it can be scrolled —
   // with many banks on one date it can be taller than the chart itself.
   // onTooltipPointerEnter/Leave in the script keep it from vanishing the
@@ -762,21 +909,33 @@ const augmentedTableRows = computed<AugmentedRow[]>(() => {
 
 .tooltip-date {
   color: var(--text-muted);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
   font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .tooltip-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 2px 0;
+  gap: 8px;
+  padding: 3px 6px;
+  margin: 0 -6px;
+  border-radius: 6px;
+
+  // Best rate on the hovered date.
+  &.top {
+    background: color-mix(in srgb, var(--success-text) 10%, transparent);
+  }
 }
 
 .line-key {
-  width: 10px;
-  height: 2px;
-  border-radius: 1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   flex: none;
 }
 

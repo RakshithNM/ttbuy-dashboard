@@ -2,6 +2,7 @@
 import { computed, ref, watch } from "vue";
 import type { BankSeries } from "../types";
 import { shortName } from "../bankPalette";
+import { curveBumpX } from "d3-shape";
 import { bisectNearest, createLinearScale, createTimeScale, downsampleDates, linePathFor, splitByGap } from "../chartScales";
 
 const props = defineProps<{
@@ -154,7 +155,7 @@ function yPos(rank: number): number {
 
 function linePath(points: RankPoint[]): string {
   return splitByGap(points)
-    .map(seg => linePathFor(seg, (p) => xPos(p.date), (p) => yPos(p.rank)))
+    .map(seg => linePathFor(seg, (p) => xPos(p.date), (p) => yPos(p.rank), curveBumpX))
     .join(" ");
 }
 
@@ -250,6 +251,16 @@ const TOOLTIP_W = 190;
           @mousemove="e => onMouseMove(e, e.currentTarget as SVGSVGElement)"
           @mouseleave="onMouseLeave"
         >
+          <defs>
+            <filter id="rb-glow" filterUnits="userSpaceOnUse" x="0" y="0" :width="W" :height="H">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feComponentTransfer in="blur" result="soft"><feFuncA type="linear" slope="0.45" /></feComponentTransfer>
+              <feMerge><feMergeNode in="soft" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            <filter id="rb-shadow" x="-20%" y="-30%" width="140%" height="180%">
+              <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.16" />
+            </filter>
+          </defs>
           <g :transform="`translate(${MARGIN.left},${MARGIN.top})`">
             <line
               v-for="tick in yTicks"
@@ -272,12 +283,14 @@ const TOOLTIP_W = 190;
               text-anchor="middle" font-size="11" fill="var(--text-muted)"
             >{{ formatDate(date) }}</text>
 
+            <g v-reveal="xTicks.join()">
             <g v-for="line in rankedLines" :key="line.name">
               <path
                 :d="linePath(line.points)"
                 fill="none"
                 :stroke="line.color"
-                stroke-width="2"
+                stroke-width="2.5"
+                filter="url(#rb-glow)"
                 stroke-linejoin="round"
                 stroke-linecap="round"
               />
@@ -290,6 +303,10 @@ const TOOLTIP_W = 190;
               <template v-if="lastPoint(line.points)">
                 <circle
                   :cx="xPos(lastPoint(line.points)!.date)" :cy="yPos(lastPoint(line.points)!.rank)"
+                  r="4.5" :fill="line.color" class="fx-pulse" aria-hidden="true"
+                />
+                <circle
+                  :cx="xPos(lastPoint(line.points)!.date)" :cy="yPos(lastPoint(line.points)!.rank)"
                   r="4.5" :fill="line.color" stroke="var(--surface-1)" stroke-width="2"
                 />
                 <text
@@ -298,19 +315,27 @@ const TOOLTIP_W = 190;
                 >{{ shortName(line.name) }} #{{ lastPoint(line.points)!.rank }}</text>
               </template>
             </g>
+            </g>
 
             <template v-if="tooltip">
               <line
                 :x1="tooltip.x - MARGIN.left" :x2="tooltip.x - MARGIN.left"
                 y1="0" :y2="plotH"
-                stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3 2"
+                stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"
+              />
+              <circle
+                v-for="item in tooltip.items"
+                :key="`hm-${item.name}-${tooltip.date}`"
+                :cx="xPos(tooltip.date)" :cy="yPos(item.rank)"
+                r="5.5" :fill="item.color" stroke="var(--surface-1)" stroke-width="2.5"
+                class="fx-pop" pointer-events="none"
               />
             </template>
           </g>
 
           <template v-if="tooltip">
             <g :transform="`translate(${tooltip.x + 10 > W - TOOLTIP_W - 4 ? tooltip.x - TOOLTIP_W - 8 : tooltip.x + 10},${Math.max(4, tooltip.y - (tooltip.items.length * 18 + 22) / 2)})`">
-              <rect :width="TOOLTIP_W" :height="tooltip.items.length * 18 + 22" rx="6" fill="var(--surface-1)" stroke="var(--border)" />
+              <rect :width="TOOLTIP_W" :height="tooltip.items.length * 18 + 22" rx="10" fill="var(--surface-1)" stroke="var(--border)" filter="url(#rb-shadow)" />
               <text x="8" y="15" font-size="11" fill="var(--text-muted)">{{ formatDate(tooltip.date) }}</text>
               <g v-for="(item, idx) in tooltip.items" :key="item.name" :transform="`translate(0,${20 + idx * 18})`">
                 <circle cx="14" cy="8" r="4" :fill="item.color" />
