@@ -2,6 +2,7 @@
 import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import BestRateTable from "./components/BestRateTable.vue";
 import MyBankPanel from "./components/MyBankPanel.vue";
+import MoneyFlow from "./components/MoneyFlow.vue";
 const LineChart = defineAsyncComponent(() => import("./components/LineChart.vue"));
 const CalendarHeatmap = defineAsyncComponent(() => import("./components/CalendarHeatmap.vue"));
 const CurrencyOptimizer = defineAsyncComponent(() => import("./components/CurrencyOptimizer.vue"));
@@ -1020,6 +1021,8 @@ const stableBank = computed<StableBankResult | null>(() => {
 
 <template>
   <header class="page-header">
+    <div class="header-intro">
+    <div class="header-text">
     <p class="eyebrow">
       <template v-if="bank"><a href="/" class="eyebrow-link">All banks</a> / {{ shortName(bank) }}</template>
       <template v-else>Foreign earnings in India</template>
@@ -1040,6 +1043,9 @@ const stableBank = computed<StableBankResult | null>(() => {
         banks daily so you can see who pays you the most, right now and over time.
       </p>
     </template>
+    </div>
+    <MoneyFlow class="header-anim" :currency="currency" />
+    </div>
     <div v-if="!loading && bank && bankHero" class="hero-card">
       <div class="hero-top">
         <span class="hero-label">{{ shortName(bank) }} right now · #{{ bankHero.rank }} of {{ bankHero.total }} banks</span>
@@ -1485,6 +1491,28 @@ const stableBank = computed<StableBankResult | null>(() => {
 <style scoped lang="scss">
 .page-header {
   margin-bottom: 32px;
+
+  // Text on the left, money-flow animation on the right; on phones the
+  // animation moves above the title at a smaller size.
+  .header-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    align-items: center;
+    gap: 24px;
+
+    @media (max-width: 719px) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+  }
+
+  .header-anim {
+    @media (max-width: 719px) {
+      order: -1;
+      max-width: 220px;
+      justify-self: center;
+    }
+  }
 
   .eyebrow {
     color: var(--text-secondary);
