@@ -4,6 +4,7 @@ import type { BankSeries, FeesByBank, FeeSlab, BenchmarksByCurrency } from "../t
 import type { CreditTimesByBank, CreditCategory } from "../creditTime";
 import { shortName, sourceUrl } from "../bankPalette";
 import { currencySymbol } from "../currencies";
+import { useDelayedHide } from "../useDelayedHide";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -327,32 +328,19 @@ function deltaDirection(delta: number): "up" | "down" | "flat" {
 // than a plain CSS :hover reveal, so it isn't clipped by .table-wrap's
 // overflow:auto (needed for horizontal scroll on narrow screens) — same
 // approach LineChart.vue uses for its own tooltip for the same reason.
-const activeFeeBank = ref<string | null>(null);
+const feeTooltip = useDelayedHide<string>(100);
+const activeFeeBank = feeTooltip.current;
 const feeTooltipPos = ref({ top: 0, left: 0 });
-let hideFeeTimer: ReturnType<typeof setTimeout> | null = null;
-
-function cancelHideFeeTooltip() {
-  if (hideFeeTimer !== null) {
-    clearTimeout(hideFeeTimer);
-    hideFeeTimer = null;
-  }
-}
-
-function scheduleHideFeeTooltip() {
-  cancelHideFeeTooltip();
-  hideFeeTimer = setTimeout(() => {
-    activeFeeBank.value = null;
-  }, 100);
-}
+const cancelHideFeeTooltip = feeTooltip.cancelHide;
+const scheduleHideFeeTooltip = feeTooltip.scheduleHide;
 
 function showFeeTooltip(bank: string, evt: Event) {
-  cancelHideFeeTooltip();
   const target = evt.currentTarget as HTMLElement;
   const rect = target.getBoundingClientRect();
   const tooltipWidth = 280;
   const left = Math.min(rect.left, window.innerWidth - tooltipWidth - 12);
   feeTooltipPos.value = { top: rect.bottom + 6, left: Math.max(12, left) };
-  activeFeeBank.value = bank;
+  feeTooltip.show(bank);
 }
 
 // Click/tap needs its own toggle rather than relying on :focus — clicking a
@@ -364,7 +352,7 @@ function showFeeTooltip(bank: string, evt: Event) {
 // in browsers that do focus on click, opening then immediately re-closing).
 function toggleFeeTooltip(bank: string, evt: Event) {
   if (activeFeeBank.value === bank) {
-    activeFeeBank.value = null;
+    feeTooltip.hide();
   } else {
     showFeeTooltip(bank, evt);
   }

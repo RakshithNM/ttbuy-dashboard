@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import type { BankSeries } from "../types";
 import { shortName } from "../bankPalette";
+import { useDelayedHide } from "../useDelayedHide";
 import { MAX_CONNECTED_GAP_DAYS, areaPathFor, bisectNearest, createLinearScale, createTimeScale, daysBetween, linePathFor, splitByGap, ticksAtStep } from "../chartScales";
 
 const props = defineProps<{
@@ -247,28 +248,14 @@ function endLabelProps(x: number): { x: number; anchor: "start" | "end" } {
   }
   return { x: x + 8, anchor: "start" };
 }
-
-const hoverDate = ref<string | null>(null);
-
 // The tooltip can be taller than the chart (many banks on one date) and
 // needs to be mouse-wheel scrollable, which means it must accept pointer
 // events — but it sits outside the SVG, so leaving the SVG towards the
 // tooltip would otherwise fire onPointerLeave and hide it before the
 // pointer arrives. Track both regions and only clear after a short delay
 // that a same-tick pointerenter on the tooltip can cancel.
-let clearHoverTimer: ReturnType<typeof setTimeout> | null = null;
-function cancelHoverClear() {
-  if (clearHoverTimer !== null) {
-    clearTimeout(clearHoverTimer);
-    clearHoverTimer = null;
-  }
-}
-function scheduleHoverClear() {
-  cancelHoverClear();
-  clearHoverTimer = setTimeout(() => {
-    hoverDate.value = null;
-  }, 60);
-}
+const hover = useDelayedHide<string>(60);
+const hoverDate = hover.current;
 
 function onPointerMove(evt: PointerEvent) {
   const svg = svgRef.value;
@@ -283,17 +270,16 @@ function onPointerMove(evt: PointerEvent) {
   const targetTime = xScaleD3.value.invert(loc.x).getTime();
   const nearest = bisectNearest(allDates.value, (d) => new Date(d).getTime(), targetTime);
   if (nearest === undefined) return;
-  cancelHoverClear();
-  hoverDate.value = nearest;
+  hover.show(nearest);
 }
 function onPointerLeave() {
-  scheduleHoverClear();
+  hover.scheduleHide();
 }
 function onTooltipPointerEnter() {
-  cancelHoverClear();
+  hover.cancelHide();
 }
 function onTooltipPointerLeave() {
-  scheduleHoverClear();
+  hover.scheduleHide();
 }
 
 const SPIKE_THRESHOLD = 0.4;

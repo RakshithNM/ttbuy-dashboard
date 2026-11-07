@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 import BestRateTable from "./components/BestRateTable.vue";
 import MyBankPanel from "./components/MyBankPanel.vue";
 import MoneyFlow from "./components/MoneyFlow.vue";
@@ -34,8 +34,6 @@ import benchmarksData from "../public/data/benchmarks.json";
 const rawRates = ref<RatesByCurrency>(rawRatesData as any);
 const fees = ref<FeesByBank>(feesData as any);
 const benchmarks = ref<BenchmarksByCurrency>(benchmarksData as any);
-const loading = ref(false);
-const loadError = ref<string | null>(null);
 const hidden = ref<Set<string>>(new Set());
 const bankQuery = ref("");
 
@@ -54,16 +52,43 @@ const RANGE_OPTIONS: { key: RangeKey; label: string; days: number | null }[] = [
 const VIEW_STORAGE_KEY = "ttbuy-dashboard:view";
 const THEME_STORAGE_KEY = "ttbuy-dashboard:theme";
 
-// Apply stored theme before first paint so there's no flash of wrong theme.
-const _storedTheme = (() => {
-  try { return localStorage.getItem(THEME_STORAGE_KEY) as "light" | "dark" | null; } catch { return null; }
-})();
-if (_storedTheme) document.documentElement.setAttribute("data-theme", _storedTheme);
-const isDark = ref(
-  _storedTheme !== null
-    ? _storedTheme === "dark"
-    : (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches)
-);
+// Theme preference:
+//   system ──toggle──▶ light | dark   (the opposite of what is on screen)
+//   light | dark ──toggle to the OS theme──▶ system
+//   light ◀──toggle──▶ dark           (when the OS theme is neither target)
+// "system" stores nothing and sets no data-theme, so the CSS follows the OS,
+// including when the OS theme changes while the page is open. index.html
+// applies a stored light/dark before first paint.
+type ThemePref = "system" | "light" | "dark";
+
+function loadThemePref(): ThemePref {
+  try {
+    const t = localStorage.getItem(THEME_STORAGE_KEY);
+    return t === "light" || t === "dark" ? t : "system";
+  } catch {
+    return "system";
+  }
+}
+
+function applyThemePref(pref: ThemePref) {
+  if (typeof document !== "undefined") {
+    if (pref === "system") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", pref);
+  }
+  try {
+    if (pref === "system") localStorage.removeItem(THEME_STORAGE_KEY);
+    else localStorage.setItem(THEME_STORAGE_KEY, pref);
+  } catch {}
+}
+
+const osDarkQuery = typeof window !== "undefined" ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+const osDark = ref(osDarkQuery?.matches ?? false);
+const themePref = ref<ThemePref>(loadThemePref());
+const isDark = computed(() => (themePref.value === "system" ? osDark.value : themePref.value === "dark"));
+
+const onOsThemeChange = (e: MediaQueryListEvent) => { osDark.value = e.matches; };
+onMounted(() => osDarkQuery?.addEventListener("change", onOsThemeChange));
+onBeforeUnmount(() => osDarkQuery?.removeEventListener("change", onOsThemeChange));
 
 function setThemeColor(dark: boolean) {
   if (typeof document !== "undefined") {
@@ -71,7 +96,7 @@ function setThemeColor(dark: boolean) {
       ?.setAttribute("content", dark ? "#0d0d0d" : "#f9f9f7");
   }
 }
-setThemeColor(isDark.value);
+watch(isDark, setThemeColor, { immediate: true });
 
 // Wraps a state change in a View Transition when the browser supports it
 // (Firefox doesn't yet) — falls back to applying the change directly.
@@ -88,13 +113,13 @@ function withViewTransition(apply: () => void) {
 
 function toggleTheme() {
   withViewTransition(() => {
-    isDark.value = !isDark.value;
-    const t = isDark.value ? "dark" : "light";
-    if (typeof document !== "undefined") {
-      document.documentElement.setAttribute("data-theme", t);
-    }
-    setThemeColor(isDark.value);
-    try { localStorage.setItem(THEME_STORAGE_KEY, t); } catch {}
+    const nextDark = !isDark.value;
+    const pref: ThemePref = nextDark === osDark.value ? "system" : nextDark ? "dark" : "light";
+    themePref.value = pref;
+    applyThemePref(pref);
+    // Set here too (not only in the watch) so the transition's "new"
+    // snapshot already has the right browser chrome color.
+    setThemeColor(nextDark);
   });
 }
 
@@ -232,29 +257,35 @@ const copied = ref(false);
 let copiedTimer: ReturnType<typeof setTimeout> | null = null;
 const canNativeShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
+// Clipboard access can fail (permissions, insecure context) — the URL bar
+// already reflects the current view, so this is a convenience on top of
+// that, not the only way to share it.
+async function copyLinkToClipboard() {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+  } catch {
+    return;
+  }
+  copied.value = true;
+  if (copiedTimer) clearTimeout(copiedTimer);
+  copiedTimer = setTimeout(() => (copied.value = false), 1800);
+}
+
 async function copyShareLink() {
   if (canNativeShare) {
     try {
       await navigator.share({ title: document.title, url: window.location.href });
+      return;
     } catch (e) {
       // AbortError = user cancelled the sheet — not an error worth handling.
-      // Any other failure falls through to the clipboard path below.
+      // Any other failure falls back to the clipboard below.
       if (e instanceof Error && e.name === "AbortError") return;
-      try { await navigator.clipboard.writeText(window.location.href); } catch {}
     }
-    return;
   }
-  try {
-    await navigator.clipboard.writeText(window.location.href);
-    copied.value = true;
-    if (copiedTimer) clearTimeout(copiedTimer);
-    copiedTimer = setTimeout(() => (copied.value = false), 1800);
-  } catch {
-    // Clipboard access can fail (permissions, insecure context) — the URL
-    // bar already reflects the current view, so this is a convenience on
-    // top of that, not the only way to share it.
-  }
+  await copyLinkToClipboard();
 }
+
+onBeforeUnmount(() => { if (copiedTimer) clearTimeout(copiedTimer); });
 
 onMounted(async () => {
   // Ensure the currency value is valid on load (in case of cached invalid currency)
@@ -368,9 +399,17 @@ function toggleBank(name: string) {
   hidden.value = next;
 }
 
+// Compare mode. "on" always holds 1..MAX_COMPARE banks, so the chart can
+// never be in compare mode with nothing selected.
+//   off ──enter (top 3 banks)──▶ on{1..4} ──toggle bank──▶ on{1..4}
+//    ▲                              │   (the last bank cannot be removed,
+//    └──── exit / currency change ──┘    a 5th bank cannot be added)
 const MAX_COMPARE = 4;
-const compareMode = ref(false);
-const compareSelected = ref<Set<string>>(new Set());
+type CompareState = { kind: "off" } | { kind: "on"; selected: ReadonlySet<string> };
+const compare = shallowRef<CompareState>({ kind: "off" });
+const compareMode = computed(() => compare.value.kind === "on");
+const NO_SELECTION: ReadonlySet<string> = new Set();
+const compareSelected = computed(() => (compare.value.kind === "on" ? compare.value.selected : NO_SELECTION));
 
 // Date-range filtered (no search filter) — chart base for compare mode so
 // users can pick any bank regardless of what's in the search box.
@@ -398,8 +437,9 @@ const comparableSeriesSorted = computed(() =>
 // Series fed to the chart — normal mode uses the search+date filtered set;
 // compare mode uses date-filtered only, restricted to the selected banks.
 const chartSeries = computed<BankSeries[]>(() => {
-  if (!compareMode.value || compareSelected.value.size === 0) return filteredSeries.value;
-  return dateFilteredSeries.value.filter(s => compareSelected.value.has(s.name));
+  const c = compare.value;
+  if (c.kind === "off") return filteredSeries.value;
+  return dateFilteredSeries.value.filter(s => c.selected.has(s.name));
 });
 
 // In compare mode the hidden set is irrelevant — the picker is the selector.
@@ -411,13 +451,13 @@ function enterCompareMode() {
     .sort((a, b) => (b.points.at(-1)?.ttbuy ?? 0) - (a.points.at(-1)?.ttbuy ?? 0))
     .slice(0, 3)
     .map(s => s.name);
-  compareSelected.value = new Set(top3);
-  compareMode.value = true;
+  // No bank has data in this range: stay off rather than enter an empty "on".
+  if (top3.length === 0) return;
+  compare.value = { kind: "on", selected: new Set(top3) };
 }
 
 function exitCompareMode() {
-  compareMode.value = false;
-  compareSelected.value = new Set();
+  compare.value = { kind: "off" };
 }
 
 // Only the direct user click gets a transition — enterCompareMode/
@@ -431,10 +471,18 @@ function toggleCompareMode() {
 }
 
 function toggleCompareBank(name: string) {
-  const next = new Set(compareSelected.value);
-  if (next.has(name)) next.delete(name);
-  else if (next.size < MAX_COMPARE) next.add(name);
-  compareSelected.value = next;
+  const c = compare.value;
+  if (c.kind === "off") return;
+  const next = new Set(c.selected);
+  if (next.has(name)) {
+    if (next.size === 1) return;
+    next.delete(name);
+  } else if (next.size < MAX_COMPARE) {
+    next.add(name);
+  } else {
+    return;
+  }
+  compare.value = { kind: "on", selected: next };
 }
 
 // Reset compare state when currency changes — selected banks are currency-specific.
@@ -550,9 +598,8 @@ const weekInsight = computed<WeekInsight | null>(() => {
 
 function exportCsv() {
   const base = dateFilteredSeries.value.filter(s => s.category === "bank");
-  const series = compareMode.value && compareSelected.value.size > 0
-    ? base.filter(s => compareSelected.value.has(s.name))
-    : base;
+  const c = compare.value;
+  const series = c.kind === "on" ? base.filter(s => c.selected.has(s.name)) : base;
   if (!series.length) return;
 
   const dates = [...new Set(series.flatMap(s => s.points.map(p => p.date)))].sort();
@@ -1046,7 +1093,7 @@ const stableBank = computed<StableBankResult | null>(() => {
     </div>
     <MoneyFlow class="header-anim" :currency="currency" />
     </div>
-    <div v-if="!loading && bank && bankHero" class="hero-card">
+    <div v-if="bank && bankHero" class="hero-card">
       <div class="hero-top">
         <span class="hero-label">{{ shortName(bank) }} right now · #{{ bankHero.rank }} of {{ bankHero.total }} banks</span>
         <span v-if="bankHero.isStale" class="hero-stale">
@@ -1085,7 +1132,7 @@ const stableBank = computed<StableBankResult | null>(() => {
         </div>
       </div>
     </div>
-    <div v-else-if="!loading && !bank && heroSummary" class="hero-card">
+    <div v-else-if="!bank && heroSummary" class="hero-card">
       <div class="hero-top">
         <span class="hero-label">Best bank right now</span>
         <span v-if="heroSummary.isStale" class="hero-stale">
@@ -1144,7 +1191,7 @@ const stableBank = computed<StableBankResult | null>(() => {
     </p>
   </header>
 
-  <nav v-if="!loading && !loadError" class="section-nav" aria-label="Page sections">
+  <nav class="section-nav" aria-label="Page sections">
     <a
       v-for="g in SECTION_GROUPS"
       :key="g.id"
@@ -1156,7 +1203,7 @@ const stableBank = computed<StableBankResult | null>(() => {
     >{{ g.label }}</a>
   </nav>
 
-  <main v-if="!loading && !loadError">
+  <main>
     <MyBankPanel v-model:my-bank="myBank" :series="allSeries" :fees="fees" :currency="currency" :amount="amount" :deduction="deduction" />
 
     <div class="toolbar">
@@ -1211,7 +1258,7 @@ const stableBank = computed<StableBankResult | null>(() => {
             stroke-linecap="round"
           />
         </svg>
-        {{ canNativeShare ? "Share" : (copied ? "Copied!" : "Copy link") }}
+        {{ copied ? "Copied!" : (canNativeShare ? "Share" : "Copy link") }}
       </button>
       <button
         type="button"
@@ -1285,6 +1332,7 @@ const stableBank = computed<StableBankResult | null>(() => {
         <p class="compare-meta">
           <strong>{{ compareSelected.size }}</strong> of {{ MAX_COMPARE }} selected
           <span v-if="compareSelected.size >= MAX_COMPARE" class="compare-full-hint">(deselect one to swap)</span>
+          <span v-else-if="compareSelected.size === 1" class="compare-full-hint">(at least one stays selected)</span>
         </p>
         <div class="compare-chips" role="group" aria-label="Select banks to compare">
           <button
@@ -1392,9 +1440,6 @@ const stableBank = computed<StableBankResult | null>(() => {
     </section>
 
   </main>
-
-  <p v-else-if="loadError" class="error">Couldn't load rate data: {{ loadError }}</p>
-  <p v-else class="loading">Loading rates…</p>
 
   <section v-if="!bank && marketFacts.length" class="panel brief-panel">
     <h2>Today's TT Buy rates in brief</h2>
@@ -2225,15 +2270,6 @@ const stableBank = computed<StableBankResult | null>(() => {
 .icon-swap-leave-active { transition: opacity 80ms ease, transform 80ms ease; }
 .icon-swap-enter-from   { opacity: 0; transform: scale(0.6) rotate(-20deg); }
 .icon-swap-leave-to     { opacity: 0; transform: scale(0.6) rotate(20deg); }
-
-.loading,
-.error {
-  color: var(--text-secondary);
-}
-
-.error {
-  color: var(--status-critical);
-}
 
 .site-footer {
   position: relative;
