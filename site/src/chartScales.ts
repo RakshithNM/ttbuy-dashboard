@@ -40,10 +40,18 @@ export function downsampleDates<T>(items: T[], targetCount = 5): T[] {
   if (!items.length) return [];
   if (items.length <= targetCount + 1) return items;
   const step = Math.floor(items.length / targetCount);
-  const picked: T[] = [];
-  for (let i = 0; i < items.length; i += step) picked.push(items[i]);
-  if (picked[picked.length - 1] !== items[items.length - 1]) picked.push(items[items.length - 1]);
-  return picked;
+  const lastIdx = items.length - 1;
+  const pickedIdx: number[] = [];
+  for (let i = 0; i < items.length; i += step) pickedIdx.push(i);
+  const tailIdx = pickedIdx[pickedIdx.length - 1];
+  if (tailIdx !== lastIdx) {
+    // The final item is always labeled. If the evenly-spaced tick before it
+    // sits less than half a step away, their labels collide ("NovNov 5"), so
+    // the final item replaces that tick instead of being added after it.
+    if (lastIdx - tailIdx < step / 2) pickedIdx.pop();
+    pickedIdx.push(lastIdx);
+  }
+  return pickedIdx.map((i) => items[i]);
 }
 
 // Binary-search for the item whose `time` is closest to `targetTime`, used
