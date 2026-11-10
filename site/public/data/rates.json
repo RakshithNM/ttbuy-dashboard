@@ -2927,6 +2927,11 @@
         "date": "2026-11-09",
         "publishedAt": "11:45 AM",
         "ttbuy": 24.9412
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 24.9436
       }
     ],
     "DCB Bank": [
@@ -4630,6 +4635,11 @@
         "date": "2026-11-09",
         "publishedAt": null,
         "ttbuy": 24.87
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": null,
+        "ttbuy": 24.95
       }
     ],
     "IDBI Bank": [
@@ -5928,6 +5938,11 @@
         "date": "2026-11-06",
         "publishedAt": "09:16 AM",
         "ttbuy": 23.91
+      },
+      {
+        "date": "2026-11-09",
+        "publishedAt": "01:25 PM",
+        "ttbuy": 23.82
       }
     ],
     "Karur Vysya Bank": [
@@ -6630,6 +6645,11 @@
       },
       {
         "date": "2026-11-09",
+        "publishedAt": null,
+        "ttbuy": 24.52
+      },
+      {
+        "date": "2026-11-10",
         "publishedAt": null,
         "ttbuy": 24.52
       }
@@ -7793,6 +7813,11 @@
         "date": "2026-11-09",
         "publishedAt": "11:05 AM",
         "ttbuy": 25.5596
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "11:03 AM",
+        "ttbuy": 25.4594
       }
     ],
     "State Bank of India": [
@@ -11750,6 +11775,11 @@
         "date": "2026-11-09",
         "publishedAt": "11:45 AM",
         "ttbuy": 102.1616
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 102.7982
       }
     ],
     "DCB Bank": [
@@ -13453,6 +13483,11 @@
         "date": "2026-11-09",
         "publishedAt": null,
         "ttbuy": 102.33
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": null,
+        "ttbuy": 102.77
       }
     ],
     "IDBI Bank": [
@@ -14781,6 +14816,11 @@
         "date": "2026-11-06",
         "publishedAt": "09:16 AM",
         "ttbuy": 105.07
+      },
+      {
+        "date": "2026-11-09",
+        "publishedAt": "01:25 PM",
+        "ttbuy": 104.29
       }
     ],
     "Karur Vysya Bank": [
@@ -15485,14 +15525,14 @@
         "date": "2026-11-09",
         "publishedAt": null,
         "ttbuy": 102.1
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": null,
+        "ttbuy": 102.1
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-11-07",
-        "publishedAt": null,
-        "ttbuy": 102.518
-      },
       {
         "date": "2025-11-10",
         "publishedAt": null,
@@ -16762,6 +16802,11 @@
         "date": "2026-11-06",
         "publishedAt": null,
         "ttbuy": 104.8645
+      },
+      {
+        "date": "2026-11-09",
+        "publishedAt": null,
+        "ttbuy": 105.1435
       }
     ],
     "Punjab National Bank": [
@@ -17843,6 +17888,11 @@
         "date": "2026-11-09",
         "publishedAt": "05:37 AM",
         "ttbuy": 105.24
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "05:35 AM",
+        "ttbuy": 105.98
       }
     ],
     "Skydo": [
@@ -18350,6 +18400,11 @@
         "date": "2026-11-09",
         "publishedAt": "11:05 AM",
         "ttbuy": 104.7593
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "11:03 AM",
+        "ttbuy": 104.9844
       }
     ],
     "State Bank of India": [
@@ -22302,6 +22357,11 @@
         "date": "2026-11-09",
         "publishedAt": "11:45 AM",
         "ttbuy": 122.4726
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 123.1631
       }
     ],
     "DCB Bank": [
@@ -24005,6 +24065,11 @@
         "date": "2026-11-09",
         "publishedAt": null,
         "ttbuy": 122.18
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": null,
+        "ttbuy": 122.71
       }
     ],
     "IDBI Bank": [
@@ -25333,6 +25398,11 @@
         "date": "2026-11-06",
         "publishedAt": "09:16 AM",
         "ttbuy": 126.06
+      },
+      {
+        "date": "2026-11-09",
+        "publishedAt": "01:25 PM",
+        "ttbuy": 125.09
       }
     ],
     "Karur Vysya Bank": [
@@ -26037,14 +26107,14 @@
         "date": "2026-11-09",
         "publishedAt": null,
         "ttbuy": 122.57
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": null,
+        "ttbuy": 122.57
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-11-07",
-        "publishedAt": null,
-        "ttbuy": 116.35
-      },
       {
         "date": "2025-11-10",
         "publishedAt": null,
@@ -27314,6 +27384,11 @@
         "date": "2026-11-06",
         "publishedAt": null,
         "ttbuy": 125.71
+      },
+      {
+        "date": "2026-11-09",
+        "publishedAt": null,
+        "ttbuy": 126.02
       }
     ],
     "Punjab National Bank": [
@@ -28400,6 +28475,11 @@
         "date": "2026-11-09",
         "publishedAt": "05:37 AM",
         "ttbuy": 126.01
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "05:35 AM",
+        "ttbuy": 126.8
       }
     ],
     "Skydo": [
@@ -28907,6 +28987,11 @@
         "date": "2026-11-09",
         "publishedAt": "11:05 AM",
         "ttbuy": 125.6105
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "11:03 AM",
+        "ttbuy": 125.7557
       }
     ],
     "State Bank of India": [
@@ -32914,6 +32999,11 @@
         "date": "2026-11-09",
         "publishedAt": "11:45 AM",
         "ttbuy": 91.8336
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "11:45 AM",
+        "ttbuy": 91.8397
       }
     ],
     "DCB Bank": [
@@ -34682,6 +34772,11 @@
         "date": "2026-11-09",
         "publishedAt": null,
         "ttbuy": 92.17
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": null,
+        "ttbuy": 92.44
       }
     ],
     "IDBI Bank": [
@@ -36100,6 +36195,11 @@
         "date": "2026-11-06",
         "publishedAt": "09:16 AM",
         "ttbuy": 93.95
+      },
+      {
+        "date": "2026-11-09",
+        "publishedAt": "01:25 PM",
+        "ttbuy": 93.5
       }
     ],
     "Karur Vysya Bank": [
@@ -36814,14 +36914,14 @@
         "date": "2026-11-09",
         "publishedAt": null,
         "ttbuy": 92.08
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": null,
+        "ttbuy": 92.08
       }
     ],
     "Mid-market": [
-      {
-        "date": "2025-11-07",
-        "publishedAt": null,
-        "ttbuy": 88.68
-      },
       {
         "date": "2025-11-10",
         "publishedAt": null,
@@ -38091,6 +38191,11 @@
         "date": "2026-11-06",
         "publishedAt": null,
         "ttbuy": 93.92
+      },
+      {
+        "date": "2026-11-09",
+        "publishedAt": null,
+        "ttbuy": 93.93
       }
     ],
     "Punjab National Bank": [
@@ -39162,6 +39267,11 @@
         "date": "2026-11-09",
         "publishedAt": "05:37 AM",
         "ttbuy": 94.26
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "05:35 AM",
+        "ttbuy": 94.35
       }
     ],
     "Skydo": [
@@ -39669,6 +39779,11 @@
         "date": "2026-11-09",
         "publishedAt": "11:05 AM",
         "ttbuy": 93.8676
+      },
+      {
+        "date": "2026-11-10",
+        "publishedAt": "11:03 AM",
+        "ttbuy": 93.4996
       }
     ],
     "State Bank of India": [
