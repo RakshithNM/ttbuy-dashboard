@@ -7,6 +7,7 @@ import AboutPage from './AboutPage.vue'
 import NotFoundPage from './NotFoundPage.vue'
 import { BANK_PAGES, bankPagePath } from './bankPages'
 import { vReveal } from './chartFx'
+import { initSmoothScroll } from './smoothScroll'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: App },
@@ -18,6 +19,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/:pathMatch(.*)*', component: NotFoundPage },
 ]
 
-export const createApp = ViteSSG(Root, { routes }, ({ app }) => {
+export const createApp = ViteSSG(Root, { routes }, ({ app, isClient }) => {
   app.directive('reveal', vReveal)
+  if (isClient) initSmoothScroll()
 })

@@ -21,6 +21,7 @@ import { currencySymbol, onCurrencyRadioKeydown, sortByCurrencyOrder } from "./c
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
 import { useHead } from "@unhead/vue";
 import { BANK_PAGES, SITE_URL, bankPagePath } from "./bankPages";
+import { scrollToEl } from "./smoothScroll";
 
 // Set on a bank's own page (see bankPages.ts): the same dashboard, with the
 // header, hero and FAQ about this bank instead of the market as a whole.
@@ -824,7 +825,7 @@ function goToBankRow(name: string) {
   const panel = row.closest<HTMLElement>(".panel");
   if (panel) { panel.style.opacity = ""; panel.style.transform = ""; }
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  row.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  scrollToEl(row, { smooth: !reduce, block: "center" });
   row.classList.remove("row-flash");
   void row.offsetWidth;
   row.classList.add("row-flash");
@@ -887,7 +888,7 @@ function holdSectionInPlace(el: HTMLElement) {
   for (const ms of [100, 300, 600, 1000, 1500]) {
     timers.push(window.setTimeout(() => {
       if (Math.abs(el.getBoundingClientRect().top - target) > 2) {
-        el.scrollIntoView({ block: "start" });
+        scrollToEl(el);
       }
       if (ms === 1500) stop();
     }, ms));
@@ -908,7 +909,7 @@ function goToSection(id: string) {
   // Set the active link inside the same update so the transition's "new"
   // snapshot already shows it, instead of waiting for the scroll handler.
   withViewTransition(() => {
-    el.scrollIntoView({ block: "start" });
+    scrollToEl(el);
     activeSection.value = id;
   });
   holdSectionInPlace(el);
