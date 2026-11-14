@@ -21,7 +21,7 @@ import { currencySymbol, onCurrencyRadioKeydown, sortByCurrencyOrder } from "./c
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
 import { useHead } from "@unhead/vue";
 import { BANK_PAGES, SITE_URL, bankPagePath } from "./bankPages";
-import { scrollToEl } from "./smoothScroll";
+import { scrollToEl, scrollToTop } from "./smoothScroll";
 
 // Set on a bank's own page (see bankPages.ts): the same dashboard, with the
 // header, hero and FAQ about this bank instead of the market as a whole.
@@ -916,6 +916,17 @@ function goToSection(id: string) {
   history.replaceState(null, "", `${location.pathname}${location.search}#${id}`);
 }
 
+// Page progress (0..1) for the thin bar at the top, and whether the reader
+// is far enough down to need the back-to-top button.
+const scrollProgress = ref(0);
+const showBackToTop = ref(false);
+
+function updateScrollUi() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  scrollProgress.value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+  showBackToTop.value = window.scrollY > window.innerHeight;
+}
+
 let navTicking = false;
 function onScrollNav() {
   if (navTicking) return;
@@ -923,12 +934,14 @@ function onScrollNav() {
   requestAnimationFrame(() => {
     navTicking = false;
     updateActiveSection();
+    updateScrollUi();
   });
 }
 
 onMounted(() => {
   window.addEventListener("scroll", onScrollNav, { passive: true });
   updateActiveSection();
+  updateScrollUi();
 });
 
 onBeforeUnmount(() => window.removeEventListener("scroll", onScrollNav));
@@ -1192,6 +1205,12 @@ const stableBank = computed<StableBankResult | null>(() => {
     </p>
   </header>
 
+  <div
+    class="scroll-progress"
+    aria-hidden="true"
+    :style="{ transform: `scaleX(${scrollProgress})` }"
+  />
+
   <nav class="section-nav" aria-label="Page sections">
     <a
       v-for="g in SECTION_GROUPS"
@@ -1441,6 +1460,21 @@ const stableBank = computed<StableBankResult | null>(() => {
     </section>
 
   </main>
+
+  <button
+    type="button"
+    class="back-to-top"
+    :class="{ visible: showBackToTop }"
+    :tabindex="showBackToTop ? 0 : -1"
+    :aria-hidden="showBackToTop ? undefined : 'true'"
+    aria-label="Back to top"
+    title="Back to top"
+    @click="scrollToTop"
+  >
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
 
   <section v-if="!bank && marketFacts.length" class="panel brief-panel">
     <h2>Today's TT Buy rates in brief</h2>
@@ -1758,6 +1792,58 @@ const stableBank = computed<StableBankResult | null>(() => {
 
 .panel[id] {
   scroll-margin-top: 64px;
+}
+
+// Reading progress: a 2px line across the very top of the screen.
+// scaleX instead of width so each scroll frame skips layout.
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 21;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+
+.back-to-top {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 19;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-1) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text-secondary);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s, color 0.15s;
+
+  &.visible {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  &:hover { color: var(--text-primary); }
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    transform: none;
+  }
 }
 
 .toolbar {

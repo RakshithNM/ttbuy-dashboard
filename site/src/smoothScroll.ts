@@ -28,3 +28,14 @@ export function scrollToEl(
   const offset = block === 'center' ? -(window.innerHeight - el.offsetHeight) / 2 : 0
   lenis.scrollTo(el, { offset, immediate: !smooth, force: true })
 }
+
+// Glide back to the top of the page. Instant when the user prefers reduced
+// motion (Lenis is off then, and the native fallback respects it here).
+export function scrollToTop(): void {
+  if (lenis) {
+    lenis.scrollTo(0, { force: true })
+    return
+  }
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
+}
