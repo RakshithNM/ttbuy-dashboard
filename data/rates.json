@@ -1956,6 +1956,11 @@
         "date": "2026-11-16",
         "publishedAt": null,
         "ttbuy": 25.385
+      },
+      {
+        "date": "2026-11-17",
+        "publishedAt": null,
+        "ttbuy": 25.25
       }
     ],
     "Citibank": [
@@ -7409,6 +7414,11 @@
         "date": "2026-11-16",
         "publishedAt": "04:00 AM",
         "ttbuy": 25.37
+      },
+      {
+        "date": "2026-11-17",
+        "publishedAt": "02:00 AM",
+        "ttbuy": 25.25
       }
     ],
     "RBL Bank": [
@@ -11364,6 +11374,11 @@
         "date": "2026-11-16",
         "publishedAt": null,
         "ttbuy": 103.3675
+      },
+      {
+        "date": "2026-11-17",
+        "publishedAt": null,
+        "ttbuy": 102.3275
       }
     ],
     "Citibank": [
@@ -18124,6 +18139,11 @@
         "date": "2026-11-16",
         "publishedAt": "04:00 AM",
         "ttbuy": 103.03
+      },
+      {
+        "date": "2026-11-17",
+        "publishedAt": "02:00 AM",
+        "ttbuy": 102.35
       }
     ],
     "RBL Bank": [
@@ -22536,6 +22556,11 @@
         "date": "2026-11-16",
         "publishedAt": null,
         "ttbuy": 123.635
+      },
+      {
+        "date": "2026-11-17",
+        "publishedAt": null,
+        "ttbuy": 122.5975
       }
     ],
     "Citibank": [
@@ -29296,6 +29321,11 @@
         "date": "2026-11-16",
         "publishedAt": "04:00 AM",
         "ttbuy": 123.72
+      },
+      {
+        "date": "2026-11-17",
+        "publishedAt": "02:00 AM",
+        "ttbuy": 122.85
       }
     ],
     "RBL Bank": [
@@ -33753,6 +33783,11 @@
         "date": "2026-11-16",
         "publishedAt": null,
         "ttbuy": 93.7675
+      },
+      {
+        "date": "2026-11-17",
+        "publishedAt": null,
+        "ttbuy": 93.2775
       }
     ],
     "Citibank": [
@@ -40693,6 +40728,11 @@
         "date": "2026-11-16",
         "publishedAt": "04:00 AM",
         "ttbuy": 93.63
+      },
+      {
+        "date": "2026-11-17",
+        "publishedAt": "02:00 AM",
+        "ttbuy": 93.18
       }
     ],
     "RBL Bank": [
