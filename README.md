@@ -162,7 +162,7 @@ missing (useful after adding a new currency, or if a run got interrupted or
 hit a Wayback API outage partway through):
 
 ```bash
-BANKS=axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi,bandhan,cityunion,hsbc,jkbank,kvb,citibank,ujjivan,dcb,idfcfirst,dbs,pnb,rbl,unionbank \
+BANKS=axis,iob,bob,canara,icici,sbi,hdfc,kotak,idbi,bandhan,hsbc,jkbank,kvb,citibank,ujjivan,dcb,idfcfirst,dbs,pnb,rbl,unionbank \
   INCLUDE_LIVE=0 .venv/bin/python3 -m scraper.main
 .venv/bin/python3 -m scraper.export_json
 cp data/rates.json site/public/data/rates.json
@@ -212,11 +212,11 @@ npm run dev
 
 ## Banks
 
-22 banks and 2 remittance platforms scraped:
+21 banks and 2 remittance platforms scraped:
 
 | Bank | Status |
 |---|---|
-| Axis Bank, IOB, Bank of Baroda, Canara Bank, ICICI Bank, IDBI Bank, Bandhan Bank, City Union Bank, HSBC | Scraped — plain HTML |
+| Axis Bank, IOB, Bank of Baroda, Canara Bank, ICICI Bank, IDBI Bank, Bandhan Bank, HSBC | Scraped — plain HTML |
 | SBI, HDFC Bank, Jammu & Kashmir Bank, Karur Vysya Bank, Citibank, Punjab National Bank, Union Bank of India | Scraped — stable daily PDF, parsed with pdfplumber |
 | Ujjivan Small Finance Bank | Scraped — PDF filename rotates behind an opaque hash; a stable landing page (`/forex-rates`) always links to the current one, so this is a two-step fetch (`kind="pdf_discover"`) |
 | RBL Bank | Scraped — `/fxadmin_getfx` endpoint returns the current PDF filename; a second fetch retrieves the PDF from the CDN. `kind="pdf_discover"` |
@@ -225,6 +225,7 @@ npm run dev
 | Central Bank of India, Bank of Maharashtra | Rate is on a PDF whose URL/filename changes daily behind an opaque token or dated path, with no stable landing page found linking to it during research — needs a human to click through the site and find the current link |
 | Karnataka Bank | PDF-only; the landing page also has a hidden decoy HTML table with fake data — do not scrape that table if this gets implemented |
 | Federal Bank, Indian Bank, Dhanlaxmi Bank, Tamilnad Mercantile Bank | PDF-only or no accessible rate page found |
+| City Union Bank | No longer scraped. Since 2026-11-17 the site times out on connections from GitHub Actions runners (it still loads from an Indian home connection). History up to 2026-11-20 stays on the site; the search shows a note. The fees scrape skips it too and carries over its last fee entry (`RETIRED` in `scraper/fees/__init__.py`). The plugin stays in `scraper/banks/cityunion.py` for manual runs. |
 | South Indian Bank, Bank of India, Equitas Small Finance Bank, ESAF Small Finance Bank | Blocked by Cloudflare/Akamai bot-challenge on plain HTTP GET |
 | IndusInd Bank | JS/AJAX-rendered; the widget doesn't appear to expose a public rate without a booking flow |
 | AU Small Finance Bank | JS-rendered widget returns "Authentication failed" without a browser session/token we don't have |

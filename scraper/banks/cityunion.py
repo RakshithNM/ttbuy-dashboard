@@ -5,6 +5,9 @@ from bs4 import BeautifulSoup
 from ..core import TARGET_CURRENCIES, normalize_date
 from .base import BankPlugin
 
+# Not in the scheduled BANKS list since 2026-11-17: the site times out on
+# connections from GitHub Actions runners. Run it by hand with
+# BANKS=cityunion from a network the bank accepts.
 CUB_URL = "https://cityunionbank.bank.in/foreign-exchange-rates"
 
 

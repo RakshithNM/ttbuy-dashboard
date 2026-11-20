@@ -15,7 +15,7 @@ const AllTimeLeaderboard = defineAsyncComponent(() => import("./components/AllTi
 const RankBumpChart = defineAsyncComponent(() => import("./components/RankBumpChart.vue"));
 const MarkupTrendChart = defineAsyncComponent(() => import("./components/MarkupTrendChart.vue"));
 const DayOfWeekChart = defineAsyncComponent(() => import("./components/DayOfWeekChart.vue"));
-import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder } from "./bankPalette";
+import { brandColor, isPlatform, isBenchmark, shortName, sortByBankOrder, DISCONTINUED_BANKS } from "./bankPalette";
 import { CREDIT_TIMES } from "./creditTime";
 import { currencySymbol, onCurrencyRadioKeydown, sortByCurrencyOrder } from "./currencies";
 import type { BankSeries, FeesByBank, RatesByCurrency, BenchmarksByCurrency } from "./types";
@@ -378,6 +378,24 @@ const searchedSeries = computed<BankSeries[]>(() => {
     (s) => s.name.toLowerCase().includes(q) || shortName(s.name).toLowerCase().includes(q)
   );
 });
+
+// Discontinued banks whose name matches the search, with the last date we
+// have a rate for in the current currency (null if none).
+const discontinuedMatches = computed(() => {
+  const q = bankQuery.value.trim().toLowerCase();
+  if (!q) return [];
+  return Object.entries(DISCONTINUED_BANKS)
+    // Drop the word "bank" so a generic "bank" search does not show the note.
+    .filter(([name]) => name.toLowerCase().replace(/\bbank\b/g, "").includes(q) || shortName(name).toLowerCase().includes(q))
+    .map(([name, { since }]) => {
+      const points = allSeries.value.find((s) => s.name === name)?.points ?? [];
+      return { name, since, lastDate: points.length ? points[points.length - 1].date : null };
+    });
+});
+
+function formatNoteDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
 
 const filteredSeries = computed<BankSeries[]>(() => {
   const opt = RANGE_OPTIONS.find((o) => o.key === range.value);
@@ -1306,7 +1324,10 @@ const stableBank = computed<StableBankResult | null>(() => {
         </Transition>
       </button>
     </div>
-    <p v-if="bankQuery && searchedSeries.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
+    <p v-for="d in discontinuedMatches" :key="d.name" class="discontinued-note" role="note">
+      {{ d.name }} has blocked automated access to its rate page since {{ formatNoteDate(d.since) }}, so we no longer track it.<template v-if="d.lastDate"> Its last rate here is from {{ formatNoteDate(d.lastDate) }}.</template>
+    </p>
+    <p v-if="bankQuery && searchedSeries.length === 0 && discontinuedMatches.length === 0" class="no-results">No banks match "{{ bankQuery }}".</p>
 
     <section id="today" class="panel" style="--cv-size: 2000px">
       <h2>Best value today</h2>
@@ -1984,6 +2005,17 @@ const stableBank = computed<StableBankResult | null>(() => {
     color: var(--success-text);
     border-color: var(--success-text);
   }
+}
+
+.discontinued-note {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: -8px 0 16px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text-secondary);
+  border-radius: 6px;
+  background: var(--surface-1);
 }
 
 .no-results {

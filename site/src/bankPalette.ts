@@ -143,6 +143,13 @@ const SHORT_NAMES: Record<string, string> = {
   "DBS Bank India": "DBS",
 };
 
+// Banks we stopped scraping because they block automated access. Their past
+// rates stay in the data; the bank search shows a note when it matches one.
+// `since` is the first day the scrape failed (YYYY-MM-DD).
+export const DISCONTINUED_BANKS: Record<string, { since: string }> = {
+  "City Union Bank": { since: "2026-11-17" },
+};
+
 export function shortName(bank: string): string {
   return SHORT_NAMES[bank] ?? bank;
 }
