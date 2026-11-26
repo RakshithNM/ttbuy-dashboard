@@ -693,7 +693,8 @@ interface HeroSummary {
 
 interface NetRow { name: string; color: string; ttbuy: number; net: number; date: string }
 
-// Every bank's latest reading, ranked by net receive (best first).
+// Every bank's latest reading: newest date first, then by net receive (best
+// first), so a stale reading never ranks above a fresh one.
 const netRows = computed<NetRow[]>(() => {
   return allSeries.value
     .filter(s => s.category === "bank" && s.points.length > 0)
@@ -711,7 +712,7 @@ const netRows = computed<NetRow[]>(() => {
       }
       return { name: s.name, color: brandColor(s.name), ttbuy: pt.ttbuy, net: gross - feeInr, date: pt.date };
     })
-    .sort((a, b) => b.net - a.net);
+    .sort((a, b) => b.date.localeCompare(a.date) || b.net - a.net);
 });
 
 const heroSummary = computed<HeroSummary | null>(() => {

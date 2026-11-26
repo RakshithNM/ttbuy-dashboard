@@ -248,8 +248,10 @@ const rows = computed<Row[]>(() => {
   }
 
   // Banks: ranked by what you'd actually walk away with (rate minus fee).
+  // Stale banks (last date behind the freshest bank) go after every fresh
+  // bank, newest date first, so an old rate never ranks as "best".
   // Banks with no data sort after every bank that has a rate to show.
-  bankDataRows.sort((a, b) => b.netReceive - a.netReceive);
+  bankDataRows.sort((a, b) => b.date.localeCompare(a.date) || b.netReceive - a.netReceive);
   const bestBankNet = bankDataRows[0]?.netReceive ?? 0;
   const banksWithGap = bankDataRows.map((r) => ({ ...r, gapToBest: bestBankNet - r.netReceive }));
 
@@ -296,7 +298,7 @@ const staleBanks = computed<DataRow[]>(() => {
 });
 
 const rateSpread = computed(() => {
-  const bankDataRows = rows.value.filter((r): r is DataRow => r.hasData && r.category === "bank");
+  const bankDataRows = rows.value.filter((r): r is DataRow => r.hasData && r.category === "bank" && r.date === latestDate.value);
   if (bankDataRows.length < 2) return null;
   const best = bankDataRows[0];
   const worst = bankDataRows[bankDataRows.length - 1];
@@ -313,6 +315,9 @@ const rateSpread = computed(() => {
 });
 
 const firstPlatformIndex = computed(() => rows.value.findIndex((r) => r.category === "platform"));
+const firstStaleIndex = computed(() =>
+  latestDate.value ? rows.value.findIndex((r) => r.hasData && r.category === "bank" && r.date < latestDate.value!) : -1,
+);
 
 function formatInr(value: number): string {
   return value.toLocaleString("en-IN", { maximumFractionDigits: 0 });
@@ -760,6 +765,12 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
             <td class="td-date">Daily</td>
           </tr>
           <template v-for="(row, i) in rows" :key="row.bank">
+            <tr v-if="i === firstStaleIndex" class="platform-divider">
+              <td colspan="6" class="platform-section-header">
+                Older rates
+                <span class="platform-section-note">Not updated on {{ formatDate(latestDate!) }}; ranked by date, then amount</span>
+              </td>
+            </tr>
             <tr v-if="row.category === 'platform' && i === firstPlatformIndex" class="platform-divider">
               <td colspan="6" class="platform-section-header">
                 Remittance platforms
