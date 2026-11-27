@@ -1262,6 +1262,11 @@
         "date": "2026-11-26",
         "publishedAt": "09:15 AM",
         "ttbuy": 24.57
+      },
+      {
+        "date": "2026-11-27",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 24.7
       }
     ],
     "Bank of Baroda": [
@@ -2096,6 +2101,11 @@
         "date": "2026-11-26",
         "publishedAt": null,
         "ttbuy": 24.9175
+      },
+      {
+        "date": "2026-11-27",
+        "publishedAt": null,
+        "ttbuy": 24.93
       }
     ],
     "Citibank": [
@@ -11485,6 +11495,11 @@
         "date": "2026-11-26",
         "publishedAt": "09:15 AM",
         "ttbuy": 100.16
+      },
+      {
+        "date": "2026-11-27",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 100.7
       }
     ],
     "Bank of Baroda": [
@@ -12319,6 +12334,11 @@
         "date": "2026-11-26",
         "publishedAt": null,
         "ttbuy": 100.53
+      },
+      {
+        "date": "2026-11-27",
+        "publishedAt": null,
+        "ttbuy": 100.7325
       }
     ],
     "Citibank": [
@@ -23517,6 +23537,11 @@
         "date": "2026-11-26",
         "publishedAt": "09:15 AM",
         "ttbuy": 119.84
+      },
+      {
+        "date": "2026-11-27",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 120.66
       }
     ],
     "Bank of Baroda": [
@@ -24351,6 +24376,11 @@
         "date": "2026-11-26",
         "publishedAt": null,
         "ttbuy": 120.125
+      },
+      {
+        "date": "2026-11-27",
+        "publishedAt": null,
+        "ttbuy": 120.35
       }
     ],
     "Citibank": [
@@ -35574,6 +35604,11 @@
         "date": "2026-11-26",
         "publishedAt": "09:15 AM",
         "ttbuy": 91.78
+      },
+      {
+        "date": "2026-11-27",
+        "publishedAt": "09:15 AM",
+        "ttbuy": 92.29
       }
     ],
     "Bank of Baroda": [
@@ -36428,6 +36463,11 @@
         "date": "2026-11-26",
         "publishedAt": null,
         "ttbuy": 92.0475
+      },
+      {
+        "date": "2026-11-27",
+        "publishedAt": null,
+        "ttbuy": 92.1
       }
     ],
     "Citibank": [
