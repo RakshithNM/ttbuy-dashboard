@@ -2,6 +2,7 @@ import os
 
 from .banks import REGISTRY
 from .pipeline import add_live_row, get_bank_snapshots, scrape_bank_history, write_combined_outputs
+from .status import now_ist, write_status
 
 
 def main():
@@ -16,6 +17,7 @@ def main():
         if bank.strip()
     }
 
+    checks = {}
     for slug in requested_banks:
         plugin = REGISTRY.get(slug)
         if not plugin:
@@ -29,11 +31,15 @@ def main():
 
             scrape_bank_history(plugin, snapshots)
             if include_live:
-                add_live_row(plugin)
+                checks[plugin.name] = {**add_live_row(plugin), "checkedAt": now_ist()}
         except Exception as e:
             print(f"Skipping {plugin.name} after unrecoverable error: {e}")
+            if include_live:
+                checks[plugin.name] = {"result": "error", "error": str(e), "checkedAt": now_ist()}
 
     write_combined_outputs()
+    if include_live:
+        write_status(checks)
     print("\nSaved forex_TTBuy.csv")
 
 

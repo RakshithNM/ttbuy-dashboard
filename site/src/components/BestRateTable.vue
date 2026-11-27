@@ -5,6 +5,7 @@ import type { CreditTimesByBank, CreditCategory } from "../creditTime";
 import { shortName, sourceUrl } from "../bankPalette";
 import { currencySymbol } from "../currencies";
 import { useDelayedHide } from "../useDelayedHide";
+import { staleReason } from "../scrapeStatus";
 
 const props = defineProps<{
   series: BankSeries[];
@@ -916,6 +917,7 @@ const splitSuggestion = computed<SplitSuggestion | null>(() => {
                     </svg>
                   </div>
                   <div v-if="row.publishedAt" class="published-time">{{ row.publishedAt }}</div>
+                  <div v-if="latestDate && row.date < latestDate && staleReason(row.bank)" class="stale-reason">{{ staleReason(row.bank) }}</div>
                 </td>
               </template>
               <td v-else colspan="5" class="no-data">No data for this bank</td>
@@ -2006,6 +2008,16 @@ tr.row-flash > td {
     color: var(--text-primary);
     font-weight: 600;
   }
+}
+
+// Why a stale row is stale (from status.json). Inherits the warning color
+// from .stale-date on the cell.
+.stale-reason {
+  font-size: 11px;
+  margin-top: 2px;
+  max-width: 14ch;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 .published-time {

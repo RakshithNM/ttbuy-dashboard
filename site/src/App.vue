@@ -29,6 +29,7 @@ const props = defineProps<{ bank?: string }>();
 
 import rawRatesData from "../public/data/rates.json";
 import holidaysData from "../public/data/holidays.json";
+import { scrapeStatus, fmtCheckedAt } from "./scrapeStatus";
 import feesData from "../public/data/fees.json";
 import benchmarksData from "../public/data/benchmarks.json";
 
@@ -656,6 +657,10 @@ const lastUpdatedFormatted = computed(() => {
   return `${MONTHS[month - 1]} ${day}, ${year}`;
 });
 
+// When the scraper last checked the banks' pages (absolute IST time, so the
+// prerendered and hydrated text match).
+const lastCheckedFormatted = scrapeStatus.checkedAt ? fmtCheckedAt(scrapeStatus.checkedAt) : null;
+
 const holidayMap = Object.fromEntries(
   (holidaysData.holidays as { date: string; name: string }[]).map(h => [h.date, h.name])
 );
@@ -1219,8 +1224,9 @@ const stableBank = computed<StableBankResult | null>(() => {
         Banks close on the 2nd and 4th Saturday — rates were last updated {{ lastUpdatedFormatted }}.
       </template>
       <template v-else>
-        Rates last updated {{ lastUpdatedFormatted }}. Scraped at 11 AM IST. Banks typically publish by 10 AM IST.
+        Rates last updated {{ lastUpdatedFormatted }}. We check every bank at 11 AM and 4 PM IST.
       </template>
+      <template v-if="lastCheckedFormatted"> Last checked {{ lastCheckedFormatted }}.</template>
     </p>
   </header>
 

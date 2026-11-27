@@ -14,3 +14,4 @@ INCLUDE_LIVE=1 \
 .venv/bin/python3 -m scraper.export_json
 cp data/rates.json site/public/data/rates.json
 cp data/benchmarks.json site/public/data/benchmarks.json
+cp data/status.json site/public/data/status.json

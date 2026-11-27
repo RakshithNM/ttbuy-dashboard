@@ -48,12 +48,13 @@ jobs:
         run: |
           cp data/rates.json site/public/data/rates.json
           cp data/benchmarks.json site/public/data/benchmarks.json || true
+          cp data/status.json site/public/data/status.json
 
       - name: Commit updated data
         run: |
           git config user.name "ttbuy-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data site/public/data/rates.json site/public/data/benchmarks.json
+          git add data site/public/data/rates.json site/public/data/benchmarks.json site/public/data/status.json
           git diff --cached --quiet || git commit -m "Update TT Buy rates $(date -u +%F)"
           # Pick up any commit pushed while this run was scraping.
           git pull --rebase origin "$GITHUB_REF_NAME"

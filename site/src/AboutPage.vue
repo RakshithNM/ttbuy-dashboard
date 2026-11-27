@@ -4,6 +4,7 @@ import { useHead } from "@unhead/vue";
 import { SOURCE_URLS, isPlatform, shortName, sortByBankOrder } from "./bankPalette";
 import { BANK_PAGES, SITE_URL, bankPagePath } from "./bankPages";
 import { sortByCurrencyOrder } from "./currencies";
+import { checkSummary } from "./scrapeStatus";
 import type { FeesByBank, RatesByCurrency } from "./types";
 import rawRatesData from "../public/data/rates.json";
 import feesData from "../public/data/fees.json";
@@ -65,6 +66,44 @@ function daysBehind(latest: string | null): number | null {
 }
 
 const STALE_DAYS = 2;
+
+// 30-day reliability: of the last 30 publishing days, how many have a rate
+// from this source (any currency). A publishing day is one where at least
+// half the banks have a rate, the same rule scraper/check_stale.py uses, so
+// Sundays and bank holidays don't count against anyone.
+const RELIABILITY_DAYS = 30;
+const RELIABLE_SHARE = 0.9;
+
+const datesBySource = computed(() => {
+  const out = new Map<string, Set<string>>();
+  for (const byBank of Object.values(rates))
+    for (const [name, points] of Object.entries(byBank)) {
+      if (!SOURCE_URLS[name]) continue;
+      const set = out.get(name) ?? new Set<string>();
+      for (const p of points) set.add(p.date);
+      out.set(name, set);
+    }
+  return out;
+});
+
+const publishingDays = computed(() => {
+  const banks = Object.keys(SOURCE_URLS).filter((n) => !isPlatform(n));
+  const votes = new Map<string, number>();
+  for (const name of banks)
+    for (const d of datesBySource.value.get(name) ?? []) votes.set(d, (votes.get(d) ?? 0) + 1);
+  return [...votes.entries()]
+    .filter(([, n]) => n >= banks.length / 2)
+    .map(([d]) => d)
+    .sort()
+    .slice(-RELIABILITY_DAYS);
+});
+
+function reliability(name: string): { hit: number; total: number } | null {
+  const days = publishingDays.value;
+  const dates = datesBySource.value.get(name);
+  if (!days.length || !dates) return null;
+  return { hit: days.filter((d) => dates.has(d)).length, total: days.length };
+}
 
 const bankCount = computed(() => sources.value.filter((s) => !isPlatform(s.name)).length);
 const currencies = sortByCurrencyOrder(Object.keys(rates));
@@ -185,12 +224,15 @@ const firstDate = computed(() => {
 
     <section class="panel">
       <h2>Sources</h2>
-      <p>Every rate on this site comes from one of these public pages. "Behind" counts the days since the freshest source last published.</p>
+      <p>Every rate on this site comes from one of these public pages. "Behind" counts the days since the freshest source last published. "Last check" is when we last read the bank's page and what we found. "30-day reliability" is the share of the last {{ RELIABILITY_DAYS }} publishing days (days when most banks published) with a rate from that source.</p>
       <p>See the <a href="/feed">best rate for each day</a>, or follow it in a feed reader with the <a href="/feed.xml">Atom feed</a>.</p>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Bank</th><th>Rate source</th><th>Fee schedule</th><th>Latest rate</th><th>Behind</th></tr>
+            <tr>
+              <th>Bank</th><th>Rate source</th><th>Fee schedule</th><th>Latest rate</th><th>Behind</th>
+              <th>Last check</th><th :title="`Share of the last ${RELIABILITY_DAYS} publishing days with a rate from this source`">30-day reliability</th>
+            </tr>
           </thead>
           <tbody>
             <tr v-for="s in sources" :key="s.name">
@@ -205,6 +247,16 @@ const firstDate = computed(() => {
                 <template v-if="daysBehind(s.latest) === null">—</template>
                 <template v-else-if="daysBehind(s.latest) === 0">Up to date</template>
                 <template v-else>{{ daysBehind(s.latest) }} {{ daysBehind(s.latest) === 1 ? "day" : "days" }}</template>
+              </td>
+              <td :class="{ muted: checkSummary(s.name).tone === 'muted', stale: checkSummary(s.name).tone === 'warn' }">
+                {{ checkSummary(s.name).text }}
+              </td>
+              <td :class="{ stale: (reliability(s.name)?.hit ?? 0) < (reliability(s.name)?.total ?? 0) * RELIABLE_SHARE }">
+                <template v-if="reliability(s.name)">
+                  {{ Math.round(reliability(s.name)!.hit / reliability(s.name)!.total * 100) }}%
+                  <span class="muted">({{ reliability(s.name)!.hit }}/{{ reliability(s.name)!.total }})</span>
+                </template>
+                <template v-else>—</template>
               </td>
             </tr>
           </tbody>

@@ -1,6 +1,7 @@
 import os
 import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 
@@ -197,26 +198,39 @@ def scrape_bank_history(plugin, snapshots):
 
 
 def add_live_row(plugin):
+    """Fetch the bank's live page and store any new rate.
+
+    Returns what this check found, for status.json:
+      {"result": "ok", "rateDate": ...}       page shows today's (IST) rate
+      {"result": "waiting", "rateDate": ...}  page read fine, rate is older
+      {"result": "error", "error": ...}       fetch or parse failed
+    """
     print(f"\nFetching live {plugin.name} rate...")
     existing_df = load_existing_output(plugin.slug, plugin.name)
     historical_data = existing_df.to_dict("records")
 
+    error = None
     try:
         content = fetch_content(plugin, plugin.live_url)
         parsed = plugin.parse(content, plugin.live_url)
     except Exception as e:
         print(f"Failed to fetch/parse live {plugin.name} rate: {e}")
         parsed = None
+        error = str(e)
 
     if not parsed:
         print(f"No live {plugin.name} TT Buy row parsed.")
-        return existing_df
+        return {"result": "error", "error": error or "No TT Buy rate found on the page"}
+
+    today_ist = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m-%d")
 
     now = datetime.now()
     live_timestamp = f"live-{now.strftime('%Y%m%d%H%M%S')}"
     added = 0
+    page_dates = []
     for currency, parsed_row in parsed.items():
         rate_date = parsed_row["Rate_Date"] or now.strftime("%Y-%m-%d")
+        page_dates.append(rate_date)
         existing_live = existing_df[
             (existing_df["Source_URL"] == plugin.live_url)
             & (existing_df["Date"] == rate_date)
@@ -262,9 +276,9 @@ def add_live_row(plugin):
         print(f"Added live {plugin.name} {currency} row: {rate_date} TT Buy {parsed_row['TT_Buy']}")
         added += 1
 
-    if added == 0:
-        return existing_df
+    if added:
+        df = prepare_output_df(pd.DataFrame(historical_data), plugin.name)
+        write_bank_outputs(plugin.slug, plugin.name, df)
 
-    df = prepare_output_df(pd.DataFrame(historical_data), plugin.name)
-    write_bank_outputs(plugin.slug, plugin.name, df)
-    return df
+    page_date = max(page_dates)
+    return {"result": "ok" if page_date >= today_ist else "waiting", "rateDate": page_date}
