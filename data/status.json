@@ -1,0 +1,143 @@
+{
+  "checkedAt": "2026-11-27T19:44:06+05:30",
+  "banks": {
+    "Axis Bank": {
+      "checkedAt": "2026-11-27T19:43:55+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:55+05:30"
+    },
+    "Bandhan Bank": {
+      "checkedAt": "2026-11-27T19:44:03+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:44:03+05:30"
+    },
+    "Bank of Baroda": {
+      "checkedAt": "2026-11-27T19:42:59+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:42:59+05:30"
+    },
+    "Canara Bank": {
+      "checkedAt": "2026-11-27T19:43:57+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:57+05:30"
+    },
+    "Citibank": {
+      "checkedAt": "2026-11-27T19:43:55+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:55+05:30"
+    },
+    "DBS Bank India": {
+      "checkedAt": "2026-11-27T19:43:27+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:27+05:30"
+    },
+    "DCB Bank": {
+      "checkedAt": "2026-11-27T19:43:09+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:09+05:30"
+    },
+    "HDFC Bank": {
+      "checkedAt": "2026-11-27T19:43:28+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:28+05:30"
+    },
+    "HSBC": {
+      "checkedAt": "2026-11-27T19:43:18+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:18+05:30"
+    },
+    "ICICI Bank": {
+      "checkedAt": "2026-11-27T19:44:02+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:44:02+05:30"
+    },
+    "IDBI Bank": {
+      "checkedAt": "2026-11-27T19:43:30+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:30+05:30"
+    },
+    "IDFC FIRST Bank": {
+      "checkedAt": "2026-11-27T19:43:37+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:37+05:30"
+    },
+    "Indian Overseas Bank": {
+      "checkedAt": "2026-11-27T19:43:00+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:00+05:30"
+    },
+    "Jammu & Kashmir Bank": {
+      "checkedAt": "2026-11-27T19:44:06+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:44:06+05:30"
+    },
+    "Karur Vysya Bank": {
+      "checkedAt": "2026-11-27T19:43:19+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:19+05:30"
+    },
+    "Kotak Mahindra Bank": {
+      "checkedAt": "2026-11-27T19:43:45+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:45+05:30"
+    },
+    "Punjab National Bank": {
+      "checkedAt": "2026-11-27T19:43:47+05:30",
+      "result": "error",
+      "error": "No TT Buy rate found on the page",
+      "failingSince": "2026-11-27T19:43:47+05:30"
+    },
+    "RBL Bank": {
+      "checkedAt": "2026-11-27T19:43:39+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:39+05:30"
+    },
+    "Remitly": {
+      "checkedAt": "2026-11-27T19:43:57+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:57+05:30"
+    },
+    "Skydo": {
+      "checkedAt": "2026-11-27T19:43:27+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:27+05:30"
+    },
+    "State Bank of India": {
+      "checkedAt": "2026-11-27T19:43:16+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:16+05:30"
+    },
+    "Ujjivan Small Finance Bank": {
+      "checkedAt": "2026-11-27T19:43:14+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:14+05:30"
+    },
+    "Union Bank of India": {
+      "checkedAt": "2026-11-27T19:43:10+05:30",
+      "result": "ok",
+      "rateDate": "2026-11-27",
+      "lastOkAt": "2026-11-27T19:43:10+05:30"
+    }
+  }
+}
