@@ -186,7 +186,7 @@ const firstDate = computed(() => {
     <section class="panel">
       <h2>Sources</h2>
       <p>Every rate on this site comes from one of these public pages. "Behind" counts the days since the freshest source last published.</p>
-      <p>Subscribe to the <a href="/feed.xml">daily rate feed (Atom)</a> to get the best rate in a feed reader.</p>
+      <p>See the <a href="/feed">best rate for each day</a>, or follow it in a feed reader with the <a href="/feed.xml">Atom feed</a>.</p>
       <div class="table-wrap">
         <table>
           <thead>

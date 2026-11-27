@@ -21,7 +21,7 @@ function writeSitemap() {
     for (const points of Object.values(byBank))
       for (const p of points) if (p.date > lastmod) lastmod = p.date
 
-  const paths = ['/', '/about', ...BANK_PAGES.map((b) => bankPagePath(b.slug))]
+  const paths = ['/', '/about', '/feed', ...BANK_PAGES.map((b) => bankPagePath(b.slug))]
   const urls = paths
     .map((p) => `  <url>\n    <loc>${SITE_URL}${p}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`)
     .join('\n')
@@ -59,11 +59,11 @@ export default defineConfig({
   plugins: [vue(), devFeed],
   ssgOptions: {
     // index.html carries the FAQPage JSON-LD for the dashboard's FAQ. The
-    // about page has no FAQ, and Google treats structured data for content
+    // about and feed pages have no FAQ, and Google treats structured data for content
     // that isn't on the page as a guideline violation, so drop it there.
     // The 404 page also drops index.html's canonical, which points at "/".
     onPageRendered: (route, html) => {
-      if (route !== '/about' && route !== '/404') return html
+      if (route !== '/about' && route !== '/feed' && route !== '/404') return html
       html = html.replace(/<script type="application\/ld\+json">\s*\{\s*"@context": "https:\/\/schema\.org",\s*"@type": "FAQPage"[\s\S]*?<\/script>\s*/, '')
       if (route === '/404') html = html.replace(/<link rel="canonical"[^>]*>\s*/, '')
       return html
