@@ -51,6 +51,21 @@ const sources = computed<SourceRow[]>(() =>
   })
 );
 
+// Days each source is behind the freshest source. Measured against the data,
+// not today's date, so the prerendered page and the hydrated page agree and a
+// Sunday (no bank publishes) doesn't flag every bank.
+const freshestDate = computed(() =>
+  sources.value.reduce((d, s) => (s.latest && s.latest > d ? s.latest : d), ""),
+);
+
+function daysBehind(latest: string | null): number | null {
+  if (!latest || !freshestDate.value) return null;
+  const ms = Date.parse(`${freshestDate.value}T00:00:00Z`) - Date.parse(`${latest}T00:00:00Z`);
+  return Math.round(ms / 86_400_000);
+}
+
+const STALE_DAYS = 2;
+
 const bankCount = computed(() => sources.value.filter((s) => !isPlatform(s.name)).length);
 const currencies = sortByCurrencyOrder(Object.keys(rates));
 
@@ -170,11 +185,12 @@ const firstDate = computed(() => {
 
     <section class="panel">
       <h2>Sources</h2>
-      <p>Every rate on this site comes from one of these public pages.</p>
+      <p>Every rate on this site comes from one of these public pages. "Behind" counts the days since the freshest source last published.</p>
+      <p>Subscribe to the <a href="/feed.xml">daily rate feed (Atom)</a> to get the best rate in a feed reader.</p>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Bank</th><th>Rate source</th><th>Fee schedule</th><th>Latest rate</th></tr>
+            <tr><th>Bank</th><th>Rate source</th><th>Fee schedule</th><th>Latest rate</th><th>Behind</th></tr>
           </thead>
           <tbody>
             <tr v-for="s in sources" :key="s.name">
@@ -185,6 +201,11 @@ const firstDate = computed(() => {
                 <span v-else class="muted">{{ isPlatform(s.name) ? "—" : "Not published" }}</span>
               </td>
               <td>{{ s.latest ? fmtLongDate(s.latest) : "—" }}</td>
+              <td :class="{ muted: !daysBehind(s.latest), stale: (daysBehind(s.latest) ?? 0) >= STALE_DAYS }">
+                <template v-if="daysBehind(s.latest) === null">—</template>
+                <template v-else-if="daysBehind(s.latest) === 0">Up to date</template>
+                <template v-else>{{ daysBehind(s.latest) }} {{ daysBehind(s.latest) === 1 ? "day" : "days" }}</template>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -289,6 +310,7 @@ table {
   }
   td { color: var(--text-primary); }
   .muted { color: var(--text-muted); }
+  .stale { color: var(--warning-text); font-weight: 600; }
 }
 
 .site-footer {

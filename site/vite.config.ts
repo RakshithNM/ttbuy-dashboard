@@ -1,10 +1,11 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { Features } from 'lightningcss'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import type {} from 'vite-ssg/node'
 import { BANK_PAGES, SITE_URL, bankPagePath } from './src/bankPages.ts'
+import { buildFeed } from './src/feed.ts'
 
 const root = fileURLToPath(new URL('.', import.meta.url))
 
@@ -30,9 +31,32 @@ function writeSitemap() {
   )
 }
 
+// Writes dist/feed.xml: a daily Atom entry with the best bank rate per
+// currency, so people can follow rates in a feed reader.
+function feedXml() {
+  return buildFeed(JSON.parse(readFileSync(`${root}public/data/rates.json`, 'utf8')))
+}
+
+function writeFeed() {
+  writeFileSync(`${root}dist/feed.xml`, feedXml())
+}
+
+// The feed only exists in dist/, so the dev server would answer /feed.xml
+// with the SPA's index.html. Serve a freshly built feed there instead.
+const devFeed: Plugin = {
+  name: 'dev-feed',
+  apply: 'serve',
+  configureServer(server) {
+    server.middlewares.use('/feed.xml', (_req, res) => {
+      res.setHeader('Content-Type', 'application/atom+xml; charset=utf-8')
+      res.end(feedXml())
+    })
+  },
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), devFeed],
   ssgOptions: {
     // index.html carries the FAQPage JSON-LD for the dashboard's FAQ. The
     // about page has no FAQ, and Google treats structured data for content
@@ -44,7 +68,10 @@ export default defineConfig({
       if (route === '/404') html = html.replace(/<link rel="canonical"[^>]*>\s*/, '')
       return html
     },
-    onFinished: writeSitemap,
+    onFinished: () => {
+      writeSitemap()
+      writeFeed()
+    },
   },
   css: {
     lightningcss: {
